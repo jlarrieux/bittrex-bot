@@ -1,0 +1,22 @@
+{
+  "hints": [],
+  "groups": [
+    {
+      "sourceType": "com.jlarrieux.bittrexbot.Properties.BittrexProperties",
+      "name": "bittrex",
+      "type": "com.jlarrieux.bittrexbot.Properties.BittrexProperties"
+    }
+  ],
+  "properties": [
+    {
+      "sourceType": "com.jlarrieux.bittrexbot.Properties.BittrexProperties",
+      "name": "bittrex.key",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.jlarrieux.bittrexbot.Properties.BittrexProperties",
+      "name": "bittrex.secret",
+      "type": "java.lang.String"
+    }
+  ]
+}
