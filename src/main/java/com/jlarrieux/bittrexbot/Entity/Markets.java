@@ -10,9 +10,10 @@ import java.util.HashMap;
 
 
 @Component
-public class Markets extends HashMap<String, Market> {
+public class Markets extends HashMap<String, Market> implements Container{
 
 
+    @Override
     public Market add(JsonArray array, int i){
         Market market = new Market((JsonObject) array.get(i)) ;
         if(market.getBaseCurrency().equals("BTC")) {
