@@ -10,7 +10,11 @@ import lombok.Data;
 public class BollingerIndicator {
 
     double high= Double.NaN, mid= Double.NaN, low= Double.NaN;
-    double percentDifference = Math.abs(high -low)/((high+low)/2);
-    double spread = high - low;
+    double percentDifference = Double.NaN;
+    double spread = Double.NaN;
 
+    public void updateSecondary(){
+        percentDifference = Math.abs(high -low)/((high+low)/2);;
+        spread = high - low;
+    }
 }

@@ -7,15 +7,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 
+
 @Data
 @Component
-@ConfigurationProperties("bittrex")
-public class BittrexProperties {
+@ConfigurationProperties("trading")
+public class TradingProperties {
 
+    private double stopLoss, profitTaking, spread, rsiOverBought, rsiOverSold, rsiNoMomentum;
 
-
-    private String secret;
-    private String key;
-    private double fee;
 
 }

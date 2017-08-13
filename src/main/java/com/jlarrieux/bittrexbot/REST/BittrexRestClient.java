@@ -5,7 +5,6 @@ package com.jlarrieux.bittrexbot.REST;
 import com.jlarrieux.bittrexbot.Properties.BittrexProperties;
 import com.jlarrieux.bittrexbot.Util.Constants;
 import com.jlarrieux.bittrexbot.Util.EncryptionUtil;
-import lombok.extern.java.Log;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -20,7 +19,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 
-@Log
+
 @Component
 public class BittrexRestClient extends RestClient {
 
@@ -281,7 +280,8 @@ public class BittrexRestClient extends RestClient {
         return urlAttachment;
     }
 
-    private Response getResponseBody(String url)  {
+    @Override
+    protected Response getResponseBody(String url)  {
 
         Response response = null;
         boolean publicRequest = true;
@@ -301,7 +301,7 @@ public class BittrexRestClient extends RestClient {
 
         try {
 
-            log.info(String.format("Printing url:"+ url));
+//            log.info(String.format("Printing url:"+ url));
             org.apache.http.client.HttpClient client = HttpClientBuilder.create().build();
 
             HttpGet request = new HttpGet(url);
@@ -337,24 +337,7 @@ public class BittrexRestClient extends RestClient {
         return response;
     }
 
-    private Response createResposeFromUrlResponse(String urlResponse) { // Creates a new Response object with the fields found in the result
 
-        String successString = "\"success\":";
-        int indexOfSuccessString = urlResponse.indexOf(successString) + successString.length();
-        String strSuccess = urlResponse.substring(indexOfSuccessString, urlResponse.indexOf(",\"", indexOfSuccessString));
-
-        String resultString = "\"result\":";
-        int indexOfResultString = urlResponse.indexOf(resultString) + resultString.length();
-        String result = urlResponse.substring(indexOfResultString, urlResponse.lastIndexOf("}"));
-
-        String messageString = "\"message\":\"";
-        int indexOfMessageString = urlResponse.indexOf(messageString) + messageString.length();
-        String message = urlResponse.substring(indexOfMessageString, urlResponse.indexOf("\"", indexOfMessageString));
-
-        boolean success = Boolean.parseBoolean(strSuccess);
-
-        return new Response(success, result, message);
-    }
 
 
 

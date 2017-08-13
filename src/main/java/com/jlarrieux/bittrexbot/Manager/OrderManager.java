@@ -3,13 +3,9 @@ package com.jlarrieux.bittrexbot.Manager;
 
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.jlarrieux.bittrexbot.Entity.Markets;
 import com.jlarrieux.bittrexbot.Entity.Order;
 import com.jlarrieux.bittrexbot.Entity.Orders;
-import com.jlarrieux.bittrexbot.Entity.Positions;
 import com.jlarrieux.bittrexbot.REST.BittrexRestClient;
-
 import com.jlarrieux.bittrexbot.REST.Response;
 import com.jlarrieux.bittrexbot.Util.JsonParserUtil;
 import lombok.extern.java.Log;
@@ -23,33 +19,22 @@ public class OrderManager {
 
 
     private Orders orderBooks;
-
-    @Autowired
-    private Markets markets;
-
-
     private BittrexRestClient client;
 
-    private double beginingBTCbalance, currentBTCbalance;
+
+
+
 
     @Autowired
     public OrderManager(BittrexRestClient client, Orders orders){
         this.client = client;
         this.orderBooks = orders;
-       getBalance();
+
        getOpenOrders();
     }
 
 
-    private void getBalance(){
-        Response response = client.getBalance("BTC");
-        if(JsonParserUtil.isAsuccess(response)){
-            JsonObject object = JsonParserUtil.getJsonObjectFromJsonString(response.getResult());
-            beginingBTCbalance = JsonParserUtil.getDoubleFromJsonObject(object,"Available");
-            currentBTCbalance = beginingBTCbalance;
-            log.info(String.format("Printing balanceContainer available: %f btc", beginingBTCbalance));
-        }
-    }
+
 
     private void getOpenOrders(){
         Response response = client.getOpenOrders();
