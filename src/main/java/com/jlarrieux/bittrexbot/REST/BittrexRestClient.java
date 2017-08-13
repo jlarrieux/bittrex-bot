@@ -59,7 +59,7 @@ public class BittrexRestClient extends RestClient {
         return getResponse(Constants.METHOD_PUBLIC, Constants.CURRENCIES, "getwallethealth");
     }
 
-    public Response getBalanceDistribution(String currency) { // Returns the balance distribution for a specific currency
+    public Response getBalanceDistribution(String currency) { // Returns the balanceContainer distribution for a specific currency
 
         return getResponse(Constants.METHOD_PUBLIC, Constants.CURRENCY, "getbalancedistribution", returnCorrectMap("currencyname", currency));
     }
@@ -119,7 +119,7 @@ public class BittrexRestClient extends RestClient {
         return getResponse(Constants.METHOD_KEY, Constants.BALANCE, "getbalances");
     }
 
-    public Response getBalance(String currency) { // Returns the balance of a specific currency
+    public Response getBalance(String currency) { // Returns the balanceContainer of a specific currency
 
         return getResponse(Constants.METHOD_KEY, Constants.BALANCE, "getbalance", returnCorrectMap("currencyname", currency));
     }
