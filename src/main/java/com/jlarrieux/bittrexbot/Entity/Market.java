@@ -21,14 +21,6 @@ import org.springframework.stereotype.Component;
 public class Market {
 
 
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    private JsonObject market;
-
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    private JsonObject summary;
-
     //    private  EvictingQueue priceQueue = EvictingQueue.create(10);
     private DescriptiveStatistics priceQueue = new DescriptiveStatistics(Constants.BOLLINGER_WINDOW);
     private DescriptiveStatistics gainsQueue = new DescriptiveStatistics(Constants.RSI_WINDOW);
@@ -46,15 +38,15 @@ public class Market {
     }
 
     public Market(JsonObject object){
-        this.market = object.getAsJsonObject(Constants.upperCaseFirst(Constants.MARKET));
-        this.summary =object.getAsJsonObject(Constants.SUMMARY);
+        JsonObject market = object.getAsJsonObject(Constants.upperCaseFirst(Constants.MARKET));
+        JsonObject summary =object.getAsJsonObject(Constants.SUMMARY);
         bollingerSMA = new BollingerIndicator();
         bollingerEMA = new BollingerIndicator();
-        buildMarket();
+        buildMarket(market, summary);
 
     }
 
-    private void buildMarket(){
+    private void buildMarket(JsonObject market, JsonObject summary){
         marketCurrency = JsonParserUtil.getStringFromJsonObject(market, Constants.MARKET_CURRENCY);
         baseCurrency = JsonParserUtil.getStringFromJsonObject(market, Constants.BASE_CURRENCY);
         marketName = JsonParserUtil.getStringFromJsonObject(market, Constants.MARKET_NAME);
