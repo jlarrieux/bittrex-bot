@@ -15,8 +15,7 @@ public class BittrexBotApplication {
 
 	public static void main(String[] args) {
 		ConfigurableApplicationContext ctx = SpringApplication.run(BittrexBotApplication.class, args);
-//		BittrexDataManager dataManager = ctx.getBean(BittrexDataManager.class);
-//		dataManager.getMarketSummaries();
+
 
 	}
 }

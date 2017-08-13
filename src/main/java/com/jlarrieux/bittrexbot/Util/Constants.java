@@ -4,6 +4,7 @@ package com.jlarrieux.bittrexbot.Util;
 
 public class Constants {
 
+    private static final int window = 3178;
     public static final String URI ="https://bittrex.com/api/v1.1/market/getopenorders?apikey=";
     public static final String ENCRYPTION_ALGORITHM = "HmacSHA512";
     public static final String ORDER_LIMIT = "LIMIT";
@@ -43,11 +44,23 @@ public class Constants {
     public static final String OPEN_BUY_ORDERS = "OpenBuyOrders";
     public static final String OPEN_SELL_ORDERS = "OpenSellOrders";
     public static final String VOLUME = "Volume";
-    public static final int BOLLINGER_WINDOW = 360;
+    public static final int BOLLINGER_WINDOW = window;
     public static final String EXCHANGE = "Exchange";
     public static final String QUANTITY = "Quantity";
     public static final String AVAILABLE = "Available";
-    public static int RSI_WINDOW =360;
+    private static final String JLARRIEUX_BITTREX_BASE_ADDRES ="http://bittrex.jlarrieux.com";
+    public static final String BITTREX_JLARRIEUX_COM_MARKET_ID = JLARRIEUX_BITTREX_BASE_ADDRES+ "/market?id=";
+    public static final String BITTREX_JLARRIEUX_COUNT = JLARRIEUX_BITTREX_BASE_ADDRES+"/count";
+    public static final String MARKET_CURRENCY_SHORT = "marketCurrency";
+    public static final String BASE_CURRENCY_SHORT = "baseCurrency";
+    public static final String MARKET_NAME_SHORT = "marketName";
+    public static final String ACTIVE = "active";
+    public static final String MIN_TRADE_SIZE_SHORT = "minTradeSize";
+    public static final String DATA_BOOK = "dataBook";
+    public static final String SPREAD = "spread";
+    public static final String OPEN_BUY_ORDERS_SHORT = "openBuyOrders";
+    public static final String OPEN_SELL_ORDERS_SHORT = "openSellOrders";
+    public static int RSI_WINDOW =window;
 
 
 

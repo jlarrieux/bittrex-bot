@@ -17,7 +17,7 @@ public class IndicatorUtil {
         bollingerIndicator.setMid(average);
         bollingerIndicator.setHigh(average+2*stDev);
         bollingerIndicator.setLow(average-2*stDev);
-
+        bollingerIndicator.updateSecondary();
         return bollingerIndicator;
     }
 
@@ -27,7 +27,8 @@ public class IndicatorUtil {
         BollingerIndicator bo = new BollingerIndicator();
         bo.setMid(ema);
         bo.setHigh(ema + 2*stdev);
-        bo.setLow(ema + 2*stdev);
+        bo.setLow(ema - 2*stdev);
+        bo.updateSecondary();
         return bo;
     }
 

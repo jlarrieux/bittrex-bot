@@ -5,9 +5,19 @@
       "sourceType": "com.jlarrieux.bittrexbot.Properties.BittrexProperties",
       "name": "bittrex",
       "type": "com.jlarrieux.bittrexbot.Properties.BittrexProperties"
+    },
+    {
+      "sourceType": "com.jlarrieux.bittrexbot.Properties.TradingProperties",
+      "name": "trading",
+      "type": "com.jlarrieux.bittrexbot.Properties.TradingProperties"
     }
   ],
   "properties": [
+    {
+      "sourceType": "com.jlarrieux.bittrexbot.Properties.BittrexProperties",
+      "name": "bittrex.fee",
+      "type": "java.lang.Double"
+    },
     {
       "sourceType": "com.jlarrieux.bittrexbot.Properties.BittrexProperties",
       "name": "bittrex.key",
@@ -17,6 +27,36 @@
       "sourceType": "com.jlarrieux.bittrexbot.Properties.BittrexProperties",
       "name": "bittrex.secret",
       "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.jlarrieux.bittrexbot.Properties.TradingProperties",
+      "name": "trading.profit-taking",
+      "type": "java.lang.Double"
+    },
+    {
+      "sourceType": "com.jlarrieux.bittrexbot.Properties.TradingProperties",
+      "name": "trading.rsi-no-momentum",
+      "type": "java.lang.Double"
+    },
+    {
+      "sourceType": "com.jlarrieux.bittrexbot.Properties.TradingProperties",
+      "name": "trading.rsi-over-bought",
+      "type": "java.lang.Double"
+    },
+    {
+      "sourceType": "com.jlarrieux.bittrexbot.Properties.TradingProperties",
+      "name": "trading.rsi-over-sold",
+      "type": "java.lang.Double"
+    },
+    {
+      "sourceType": "com.jlarrieux.bittrexbot.Properties.TradingProperties",
+      "name": "trading.spread",
+      "type": "java.lang.Double"
+    },
+    {
+      "sourceType": "com.jlarrieux.bittrexbot.Properties.TradingProperties",
+      "name": "trading.stop-loss",
+      "type": "java.lang.Double"
     }
   ]
 }

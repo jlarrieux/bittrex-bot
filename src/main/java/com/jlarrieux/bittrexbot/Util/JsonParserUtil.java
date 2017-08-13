@@ -28,6 +28,10 @@ public class JsonParserUtil {
         return jsonObject.getAsJsonPrimitive(key).getAsInt();
     }
 
+    public static long getLongFromJsonObject(JsonObject jsonObject, String key){
+        return jsonObject.getAsJsonPrimitive(key).getAsLong();
+    }
+
 
 
     public static JsonObject getJsonObjectFromJsonString(String json) {
@@ -56,7 +60,11 @@ public class JsonParserUtil {
 
     public static boolean isAsuccess(Response response){
         boolean isGood = response.isSuccess();
-        if(!response.isSuccess())  log.severe(String.format("Response unsuccessfull!%nwith Code: %d%nAnd Message: %s", response.getResponseCode(), response.getMessage()));
+        if(!response.isSuccess()){
+//            log.severe(String.format("Response unsuccessfull!%nwith Code: %d%nAnd Message: %s", response.getResponseCode(), response.getMessage()));
+//            log.info(response.toString());
+
+        }
         return isGood;
     }
 }

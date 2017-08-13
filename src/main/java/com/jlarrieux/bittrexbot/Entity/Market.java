@@ -6,7 +6,9 @@ import com.google.gson.JsonObject;
 import com.jlarrieux.bittrexbot.Util.Constants;
 import com.jlarrieux.bittrexbot.Util.IndicatorUtil;
 import com.jlarrieux.bittrexbot.Util.JsonParserUtil;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.extern.java.Log;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.springframework.stereotype.Component;
@@ -16,12 +18,13 @@ import org.springframework.stereotype.Component;
 @Component
 @Log
 @Data
-@ToString(exclude = {"summary", "market", "marketCurrency", "baseCurrency", "isActive"})
+@ToString(exclude = {"summary", "market", "marketCurrency", "baseCurrency", "isActive", "priceQueue", "gainsQueue","lossQueue"})
 @EqualsAndHashCode(exclude = {"summary", "market"})
 public class Market {
 
 
     //    private  EvictingQueue priceQueue = EvictingQueue.create(10);
+
     private DescriptiveStatistics priceQueue = new DescriptiveStatistics(Constants.BOLLINGER_WINDOW);
     private DescriptiveStatistics gainsQueue = new DescriptiveStatistics(Constants.RSI_WINDOW);
     private DescriptiveStatistics lossQueue = new DescriptiveStatistics(Constants.RSI_WINDOW);
