@@ -25,7 +25,7 @@ public class Constants {
     public static final String MARKETS = "markets";
     public static final String CURRENCY = "currency";
     public static final String CURRENCIES = "currencies";
-    public static final String BALANCE = "balance";
+    public static final String BALANCE = "Balance";
     public static final String ORDERS = "orders";
     public static final String INITIAL_URL ="https://bittrex.com/api/";
     public static final Exception InvalidStringListException = new Exception("Must be in key-value pairs");
@@ -44,6 +44,9 @@ public class Constants {
     public static final String OPEN_SELL_ORDERS = "OpenSellOrders";
     public static final String VOLUME = "Volume";
     public static final int BOLLINGER_WINDOW = 360;
+    public static final String EXCHANGE = "Exchange";
+    public static final String QUANTITY = "Quantity";
+    public static final String AVAILABLE = "Available";
     public static int RSI_WINDOW =360;
 
 

@@ -7,7 +7,9 @@ import com.google.gson.JsonObject;
 import com.jlarrieux.bittrexbot.Entity.Markets;
 import com.jlarrieux.bittrexbot.Entity.Order;
 import com.jlarrieux.bittrexbot.Entity.Orders;
+import com.jlarrieux.bittrexbot.Entity.Positions;
 import com.jlarrieux.bittrexbot.REST.BittrexRestClient;
+
 import com.jlarrieux.bittrexbot.REST.Response;
 import com.jlarrieux.bittrexbot.Util.JsonParserUtil;
 import lombok.extern.java.Log;
@@ -45,7 +47,7 @@ public class OrderManager {
             JsonObject object = JsonParserUtil.getJsonObjectFromJsonString(response.getResult());
             beginingBTCbalance = JsonParserUtil.getDoubleFromJsonObject(object,"Available");
             currentBTCbalance = beginingBTCbalance;
-            log.info(String.format("Printing balance available: %f btc", beginingBTCbalance));
+            log.info(String.format("Printing balanceContainer available: %f btc", beginingBTCbalance));
         }
     }
 
