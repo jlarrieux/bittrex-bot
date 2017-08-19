@@ -11,8 +11,6 @@ import com.sun.jersey.api.client.WebResource;
 
 
 
-
-
 public abstract class RestClient {
 
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -40,6 +38,7 @@ public abstract class RestClient {
     }
 
     protected static String getJsonAsString(String url){
+//        log.info("URL: "+ url);
         Client client = Client.create();
         WebResource webResource = client.resource(url);
         ClientResponse response = webResource.accept("application/json")

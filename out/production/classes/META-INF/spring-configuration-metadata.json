@@ -30,6 +30,17 @@
     },
     {
       "sourceType": "com.jlarrieux.bittrexbot.Properties.TradingProperties",
+      "name": "trading.minimum-btc",
+      "type": "java.lang.Double"
+    },
+    {
+      "sourceType": "com.jlarrieux.bittrexbot.Properties.TradingProperties",
+      "defaultValue": 0,
+      "name": "trading.order-time-out-in-minutes",
+      "type": "java.lang.Integer"
+    },
+    {
+      "sourceType": "com.jlarrieux.bittrexbot.Properties.TradingProperties",
       "name": "trading.profit-taking",
       "type": "java.lang.Double"
     },

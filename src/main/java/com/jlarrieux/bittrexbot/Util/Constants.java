@@ -2,10 +2,24 @@ package com.jlarrieux.bittrexbot.Util;
 
 
 
+import lombok.extern.java.Log;
+
+import java.text.DecimalFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.List;
+
+
+
+@Log
 public class Constants {
 
-    private static final int window = 3178;
-    public static final String URI ="https://bittrex.com/api/v1.1/market/getopenorders?apikey=";
+
+    public static final String RATE_CapitalFIRST = "Rate";
+    public static final int DATA_WINDOW = 1440;
+    public static final String BITTREX_BASE_URL="https://bittrex.com/api/v1.1/";
+    public static final String BITTREX_BASE_URL2 = "https://bittrex.com/api/v2.0/";
     public static final String ENCRYPTION_ALGORITHM = "HmacSHA512";
     public static final String ORDER_LIMIT = "LIMIT";
     public static final String ORDER_MARKET = "MARKET";
@@ -44,7 +58,7 @@ public class Constants {
     public static final String OPEN_BUY_ORDERS = "OpenBuyOrders";
     public static final String OPEN_SELL_ORDERS = "OpenSellOrders";
     public static final String VOLUME = "Volume";
-    public static final int BOLLINGER_WINDOW = window;
+
     public static final String EXCHANGE = "Exchange";
     public static final String QUANTITY = "Quantity";
     public static final String AVAILABLE = "Available";
@@ -60,7 +74,34 @@ public class Constants {
     public static final String SPREAD = "spread";
     public static final String OPEN_BUY_ORDERS_SHORT = "openBuyOrders";
     public static final String OPEN_SELL_ORDERS_SHORT = "openSellOrders";
-    public static int RSI_WINDOW =window;
+    public static final String PUBLIC = "public";
+    public static final String GETMARKETSUMMARIES = "/getmarketsummaries";
+    public static final String ACCOUNT = "account/";
+    public static final String GETBALANCES = "getbalances";
+    public static final String APIKEY = "?apikey=";
+    public static final String NONCE = "&nonce=";
+    public static final String GETBALANCE = "getbalance";
+    public static final String CURRENCY_URL = "&currency=";
+    public static final String BUYLIMIT = "/buylimit";
+    public static final String MARKET_URL = "&market=";
+    public static final String QUANTITY_URL = "&quantity=";
+    public static final String RATE = "&rate=";
+    public static final String SUCCESS = "success";
+    public static final String MESSAGE = "message";
+    public static final String RESULT = "result";
+    public static final String BTC = "btc";
+    public static final int CURRENCY_PRECISION = 8;
+    public static final String PUB = "pub/";
+    public static final String GETMARKETORDERBOOK = "/getmarketorderbook?";
+    public static final String ORDER_UUID = "OrderUuid";
+    public static final String KEY = "key/";
+    public static final String OPENED = "Opened";
+    public static final String GETMARKETSUMMARY = "/getmarketsummary?";
+    public static final String EQUAL = "=";
+    public static final int SPACING = 15;
+    public static final String BITTREX = "Bittrex";
+    public static final String SIMULATOR = "Simulator";
+
 
 
 
@@ -70,11 +111,80 @@ public class Constants {
         return new String(array);
     }
 
-    public static void main(String[] args ){
-        double d1=1.865815770698525E-5;
-        double d2 = 1.809488229301446E-5;
-        System.out.println(Double.compare(d1,d2));
+
+
+    public static String buildDecimalFormatterPattern(int digitsAfterDecimal){
+        StringBuilder builder = new StringBuilder("#,###,###,###,###,###,##0");
+        if(digitsAfterDecimal>0){
+            builder.append(".");
+            for(int i=0; i<digitsAfterDecimal;i++)builder.append("#");
+        }
+
+        return builder.toString();
     }
+
+    public static String format(double value,int d, String units){
+        DecimalFormat format = new DecimalFormat(buildDecimalFormatterPattern(d));
+        return format.format(value)+" "+units;
+    }
+
+    public static String addSpace(String currency){
+        int l = currency.length();
+        StringBuilder builder = new StringBuilder(currency);
+        for(int i = 0; i< SPACING -l; i++) builder.append(" ");
+        return builder.toString();
+
+    }
+
+    public static String addSpaceForDouble(double d, int digitsAfterDecimal, String units){
+        return addSpace(format(d,digitsAfterDecimal, units));
+    }
+
+
+    public static String addSpaceForInt(int d, String units){
+        return addSpace(String.valueOf(d+" "+ units));
+    }
+
+    public static  String addSpaceForLong(long d, String units){
+        return addSpace(String.valueOf(d+" "+ units));
+    }
+
+
+    public static String buildBtcMarketName(String coin){
+        return "BTC-"+coin;
+    }
+
+    public static String getListAsString(List arrayList){
+        StringBuilder builder = new StringBuilder("[");
+        for(Object o: arrayList) {
+            if(builder.toString().length()>1)builder.append(",");
+            builder.append(o.toString());
+        }
+        builder.append("]");
+        return builder.toString();
+    }
+
+
+
+
+
+
+
+
+
+
+
+    public static void main(String[] args ){
+        LocalDateTime localDateTime = LocalDateTime.now();
+        ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.systemDefault());
+        ZonedDateTime utc = zonedDateTime.withZoneSameInstant(ZoneId.of("UTC"));
+
+        log.info(String.format("Local time: %s\t\tutc time: %s", localDateTime.toString(), utc.toLocalDateTime().toString()));
+    }
+
+
+
+
 
 
 }

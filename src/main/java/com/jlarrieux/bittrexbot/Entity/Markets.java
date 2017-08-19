@@ -17,10 +17,7 @@ public class Markets extends HashMap<String, Market> implements Container{
     @Override
     public Market add(JsonArray array, int i){
         Market market = new Market((JsonObject) array.get(i)) ;
-//        log.info(String.format("Market Base currency = %s", market.getBaseCurrency()));
-        if(market.getBaseCurrency().equals("Bitcoin")) {
-            return add(market);
-        }
+        if(market.getBaseCurrency().equals("Bitcoin")) return add(market);
         else return null;
 
     }
@@ -28,10 +25,10 @@ public class Markets extends HashMap<String, Market> implements Container{
 
     public Market add(Market market){
         StringBuilder marketName = new StringBuilder(market.getMarketName());
-        boolean doesNotContain = containsKey(market.getMarketName());
-        if (!doesNotContain) put(marketName.toString(), market);
+        boolean doesContain = containsKey(market.getMarketName());
+        if (!doesContain) put(marketName.toString(), market);
         Market m = get(marketName.toString());
-        m.updatePrice(market.getLast());
+        m.update(market);
         return m;
     }
 

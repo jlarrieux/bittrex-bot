@@ -2,12 +2,18 @@ package com.jlarrieux.bittrexbot.REST;
 
 
 
+import com.google.gson.JsonObject;
+import com.jlarrieux.bittrexbot.Util.Constants;
+import com.jlarrieux.bittrexbot.Util.JsonParserUtil;
 import lombok.Data;
+import lombok.extern.java.Log;
 
 
 
+@Log
 @Data
 public class Response {
+
 
     private boolean success;
     private int responseCode;
@@ -28,6 +34,16 @@ public class Response {
         this.result = result;
         this.message = message;
     }
+
+    public Response(String jsonString){
+
+        JsonObject object = JsonParserUtil.getJsonObjectFromJsonString(jsonString);
+        success = JsonParserUtil.getBooleanFromJsonObject(object, Constants.SUCCESS);
+        message = JsonParserUtil.getStringFromJsonObject(object, Constants.MESSAGE);
+        result = object.get(Constants.RESULT).toString();
+    }
+
+
 
 
 

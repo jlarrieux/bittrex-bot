@@ -20,9 +20,7 @@ import java.io.InputStreamReader;
 public class JLarrieuxRestClient extends RestClient {
 
 
-    public JLarrieuxRestClient(){
 
-    }
 
     public String getCount(){
 
@@ -30,7 +28,7 @@ public class JLarrieuxRestClient extends RestClient {
     }
 
     public String getMarketById(long id){
-        log.info( Constants.BITTREX_JLARRIEUX_COM_MARKET_ID+id);
+//        log.info( Constants.BITTREX_JLARRIEUX_COM_MARKET_ID+id);
         return getJsonAsString(Constants.BITTREX_JLARRIEUX_COM_MARKET_ID+id);
 
     }
