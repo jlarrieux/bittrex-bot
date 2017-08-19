@@ -3,7 +3,6 @@ package com.jlarrieux.bittrexbot.Entity;
 
 
 import com.google.common.math.DoubleMath;
-import com.google.common.primitives.Doubles;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.springframework.stereotype.Component;
@@ -17,9 +16,8 @@ public class Positions extends HashMap<String, Position>  implements Container{
 
     @Override
     public Position add(JsonArray array, int i){
-
         Position position = new Position((JsonObject) array.get(i));
-        if(!DoubleMath.fuzzyEquals(position.getBalance(),0,0.0000000009)){
+        if(!DoubleMath.fuzzyEquals(position.getQuantity(),0,0.0000000009)){
             put(position.getCurrency(), position);
             return position;
         }
@@ -27,6 +25,10 @@ public class Positions extends HashMap<String, Position>  implements Container{
         return null;
 
     }
+
+
+
+
 
 
 }

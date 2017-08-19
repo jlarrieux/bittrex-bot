@@ -5,6 +5,7 @@ package com.jlarrieux.bittrexbot.REST;
 import com.jlarrieux.bittrexbot.Properties.BittrexProperties;
 import com.jlarrieux.bittrexbot.Util.Constants;
 import com.jlarrieux.bittrexbot.Util.EncryptionUtil;
+import lombok.extern.java.Log;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -19,7 +20,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 
-
+@Log
 @Component
 public class BittrexRestClient extends RestClient {
 
@@ -178,17 +179,27 @@ public class BittrexRestClient extends RestClient {
         return getResponse(Constants.METHOD_KEY, Constants.BALANCE, "withdrawcurrency", returnCorrectMap("currencyname", currency, "quantity", amount, "address", address));
     }
 
+
+
+    /**
+     *
+     * *
+     * @param tradeType
+     * @param market
+     * @param orderType
+     * @param quantity
+     * @param rate
+     * @param timeInEffect
+     * @param conditionType
+     * @param target
+     * @return
+     */
     public Response placeOrder(String tradeType, String market, String orderType, String quantity, String rate, String timeInEffect, String conditionType, String target) { // Places a buy/sell order with these specific conditions (target only required if a condition is in place)
 
         String method = null;
 
-        if(tradeType.equals(Constants.TRADE_BUY))
-
-            method = "tradebuy";
-
-        else if(tradeType.equals(Constants.TRADE_SELL))
-
-            method = "tradesell";
+        if(tradeType.equals(Constants.TRADE_BUY))     method = "tradebuy";
+        else if(tradeType.equals(Constants.TRADE_SELL))      method = "tradesell";
 
         if(conditionType.equals(Constants.CONDITION_NONE)) // Ignore target if the condition is none.
 
@@ -196,6 +207,9 @@ public class BittrexRestClient extends RestClient {
 
         return getResponse(Constants.METHOD_KEY, Constants.MARKET, method, returnCorrectMap("marketname", market, "ordertype", orderType, "quantity", quantity, "rate", rate, "timeineffect", timeInEffect, "conditiontype", conditionType, "target", target));
     }
+
+
+
 
     public Response placeNonConditionalOrder(String tradeType, String market, String orderType, String quantity, String rate, String timeInEffect) { // Used for non-conditional orders
 
@@ -301,7 +315,7 @@ public class BittrexRestClient extends RestClient {
 
         try {
 
-//            log.info(String.format("Printing url:"+ url));
+            log.info(String.format("Printing url:"+ url));
             org.apache.http.client.HttpClient client = HttpClientBuilder.create().build();
 
             HttpGet request = new HttpGet(url);

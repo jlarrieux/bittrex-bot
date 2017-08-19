@@ -7,11 +7,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.jlarrieux.bittrexbot.REST.Response;
-import lombok.extern.java.Log;
 
 
 
-@Log
+
 public class JsonParserUtil {
 
     public static boolean getBooleanFromJsonObject(JsonObject jsonObject, String key){
@@ -19,6 +18,7 @@ public class JsonParserUtil {
     }
 
     public static double getDoubleFromJsonObject(JsonObject jsonObject, String key) {
+
         return jsonObject.getAsJsonPrimitive(key).getAsDouble();
     }
 
@@ -35,6 +35,7 @@ public class JsonParserUtil {
 
 
     public static JsonObject getJsonObjectFromJsonString(String json) {
+//        log.info("Maybe null: "+json);
         return getJsonElementFromString(json).getAsJsonObject();
     }
 
@@ -47,6 +48,7 @@ public class JsonParserUtil {
 
 
     public static JsonElement getJsonElementFromString(String json){
+
         return new JsonParser().parse(json);
     }
 
@@ -63,7 +65,6 @@ public class JsonParserUtil {
         if(!response.isSuccess()){
 //            log.severe(String.format("Response unsuccessfull!%nwith Code: %d%nAnd Message: %s", response.getResponseCode(), response.getMessage()));
 //            log.info(response.toString());
-
         }
         return isGood;
     }

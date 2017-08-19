@@ -11,6 +11,8 @@ public class Orders extends HashMap<String, Order> implements Container{
 
     @Override
     public Order add(JsonArray array, int i){
-        return new Order((JsonObject) array.get(i));
+        Order o =     new Order((JsonObject) array.get(i));
+        put(o.getOrderUuid(),o);
+        return o;
     }
 }

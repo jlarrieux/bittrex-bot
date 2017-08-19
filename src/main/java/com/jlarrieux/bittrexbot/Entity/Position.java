@@ -11,8 +11,9 @@ import lombok.extern.java.Log;
 public class Position {
 
 
-    private String currency;
-    private double balance, available, pending, purchasedPrice, lastPrice;
+    private String currency, marketName;
+    private double  available, pending, averagePurchasedPrice, lastPrice, quantity, total, pAndL;
+
 
     public Position(){
 
@@ -22,14 +23,36 @@ public class Position {
         buildPosition(object);
     }
 
+    public Position(double quantity, double purchasedPrice, String marketCurrency){
+        this.quantity = quantity;
+        this.averagePurchasedPrice = purchasedPrice;
+        total = quantity * purchasedPrice;
+        this.currency = marketCurrency;
+    }
 
 
     private void buildPosition(JsonObject object) {
-//        log.info("Printing object: "+ object.toString());
+        log.info(object.toString());
         JsonObject balanceContainer = object.getAsJsonObject(Constants.BALANCE);
-        balance = JsonParserUtil.getDoubleFromJsonObject(balanceContainer, Constants.BALANCE);
+        quantity = JsonParserUtil.getDoubleFromJsonObject(balanceContainer, Constants.BALANCE);
         available = JsonParserUtil.getDoubleFromJsonObject(balanceContainer, Constants.AVAILABLE);
         currency = JsonParserUtil.getStringFromJsonObject(balanceContainer, "Currency");
     }
+
+
+    public void update(double quantityNew, double priceNew){
+        total = total+(quantityNew*priceNew);
+        quantity = quantityNew + quantity;
+        averagePurchasedPrice = total/quantity;
+    }
+
+    public void alternatBuild(JsonObject object){
+        currency = JsonParserUtil.getStringFromJsonObject(object, Constants.upperCaseFirst(Constants.CURRENCY));
+        quantity = JsonParserUtil.getDoubleFromJsonObject(object, Constants.BALANCE);
+        available = JsonParserUtil.getDoubleFromJsonObject(object,Constants.AVAILABLE);
+        marketName =Constants.buildBtcMarketName(currency);
+
+    }
+
 }
 
