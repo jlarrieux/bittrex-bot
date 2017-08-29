@@ -101,7 +101,15 @@ public class Constants {
     public static final int SPACING = 15;
     public static final String BITTREX = "Bittrex";
     public static final String SIMULATOR = "Simulator";
-
+    public static final String QUANTITY_REMAINING = "QuantityRemaining";
+    public static final String IS_OPEN = "IsOpen";
+    public static final String UUID = "uuid";
+    public static final String NULL = "null";
+    public static final String CANCEL_INITIATED = "CancelInitiated";
+    public static final String LIMIT = "Limit";
+    public static final double DECIMAL_PRECISION_EQUAL =0.001;
+    public static final String TYPE = "Type";
+    public static final String ORDER_TYPE = "OrderType";
 
 
 

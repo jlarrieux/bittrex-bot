@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("trading")
 public class TradingProperties {
 
-    private double stopLoss, profitTaking, spread, rsiOverBought, rsiOverSold, rsiNoMomentum, minimumBtc;
+    private double stopLoss, profitTaking, spread, rsiOverBought, rsiOverSold, rsiNoMomentum, minimumBtc, adxTrendThreshold;
     private int orderTimeOutInMinutes;
 
 

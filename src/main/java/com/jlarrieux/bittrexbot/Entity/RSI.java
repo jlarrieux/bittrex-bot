@@ -37,7 +37,7 @@ public class RSI {
         double change = currentPrice - prevPrice[0];
         currentGain = 0;
         currentLoss = 0;
-//        log.info(String.format("current price: %f\t prevPrice: %f\t change: %f\t counter: %d\n\n",currentPrice,prevPrice[0],change, counter ));
+//        log.info(String.format("current priceQueue: %f\t prevPrice: %f\t change: %f\t counter: %d\n\n",currentPrice,prevPrice[0],change, counter ));
         if(change>0){
             gains.addValue(change);
             currentGain = change;

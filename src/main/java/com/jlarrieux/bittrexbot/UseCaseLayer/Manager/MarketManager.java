@@ -4,10 +4,10 @@ package com.jlarrieux.bittrexbot.UseCaseLayer.Manager;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.jlarrieux.bittrexbot.UseCaseLayer.Decider;
 import com.jlarrieux.bittrexbot.Entity.Market;
 import com.jlarrieux.bittrexbot.Entity.Markets;
 import com.jlarrieux.bittrexbot.REST.JLarrieuxRestClient;
+import com.jlarrieux.bittrexbot.UseCaseLayer.Decider;
 import com.jlarrieux.bittrexbot.Util.Constants;
 import com.jlarrieux.bittrexbot.Util.JsonParserUtil;
 import lombok.Getter;
@@ -52,7 +52,7 @@ public class MarketManager {
     }
 
     private void iterate(JsonArray array){
-        Market market;
+
         for(int i=0; i<array.size(); i++){
             marketBooks.add(array, i);
         }
@@ -89,11 +89,29 @@ public class MarketManager {
         String marketName = Constants.buildBtcMarketName(coin);
         if(marketBooks.containsKey(marketName)){
             Market m = marketBooks.get(marketName);
-            return String.format("Coin: %s\nHigh: %f\t low: %f\t volume: %f\t last price: %f\n# of open buys: %d\t# of open sells: %d\tspread: %f\ncurrentRSI: %f\n bollinger: %s",
+            return String.format("Coin: %s\nHigh: %f\t low: %f\t volume: %f\t last priceQueue: %f\n# of open buys: %d\t# of open sells: %d\tspread: %f\ncurrentRSI: %f\n bollinger: %s",
                     m.getMarketCurrency(), m.getHigh(), m.getLow(), m.getVolume(), m.getLast(), m.getOpenBuyOrders(), m.getOpenSellOrders(),m.getSpread(), m.getCurrentRSI(), m.bollingerToString());
         }
         else return String.format("No such '%s' exists", marketName);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

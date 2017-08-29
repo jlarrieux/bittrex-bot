@@ -30,6 +30,11 @@
     },
     {
       "sourceType": "com.jlarrieux.bittrexbot.Properties.TradingProperties",
+      "name": "trading.adx-trend-threshold",
+      "type": "java.lang.Double"
+    },
+    {
+      "sourceType": "com.jlarrieux.bittrexbot.Properties.TradingProperties",
       "name": "trading.minimum-btc",
       "type": "java.lang.Double"
     },

@@ -2,7 +2,6 @@ package com.jlarrieux.bittrexbot.UseCaseLayer.Manager;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.jlarrieux.bittrexbot.Entity.Market;
 import com.jlarrieux.bittrexbot.Entity.Position;
 import com.jlarrieux.bittrexbot.Entity.Positions;
 import com.jlarrieux.bittrexbot.Properties.BittrexProperties;
@@ -14,6 +13,10 @@ import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,12 +28,14 @@ public class PositionManager {
 
 
     private MyBittrexClient client;
-    private Positions positionBooks;
+    private Positions positionBooks = new Positions();
     private double fee;
 
 
 
+    public PositionManager(){
 
+    }
 
 
     @Autowired
@@ -49,44 +54,24 @@ public class PositionManager {
         return positionBooks;
     }
 
-    public double buy(Market market, double quantity, double price){
-        client.buy(market.getMarketName(),quantity,price);
-        double total = calculateTotal(price*quantity);
-        Position p= null;
-        if(positionBooks.containsKey(market.getMarketName())){
-            p = positionBooks.get(market.getMarketName());
-            p.update(quantity, price);
-        }
-        else {
-            p = new Position(quantity, price, market.getMarketCurrency());
-            p.setMarketName(market.getMarketName());
-        }
-        positionBooks.put(market.getMarketName(),p);
 
-        return total;
+
+
+    public void add(Position p){
+        Position p2 ;
+        if(positionBooks.containsKey(p.getCurrency())){
+            p2 = positionBooks.get(p.getCurrency());
+            p2.update(p.getQuantity(), p.getAveragePurchasedPrice());
+        }
+        else p2 = p;
+        positionBooks.put(p2.getCurrency(), p2);
     }
 
-    public double sell( Position p){
-
-        JsonObject jsonObject = getLastPrice(p.getMarketName());
-        if(jsonObject!=null && !jsonObject.get(Constants.BID).toString().equals("null")){
-//            log.info("before maybe null: "+p.getMarketName()+"\t bid: "+ jsonObject.get(Constants.BID));
-            double bid = JsonParserUtil.getDoubleFromJsonObject(jsonObject,Constants.BID);
-            double last = JsonParserUtil.getDoubleFromJsonObject(jsonObject, Constants.LAST);
-            double ask = JsonParserUtil.getDoubleFromJsonObject(jsonObject, Constants.ASK);
-            double quantity = p.getQuantity();
-            double price = bid;
-            Response response = new Response(client.sell(p.getMarketName(), quantity, bid));
-            if(JsonParserUtil.isAsuccess(response)){
-                double total = quantity * price;
-                log.info(String.format("Selling %f units of %s at %f btc with bid: %f and ask: %f and last: %f", quantity, p.getCurrency(), price,bid, ask, last ));
-                return total;
-            }
-        }
-
-
-        return 0;
+    public void remove(String key){
+        positionBooks.remove(key);
     }
+
+
 
 
 
@@ -97,7 +82,7 @@ public class PositionManager {
 
 
     private JsonObject getLastPrice(String marketname){
-        Response response = new Response(client.getMarketSummary(marketname));
+        Response response = client.getMarketSummary(marketname);
         if(JsonParserUtil.isAsuccess(response)&& response.getResult().length()>5){
             return  JsonParserUtil.getJsonObjectFromJsonString(response.getResult());
 
@@ -106,7 +91,7 @@ public class PositionManager {
     }
 
     private JsonObject getMarketOrderFirstObject(String marketName){
-        Response r = new Response(client.getMarketOrderBook(marketName));
+        Response r = client.getMarketOrderBook(marketName);
 //        log.info(String.valueOf(r.getResult().length()));
         if(r.getResult().length()>50) {
             JsonObject object = JsonParserUtil.getJsonObjectFromJsonString(r.getResult());
@@ -125,20 +110,11 @@ public class PositionManager {
         return JsonParserUtil.getDoubleFromJsonObject(jsonObject, Constants.RATE_CapitalFIRST);
     }
 
-    public void sellAll(){
-       List<Position> allPosition = getAllOpenPositions();
-       if(allPosition!=null) sellEach(allPosition);
-    }
 
-    private void sellEach(List<Position> allposition){
-        for(Position p: allposition){
-            if(shouldSell(p)) sell(p);
-        }
-    }
 
     public List<Position> getAllOpenPositions(){
         List<Position> allPositions = new ArrayList<>();
-        Response r = new Response(client.getBalances());
+        Response r =client.getBalances();
         if(JsonParserUtil.isAsuccess(r)){
             JsonArray array = JsonParserUtil.getJsonArrayFromJsonString(r.getResult());
             for(int i=0 ;i<array.size();i++){
@@ -152,23 +128,33 @@ public class PositionManager {
         return null;
     }
 
-    private boolean shouldSell(Position p){
-//        String currency = p.getCurrency();
-//        log.info(p.getMarketName());
-//        Market m= marketManager.getMarketBooks().get(p.getMarketName());
-//        Double min = m.getMinTradeSize();
-//        boolean minTradeSatisfied = true;
-//        if(min!=null) minTradeSatisfied = min<=p.getQuantity();
 
-        return    true;//m.getMinTradeSize()<=p.getQuantity();//!currency.equals("STORJ") && !currency.equals("OMG");// &&
+
+    public boolean contains(String key){
+        return positionBooks.containsKey(key);
+    }
+
+    public double getTotalPricePaid(String key){
+        return positionBooks.get(key).getTotal();
     }
 
 
-    public boolean contains(Position p){
-        return positionBooks.containsKey(p.getMarketName());
+    public double getQuantityOwn(String currency){
+        if(positionBooks.containsKey(currency)) return positionBooks.get(currency).getQuantity();
+        else return 0;
     }
 
 
+
+    public static void main(String[] args){
+        LocalDateTime localDateTime = LocalDateTime.now();
+        LocalDateTime utc = LocalDateTime.now(Clock.systemUTC());
+        String s = "2017-08-27T04:49:17.36";
+        LocalDateTime localDateTime1 = LocalDateTime.parse(s);
+        ZonedDateTime zonedDateTime = localDateTime1.atZone(ZoneId.of("UTC"));
+
+        log.info(String.format("Local: %s\nUTC: %s\nlocal from string: %s\nUtc2: %s", localDateTime.toString(),utc.toString(), localDateTime1.toString(), zonedDateTime.toString()));
+    }
 
 
 }

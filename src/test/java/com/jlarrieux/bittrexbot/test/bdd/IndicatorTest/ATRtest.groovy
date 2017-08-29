@@ -72,7 +72,7 @@ class ATRtest extends Specification {
 
             if(n>0)c= ATR[n-1]
 
-            System.out.println(String.format("ATR~ N: %d\tc: %f",n, c))
+//            System.out.println(String.format("ATR~ N: %d\tc: %f",n, c))
             assert  DoubleMath.fuzzyEquals(IndicatorUtil.calculateATR(atrHolder, c), ATR[n], 0.01)
 
         }

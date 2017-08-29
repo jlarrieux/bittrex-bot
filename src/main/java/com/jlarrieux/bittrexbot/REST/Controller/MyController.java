@@ -28,10 +28,10 @@ public class MyController {
     }
 
 
-    @GetMapping(path = "/portfolio")
-    public @ResponseBody String getPortfolio(){
-        return  decider.getPortfolioStatement().toString();
-    }
+//    @GetMapping(path = "/portfolio")
+//    public @ResponseBody String getPortfolio(){
+//        return  decider.getPortfolioStatement().toString();
+//    }
 
     @GetMapping("/getcoin")
     public @ResponseBody String getCoinInsight(@RequestParam(value = "coin", required = true) String coin){

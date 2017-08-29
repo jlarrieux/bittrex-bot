@@ -6,80 +6,98 @@ import com.jlarrieux.bittrexbot.Util.Constants;
 import lombok.Data;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
 
 
+@Component
 @Data
 @Log
 @Qualifier(Constants.SIMULATOR)
+@Profile("!live")
 public class SimulatorExchange  implements ExchangeInterface{
 
 
     @Override
-    public String getMarkets() {
+    public Response getMarkets() {
         return null;
     }
 
 
 
     @Override
-    public String getMarketSummary(String marketName) {
+    public Response getMarketSummary(String marketName) {
         return null;
     }
 
 
 
     @Override
-    public String getMarketOrderBook(String marketName) {
+    public Response getMarketOrderBook(String marketName) {
         return null;
     }
 
 
 
     @Override
-    public String getMarketSummaries() {
+    public Response getMarketSummaries() {
         return null;
     }
 
 
 
     @Override
-    public String getOpenOrders() {
+    public Response getOpenOrders() {
         return null;
     }
 
 
 
     @Override
-    public String getBalance(String currency) {
+    public Response getBalance(String currency) {
         return null;
     }
 
 
 
     @Override
-    public String getBalances() {
+    public Response getBalances() {
         return null;
     }
 
 
 
     @Override
-    public String cancelOrder(String id) {
+    public Response cancelOrder(String id) {
         return null;
     }
 
 
 
     @Override
-    public String buy(String marketName, double quantity, double price) {
+    public Response buy(String marketName, double quantity, double price) {
         return null;
     }
 
 
 
     @Override
-    public String sell(String marketName, double quantity, double price) {
+    public Response sell(String marketName, double quantity, double price) {
+        return null;
+    }
+
+
+
+    @Override
+    public Response getOrderHistory(String marketName) {
+        return null;
+    }
+
+
+
+    @Override
+    public Response getOrder(String uuid) {
         return null;
     }
 }

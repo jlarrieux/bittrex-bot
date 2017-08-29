@@ -27,13 +27,14 @@ public class Market {
     private DescriptiveStatistics priceQueue = new DescriptiveStatistics(Constants.DATA_WINDOW);
     private DescriptiveStatistics ATRholder = new DescriptiveStatistics(Constants.DATA_WINDOW);
     private RSI rsi = new RSI(Constants.DATA_WINDOW);
-
     private String marketCurrency,  baseCurrency, marketName;
     private boolean isActive;
     private double minTradeSize, high, low, volume, last, bid, ask, spread, currentRSI =-1;
-    private double oldEMA=-1;
+
     private int openBuyOrders, openSellOrders;
-    private BollingerIndicator bollingerSMA, bollingerEMA;
+    private BollingerIndicator bollingerSMA = new BollingerIndicator(1);
+    private ADX adx = new ADX(2);
+    private KeltnerChannels keltnerChannels = new KeltnerChannels(1);
     private double atr=-1;
 
     public Market(){
@@ -43,8 +44,8 @@ public class Market {
     public Market(JsonObject object){
         JsonObject market = object.getAsJsonObject(Constants.upperCaseFirst(Constants.MARKET));
         JsonObject summary =object.getAsJsonObject(Constants.SUMMARY);
-        bollingerSMA = new BollingerIndicator();
-        bollingerEMA = new BollingerIndicator();
+        bollingerSMA = new BollingerIndicator(Constants.DATA_WINDOW);
+        adx.setWindowSize(Constants.DATA_WINDOW);
         buildMarket(market, summary);
 
     }
@@ -66,7 +67,7 @@ public class Market {
         openSellOrders = JsonParserUtil.getIntFromJsonObject(summary, Constants.OPEN_SELL_ORDERS);
         volume = JsonParserUtil.getDoubleFromJsonObject(summary, Constants.VOLUME);
         spread = 100*(ask-bid)/ask;
-        rsi.updateGainLoss(last);
+        updatePrice(last);
     }
 
     public void update(Market market){
@@ -81,11 +82,14 @@ public class Market {
         updatePrice(market.getLast());
     }
 
-    private void updatePrice(double price){
+    public void updatePrice(double price){
 
         rsi.updateGainLoss(price);
         priceQueue.addValue(price);
         ATRholder.addValue(IndicatorUtil.calculateTrueRange(high,low,last ));
+        bollingerSMA.update(price);
+        adx.update(high,low,price);
+        keltnerChannels.update(high,low,price);
         calculateIndicators();
         last = price;
     }
@@ -94,14 +98,16 @@ public class Market {
         if(priceQueue.getN()==Constants.DATA_WINDOW){
             currentRSI = rsi.getCurrentRSI();
             atr = IndicatorUtil.calculateATR(ATRholder,atr);
-            oldEMA = IndicatorUtil.calculateEMA(priceQueue, oldEMA);
-            bollingerSMA = IndicatorUtil.calculateBollingerSMA(priceQueue);
-            bollingerEMA = IndicatorUtil.calculateBollingerEMA(priceQueue, oldEMA);
+
         }
 
     }
 
 
+
+    public double getAdxValue(){
+        return adx.getCurrentADX();
+    }
 
 
 
@@ -117,7 +123,7 @@ public class Market {
 
 
     public String bollingerToString(){
-        return  "EMA Bollinger: "+ bollingerEMA.toString()+String.format("\nBid: %f\tAsk: %f\tprice: %f\tspread: %.2f%%\t# of buys: %d\t # of sells: %d", bid, ask, last, spread, openBuyOrders, openSellOrders);
+        return  "Bollinger: "+ bollingerSMA.toString()+String.format("\nBid: %f\tAsk: %f\tpriceQueue: %f\tspread: %.2f%%\t# of buys: %d\t # of sells: %d", bid, ask, last, spread, openBuyOrders, openSellOrders);
     }
 
     public String RSItoString(){
@@ -154,5 +160,28 @@ public class Market {
         setOpenSellOrders(JsonParserUtil.getIntFromJsonObject(object, Constants.OPEN_SELL_ORDERS_SHORT));
 
     }
+
+    public double getBollingerHigh(){
+        return bollingerSMA.getHigh();
+    }
+
+    public double getBollingerLow(){
+        return bollingerSMA.getLow();
+    }
+
+    public double getBollingerMid(){
+        return bollingerSMA.getMid();
+    }
+
+    public double getBollingerBandwidth(){
+        return bollingerSMA.getBandwidth();
+    }
+
+    public double getBollingerPercentB(){
+        return bollingerSMA.getPercentB();
+    }
+
+
+
 
 }
