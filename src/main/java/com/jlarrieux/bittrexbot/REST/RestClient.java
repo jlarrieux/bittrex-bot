@@ -7,10 +7,11 @@ import com.google.gson.GsonBuilder;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import lombok.extern.java.Log;
 
 
 
-
+@Log
 public abstract class RestClient {
 
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -38,7 +39,7 @@ public abstract class RestClient {
     }
 
     protected static String getJsonAsString(String url){
-//        log.info("URL: "+ url);
+        log.info("URL: "+ url);
         Client client = Client.create();
         WebResource webResource = client.resource(url);
         ClientResponse response = webResource.accept("application/json")

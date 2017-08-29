@@ -14,6 +14,7 @@ import com.jlarrieux.bittrexbot.REST.Response;
 public class JsonParserUtil {
 
     public static boolean getBooleanFromJsonObject(JsonObject jsonObject, String key){
+//        System.out.println("reddd: " +jsonObject.toString()+"\t"+key);
         return jsonObject.getAsJsonPrimitive(key).getAsBoolean();
     }
 
@@ -35,7 +36,7 @@ public class JsonParserUtil {
 
 
     public static JsonObject getJsonObjectFromJsonString(String json) {
-//        log.info("Maybe null: "+json);
+//        System.out.println("Maybe null: "+json);
         return getJsonElementFromString(json).getAsJsonObject();
     }
 

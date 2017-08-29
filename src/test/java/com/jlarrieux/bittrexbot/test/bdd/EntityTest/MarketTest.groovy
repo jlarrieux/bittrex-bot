@@ -24,12 +24,12 @@ class MarketTest extends Specification {
         double[] sma = TestData.AverageData.sma;
 
         when:
-        for(int i=0; i<k; i++)m.getPriceQueue().addValue(price[i])
+        for(int i=0; i<k; i++)m.updatePrice(price[i])
 
 
         then:
         (sma.length).times {n->
-            m.getPriceQueue().addValue(price[period-1+n])
+            m.updatePrice(price[period-1+n])
             assert DoubleMath.fuzzyEquals(IndicatorUtil.calculateSMA(m.getPriceQueue()), sma[n], 0.01)
         }
 
@@ -48,14 +48,14 @@ class MarketTest extends Specification {
 
 
         when:
-        for(int i=0; i<k; i++)m.getPriceQueue().addValue(price[i])
+        for(int i=0; i<k; i++)m.updatePrice(price[i])
 
 
         then:
         (ema.length).times {n->
-            m.getPriceQueue().addValue(price[period-1+n])
+            m.updatePrice(price[period-1+n])
             double old = -1
-            if(n!=0) old = ema[n]
+            if(n!=0) old = ema[n-1]
             assert DoubleMath.fuzzyEquals(IndicatorUtil.calculateEMA(m.getPriceQueue(), old), ema[n], 0.01)
         }
 
@@ -71,14 +71,105 @@ class MarketTest extends Specification {
         double [] rsiData = TestData.RSIdata.RSI14;
 
         when:
-        for(int i=0; i<period-1; i++) m.getRsi().updateGainLoss(close[i])
+        for(int i=0; i<period-1; i++) m.updatePrice(close[i])
 
         then:
         (rsiData.length).times {n->
-            m.getRsi().updateGainLoss(close[n+period])
+            m.updatePrice(close[n+period])
             assert DoubleMath.fuzzyEquals(m.getRsi().getCurrentRSI(), rsiData[n], 0.0001)
         }
 
+    }
+
+
+    def"Bollinger check High"(){
+        given:
+        int period = TestData.BollingerData.period
+        m.getBollingerSMA().setWindowSize(period)
+        double[] price =TestData.BollingerData.price
+        double[] high = TestData.BollingerData.high
+
+        when:
+        for(int i=0; i<period-1; i++) m.updatePrice(price[i])
+
+        then:
+        (high.length).times {n->
+            m.updatePrice(price[n+period-1])
+            assert DoubleMath.fuzzyEquals(m.getBollingerSMA().getHigh(), high[n], 0.0001)
+        }
+    }
+
+
+    def"Bollinger check mid"(){
+        given:
+        int period = TestData.BollingerData.period
+        m.getBollingerSMA().setWindowSize(period)
+        double[] price =TestData.BollingerData.price
+        double[] mid = TestData.BollingerData.mid
+
+        when:
+        for(int i=0; i<period-1; i++) m.updatePrice(price[i])
+
+        then:
+        (mid.length).times {n->
+            m.updatePrice(price[n+period-1])
+            assert DoubleMath.fuzzyEquals(m.getBollingerSMA().getMid(), mid[n], 0.0001)
+        }
+    }
+
+
+
+    def"Bollinger check Low"(){
+        given:
+        int period = TestData.BollingerData.period
+        m.getBollingerSMA().setWindowSize(period)
+        double[] price =TestData.BollingerData.price
+        double[] low = TestData.BollingerData.low
+
+        when:
+        for(int i=0; i<period-1; i++) m.updatePrice(price[i])
+
+        then:
+        (low.length).times {n->
+            m.updatePrice(price[n+period-1])
+            assert DoubleMath.fuzzyEquals(m.getBollingerSMA().getLow(), low[n], 0.0001)
+        }
+    }
+
+
+    def"Bollinger check Bandwidth"(){
+        given:
+        int period = TestData.BollingerData.period
+        m.getBollingerSMA().setWindowSize(period)
+        double[] price =TestData.BollingerData.price
+        double[] bandWidth = TestData.BollingerData.bandwidth
+
+        when:
+        for(int i=0; i<period-1; i++) m.updatePrice(price[i])
+
+        then:
+        (bandWidth.length).times {n->
+            m.updatePrice(price[n+period-1])
+            assert DoubleMath.fuzzyEquals(m.getBollingerSMA().getBandwidth(), bandWidth[n], 0.0001)
+        }
+    }
+
+
+    def"Bollinger check % B"(){
+        given:
+        int period = TestData.BollingerData.period
+        m.getBollingerSMA().setWindowSize(period)
+        double[] price =TestData.BollingerData.price
+        double[] percentB = TestData.BollingerData.percentB
+
+        when:
+        for(int i=0; i<period-1; i++) m.updatePrice(price[i])
+
+        then:
+        (percentB.length).times {n->
+            m.updatePrice(price[n+period-1])
+            assert DoubleMath.fuzzyEquals(m.getBollingerSMA().getPercentB(), percentB[n], 0.0001)
+        }
     }
 
 
@@ -115,9 +206,123 @@ class MarketTest extends Specification {
     }
 
 
+    def "ADX market test"(){
+        given:
+        int period = TestData.ADXdata.period
+        m.getAdx().setWindowSize(period)
+        double[] close = TestData.ADXdata.close
+        double[] high = TestData.ADXdata.high
+        double[] low = TestData.ADXdata.low
+        double[] adxData = TestData.ADXdata.adx
+
+        when:
+        for(int i=0 ;i<period-1;i++){
+            m.setHigh(high[i])
+            m.setLow(low[i])
+            m.updatePrice(close[i])
+        }
+
+        then:
+        (adxData.length).times {n->
+            int j = n + period-1
+            m.setHigh(high[j])
+            m.setLow(low[j])
+            m.updatePrice(close[j])
+            assert DoubleMath.fuzzyEquals(m.adx.getCurrentADX(),adxData[n],0.001)
+        }
+
+
+    }
 
 
 
+    def"Keltner High market test"(){
+        given:
+        int period = TestData.KeltnerChannel.period
+        double[] close = TestData.KeltnerChannel.close
+        double[] midKeltner = TestData.KeltnerChannel.midKeltner
+        double[] highKeltner= TestData.KeltnerChannel.highKeltner
+        double[] lowKeltner = TestData.KeltnerChannel.lowKeltner
+        double[] high = TestData.KeltnerChannel.high
+        double[] low = TestData.KeltnerChannel.low
+        m.getKeltnerChannels().setWindowSize(period)
+        for(int i=0; i<period-1; i++){
+            m.setHigh(high[i])
+            m.setLow(low[i])
+            m.updatePrice(close[i])
+        }
+
+
+        expect:
+        (highKeltner.length).times {n->
+            int j= n+ period-1
+            m.setHigh(high[j])
+            m.setLow(low[j])
+            m.updatePrice(close[j])
+
+            assert DoubleMath.fuzzyEquals(m.getKeltnerChannels().getHigh(), highKeltner[n], 0.001)
+        }
+
+    }
+
+
+    def"Keltner low market test"(){
+        given:
+        int period = TestData.KeltnerChannel.period
+        double[] close = TestData.KeltnerChannel.close
+        double[] midKeltner = TestData.KeltnerChannel.midKeltner
+        double[] highKeltner= TestData.KeltnerChannel.highKeltner
+        double[] lowKeltner = TestData.KeltnerChannel.lowKeltner
+        double[] high = TestData.KeltnerChannel.high
+        double[] low = TestData.KeltnerChannel.low
+        m.getKeltnerChannels().setWindowSize(period)
+        for(int i=0; i<period-1; i++){
+            m.setHigh(high[i])
+            m.setLow(low[i])
+            m.updatePrice(close[i])
+        }
+
+
+        expect:
+        (lowKeltner.length).times {n->
+            int j= n+ period-1
+            m.setHigh(high[j])
+            m.setLow(low[j])
+            m.updatePrice(close[j])
+            assert DoubleMath.fuzzyEquals(m.getKeltnerChannels().getLow(), lowKeltner[n], 0.001)
+        }
+
+    }
+
+
+
+    def"Keltner mid market test"(){
+        given:
+        int period = TestData.KeltnerChannel.period
+        double[] close = TestData.KeltnerChannel.close
+        double[] midKeltner = TestData.KeltnerChannel.midKeltner
+        double[] highKeltner= TestData.KeltnerChannel.highKeltner
+        double[] lowKeltner = TestData.KeltnerChannel.lowKeltner
+        double[] high = TestData.KeltnerChannel.high
+        double[] low = TestData.KeltnerChannel.low
+        m.getKeltnerChannels().setWindowSize(period)
+        for(int i=0; i<period-1; i++){
+            m.setHigh(high[i])
+            m.setLow(low[i])
+            m.updatePrice(close[i])
+        }
+
+
+        expect:
+        (midKeltner.length).times {n->
+            int j= n+ period-1
+            m.setHigh(high[j])
+            m.setLow(low[j])
+            m.updatePrice(close[j])
+            assert DoubleMath.fuzzyEquals(m.getKeltnerChannels().getMid(), midKeltner[n], 0.001)
+        }
+
+    }
 
 
 

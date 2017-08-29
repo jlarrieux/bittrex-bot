@@ -36,7 +36,7 @@ public class Response {
     }
 
     public Response(String jsonString){
-
+//        log.info("inside response: " +jsonString+"\n");
         JsonObject object = JsonParserUtil.getJsonObjectFromJsonString(jsonString);
         success = JsonParserUtil.getBooleanFromJsonObject(object, Constants.SUCCESS);
         message = JsonParserUtil.getStringFromJsonObject(object, Constants.MESSAGE);

@@ -28,14 +28,14 @@ public class Comparators {
     }
 
 
-    public static class PositionPandLComparatorDescending implements Comparator<Position>{
-
-
-        @Override
-        public int compare(Position o1, Position o2) {
-            return Double.compare(o2.getPAndL(), o1.getPAndL());
-        }
-    }
+//    public static class PositionPandLComparatorDescending implements Comparator<Position>{
+//
+//
+//        @Override
+//        public int compare(Position o1, Position o2) {
+//            return Double.compare(o2.getPAndL(), o1.getPAndL());
+//        }
+//    }
 
 
 }
