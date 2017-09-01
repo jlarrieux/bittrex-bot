@@ -42,14 +42,7 @@ public class BittrexDataManager {
         Response response = client.getMarketSummaries();
         client2.cancelOrder("");
 //        Response r = client2.placeOrder("","btc-vtr","","1","0.00004218","1","","");
-        if(response.isSuccess())       marketManager.addMarkets(JsonParserUtil.getJsonArrayFromJsonString(response.getResult()));
-
-
+        if(response.isSuccess())
+            marketManager.addMarkets(JsonParserUtil.getJsonArrayFromJsonString(response.getResult()));
     }
-
-
-
-
-
-
 }

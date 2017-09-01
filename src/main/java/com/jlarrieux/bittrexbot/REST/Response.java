@@ -43,8 +43,11 @@ public class Response {
         result = object.get(Constants.RESULT).toString();
     }
 
+    public String getResult() {
+        return result;
+    }
 
-
-
-
+    public void setResult(String result) {
+        this.result = result;
+    }
 }
