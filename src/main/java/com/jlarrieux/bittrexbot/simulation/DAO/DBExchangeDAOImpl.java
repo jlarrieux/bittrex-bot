@@ -1,6 +1,6 @@
 package com.jlarrieux.bittrexbot.simulation.DAO;
 
-import com.jlarrieux.bittrexbot.simulation.ResponseTO;
+import com.jlarrieux.bittrexbot.simulation.TO.ResponseTO;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 public class DBExchangeDAOImpl implements IDBExchangeDAO {

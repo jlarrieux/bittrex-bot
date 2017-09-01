@@ -1,6 +1,4 @@
-package com.jlarrieux.bittrexbot.simulation;
-
-import com.google.gson.Gson;
+package com.jlarrieux.bittrexbot.simulation.TO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +9,7 @@ public class ResponseTO {
     private List result = new ArrayList();
 
     public ResponseTO(){
-        MarketWhole marketWhole = new MarketWhole();
+        MarketSet marketWhole = new MarketSet();
         result.add(marketWhole);
     }
 
@@ -39,8 +37,8 @@ public class ResponseTO {
         this.result = result;
     }
 
-    public MarketWhole createMarketWhole(){
-        return new MarketWhole();
+    public MarketSet createMarketSet(){
+        return new MarketSet();
     }
 
     public class Market {
@@ -59,7 +57,7 @@ public class ResponseTO {
 
 
     }
-    public class MarketWhole{
+    public class MarketSet {
         Market Market = new Market();
         Summary Summary = new Summary();
         boolean IsVerified = false;
@@ -71,6 +69,25 @@ public class ResponseTO {
         public Summary getSummary(){
             return Summary;
         }
+
+        public void setmarketCurrenty(String marketCurrency) {
+            Market.MarketCurrency = marketCurrency;
+        }
+
+        public void setIsActive(boolean bool) {
+            Market.IsActive = bool;
+        }
+
+        public void setMinTradeSize(double minTradeSize) {
+            Market.MinTradeSize = minTradeSize;
+        }
+
+        public void setMarketName(String marketName) {
+            Market.MarketName = marketName;
+        }
+
+
+
     }
 
 }
