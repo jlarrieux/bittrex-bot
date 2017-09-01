@@ -1,4 +1,4 @@
-package com.jlarrieux.bittrexbot.simulation;
+package com.jlarrieux.bittrexbot.simulation.TO;
 
 public class MarketTO {
     private String marketCurrency = "";

@@ -1,6 +1,6 @@
 package com.jlarrieux.bittrexbot.simulation.DAO;
 
-import com.jlarrieux.bittrexbot.simulation.ResponseTO;
+import com.jlarrieux.bittrexbot.simulation.TO.ResponseTO;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.sql.*;
@@ -51,10 +51,14 @@ public class DBExchangeDAOImpl2 implements IDBExchangeDAO {
             resultSet = statement.executeQuery("select * from market");
 
             ResponseTO responseTO = new ResponseTO();
-            while (resultSet.next()) {
-                String market_name = resultSet.getString("market_name");
-                ResponseTO.MarketWhole  marketWhole = responseTO.createMarketWhole();
 
+            while (resultSet.next()) {
+                ResponseTO.MarketSet marketSet = responseTO.createMarketSet();
+
+                marketSet.setMarketName(resultSet.getString("market_name"));
+                marketSet.setIsActive(resultSet.getBoolean("is_active"));
+                marketSet.setmarketCurrenty(resultSet.getString("market_currency"));
+                marketSet.setMinTradeSize(resultSet.getDouble("min_trade_size"));
             }
 
            /* // PreparedStatements can use variables and are more efficient
