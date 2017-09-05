@@ -56,7 +56,7 @@ public class MyBittrexClient extends RestClient implements ExchangeInterface {
     }
 
     public Response getMarketSummary(String marketName){
-        return getResponseBody(getJsonAsString(Constants.BITTREX_BASE_URL+ Constants.PUBLIC+"/getticker?"+Constants.MARKET+Constants.EQUAL +marketName.toUpperCase()));
+        return getResponseBody(getJsonAsString(Constants.BITTREX_BASE_URL+ Constants.PUBLIC+"/getmarketsummary?"+Constants.MARKET+Constants.EQUAL +marketName.toUpperCase()));
     }
 
     public Response getMarketOrderBook(String marketName){
@@ -213,25 +213,7 @@ public class MyBittrexClient extends RestClient implements ExchangeInterface {
 
 
 
-    public static void main(String[] args){
-        MyBittrexClient client = new MyBittrexClient(null);
-        client.setSecret("faf2bf0bb20b4b5db3763868e814c190");
-        client.setApikey("9893fcf9b4b848f79cddf3d9d246a9bf");
-        String marketName = "BTC-HMQ";
-        Response response = client.getOrder("6fa336ac-f4e2-45b2-93b3-a30e51f39f31");
-        log.info(response.toString());
-////        Response response = new Response(client.getOrder("6f8d7ab7-ae71-4417-a983-5e692ddb9e0d"));
-//        if(JsonParserUtil.isAsuccess(response)){
-//            log.info(response.getResult());
-//            Order order = new Order(JsonParserUtil.getJsonObjectFromJsonString(response.getResult()));
-//            log.info("\n\n"+order.toString());
-//        }
-//
-//        else log.severe(response.getMessage());
-////        JsonObject jsonObject = JsonParserUtil.getJsonObjectFromJsonString(response.getResult());
-////        double ask = JsonParserUtil.getDoubleFromJsonObject(jsonObject,Constants.ASK);
-////        log.info(client.buy(marketName,20,ask));
-    }
+
 
 
 

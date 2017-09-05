@@ -1,12 +1,11 @@
 package com.jlarrieux.bittrexbot.UseCaseLayer.Manager;
 
-import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.jlarrieux.bittrexbot.Entity.Position;
 import com.jlarrieux.bittrexbot.Entity.Positions;
 import com.jlarrieux.bittrexbot.Properties.BittrexProperties;
-import com.jlarrieux.bittrexbot.REST.MyBittrexClient;
-import com.jlarrieux.bittrexbot.REST.Response;
+import com.jlarrieux.bittrexbot.UseCaseLayer.Adapter.OrderAdapater;
 import com.jlarrieux.bittrexbot.Util.Constants;
 import com.jlarrieux.bittrexbot.Util.JsonParserUtil;
 import lombok.extern.java.Log;
@@ -27,11 +26,11 @@ import java.util.List;
 public class PositionManager {
 
 
-    private MyBittrexClient client;
+
     private Positions positionBooks = new Positions();
     private double fee;
 
-
+    private OrderAdapater orderAdapater;
 
     public PositionManager(){
 
@@ -39,10 +38,10 @@ public class PositionManager {
 
 
     @Autowired
-    public PositionManager(MyBittrexClient client, Positions positions, BittrexProperties bittrexProperties){
-
+    public PositionManager( Positions positions, BittrexProperties bittrexProperties, OrderAdapater orderAdapater){
+        this.orderAdapater = orderAdapater;
         fee = bittrexProperties.getFee();
-        this.client = client;
+
         this.positionBooks = positions;
 
     }
@@ -81,25 +80,9 @@ public class PositionManager {
     }
 
 
-    private JsonObject getLastPrice(String marketname){
-        Response response = client.getMarketSummary(marketname);
-        if(JsonParserUtil.isAsuccess(response)&& response.getResult().length()>5){
-            return  JsonParserUtil.getJsonObjectFromJsonString(response.getResult());
 
-        }
-        return null;
-    }
 
-    private JsonObject getMarketOrderFirstObject(String marketName){
-        Response r = client.getMarketOrderBook(marketName);
-//        log.info(String.valueOf(r.getResult().length()));
-        if(r.getResult().length()>50) {
-            JsonObject object = JsonParserUtil.getJsonObjectFromJsonString(r.getResult());
-            JsonArray array = object.getAsJsonArray("buy");
-            return (JsonObject) array.get(0);
-        }
-        return null;
-    }
+
 
     private double calculateQuantity(JsonObject jsonObject){
         return JsonParserUtil.getDoubleFromJsonObject(jsonObject, Constants.QUANTITY);
@@ -111,23 +94,16 @@ public class PositionManager {
     }
 
 
-
-    public List<Position> getAllOpenPositions(){
+    public List<Position> getAllPositions(){
         List<Position> allPositions = new ArrayList<>();
-        Response r =client.getBalances();
-        if(JsonParserUtil.isAsuccess(r)){
-            JsonArray array = JsonParserUtil.getJsonArrayFromJsonString(r.getResult());
-            for(int i=0 ;i<array.size();i++){
-                Position p = new Position();
-                p.alternatBuild((JsonObject) array.get(i));
-                allPositions.add(p);
-            }
-            return allPositions;
+        for(JsonElement element : orderAdapater.getAllOpenOrders()){
+            Position p = new Position();
+            p.alternatBuild(element.getAsJsonObject());
+            allPositions.add(p);
         }
 
-        return null;
+        return allPositions;
     }
-
 
 
     public boolean contains(String key){

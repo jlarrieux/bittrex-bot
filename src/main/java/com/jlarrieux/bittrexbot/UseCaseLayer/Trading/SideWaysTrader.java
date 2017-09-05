@@ -2,16 +2,12 @@ package com.jlarrieux.bittrexbot.UseCaseLayer.Trading;
 
 
 
-import com.google.gson.JsonObject;
 import com.jlarrieux.bittrexbot.Entity.Comparators;
 import com.jlarrieux.bittrexbot.Entity.Market;
 import com.jlarrieux.bittrexbot.Properties.TradingProperties;
-import com.jlarrieux.bittrexbot.REST.ExchangeInterface;
-import com.jlarrieux.bittrexbot.REST.Response;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Manager.OrderManager;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Manager.PositionManager;
 import com.jlarrieux.bittrexbot.Util.Constants;
-import com.jlarrieux.bittrexbot.Util.JsonParserUtil;
 import lombok.Data;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,15 +24,15 @@ public class SideWaysTrader  extends AbstractTrader{
 
     private double stopLoss, profitTaking, spreadThreshold, rsiOverBought, rsiOverSold, rsiNoMomentum, tradingMinimum, currentBTCbalance;
 
-    private ExchangeInterface client;
+
     private OrderManager orderManager;
     private int orderTimeOutInMinutes;
 
 
 
     @Autowired
-    public SideWaysTrader(ExchangeInterface client, TradingProperties properties, PositionManager positionManager, OrderManager orderManager){
-        super(client,properties,positionManager,orderManager);
+    public SideWaysTrader( TradingProperties properties, PositionManager positionManager, OrderManager orderManager){
+        super(properties,positionManager,orderManager);
 
     }
 
@@ -68,15 +64,6 @@ public class SideWaysTrader  extends AbstractTrader{
 
 
 
-    private Double getBalance(){
-        Response response = new Response(client.getBalance("BTC").toString());
-        Double result = null;
-        if(response.isSuccess()){
-            JsonObject object = JsonParserUtil.getJsonObjectFromJsonString(response.getResult());
-            result= JsonParserUtil.getDoubleFromJsonObject(object, "Available");
-        }
-        return  result;
-    }
 
 
 
