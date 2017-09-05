@@ -176,7 +176,7 @@ class MarketTest extends Specification {
 
 
     def "Average True Range market test"() {
-        given: "A market with definition"
+        given: "A Market with definition"
         int period = TestData.ATRdata.period
         m.getATRholder().setWindowSize(period)
         int k = period-1

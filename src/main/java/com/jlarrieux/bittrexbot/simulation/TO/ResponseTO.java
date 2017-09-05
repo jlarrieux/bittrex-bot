@@ -4,20 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ResponseTO {
-    private String success="true";
-    private String message="";
-    private List result = new ArrayList();
 
-    public ResponseTO(){
-        MarketSet marketWhole = new MarketSet();
-        result.add(marketWhole);
-    }
+    private Boolean success =true;
+    private String message = "";
+    private List<Result> result = new ArrayList<>();
+    //private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    public String getSuccess() {
+    public Boolean getSuccess() {
         return success;
     }
 
-    public void setSuccess(String success) {
+    public void setSuccess(Boolean success) {
         this.success = success;
     }
 
@@ -29,65 +26,20 @@ public class ResponseTO {
         this.message = message;
     }
 
-    public List getResult() {
+    public List<Result> getResult() {
         return result;
     }
 
-    public void setResult(List result) {
+    public void setResult(List<Result> result) {
         this.result = result;
     }
 
-    public MarketSet createMarketSet(){
-        return new MarketSet();
+   /* public Map<String, Object> getAdditionalProperties() {
+        return this.additionalProperties;
     }
 
-    public class Market {
-        String MarketCurrency="";
-        String BaseCurrency = "";
-        boolean IsActive;
-        double MinTradeSize;
-        String MarketName = "";
-    }
-
-    public class Summary{
-        String MarketName = "";
-        double High, Low, Last, Bid, Ask,Volume;
-        int OpenBuyOrders;
-        int OpenSellOrders;
-
-
-    }
-    public class MarketSet {
-        Market Market = new Market();
-        Summary Summary = new Summary();
-        boolean IsVerified = false;
-
-        public ResponseTO.Market getMarket() {
-            return Market;
-        }
-
-        public Summary getSummary(){
-            return Summary;
-        }
-
-        public void setmarketCurrenty(String marketCurrency) {
-            Market.MarketCurrency = marketCurrency;
-        }
-
-        public void setIsActive(boolean bool) {
-            Market.IsActive = bool;
-        }
-
-        public void setMinTradeSize(double minTradeSize) {
-            Market.MinTradeSize = minTradeSize;
-        }
-
-        public void setMarketName(String marketName) {
-            Market.MarketName = marketName;
-        }
-
-
-
-    }
+    public void setAdditionalProperty(String name, Object value) {
+        this.additionalProperties.put(name, value);
+    }*/
 
 }

@@ -1,6 +1,6 @@
 package com.jlarrieux.bittrexbot.simulation;
 
-import com.jlarrieux.bittrexbot.simulation.DAO.DBExchangeDAOImpl;
+import com.jlarrieux.bittrexbot.simulation.DAO.SpringDBExchangeDAOImpl;
 import com.jlarrieux.bittrexbot.simulation.DAO.IDBExchangeDAO;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -30,7 +30,7 @@ public class SpringJDBCConfig {
 
     @Bean
     public IDBExchangeDAO IDbexchangeDAO(){
-        DBExchangeDAOImpl  dbExchangeDao = new DBExchangeDAOImpl();
+        SpringDBExchangeDAOImpl dbExchangeDao = new SpringDBExchangeDAOImpl();
         dbExchangeDao.setJdbcTemplate(jdbcTemplate());
         return dbExchangeDao;
     }
