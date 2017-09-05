@@ -4,7 +4,6 @@ package com.jlarrieux.bittrexbot.UseCaseLayer.Trading;
 
 import com.jlarrieux.bittrexbot.Entity.Market;
 import com.jlarrieux.bittrexbot.Properties.TradingProperties;
-import com.jlarrieux.bittrexbot.REST.ExchangeInterface;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Manager.OrderManager;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Manager.PositionManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,7 @@ public abstract class AbstractTrader implements Trader {
 
     private PositionManager positionManager;
     private OrderManager orderManager;
-    private ExchangeInterface client;
+
     private double stopLoss, tradingMinimum, profitTaking;
     protected List<Market> potentialMarkets = new ArrayList<>();
 
@@ -27,8 +26,8 @@ public abstract class AbstractTrader implements Trader {
 
 
     @Autowired
-    public AbstractTrader(ExchangeInterface client, TradingProperties tradingProperties, PositionManager positionManager, OrderManager orderManager){
-        this.client = client;
+    public AbstractTrader( TradingProperties tradingProperties, PositionManager positionManager, OrderManager orderManager){
+
         this.positionManager = positionManager;
         this.orderManager = orderManager;
         stopLoss = tradingProperties.getStopLoss();

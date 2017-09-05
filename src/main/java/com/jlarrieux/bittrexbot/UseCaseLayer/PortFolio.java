@@ -2,14 +2,9 @@ package com.jlarrieux.bittrexbot.UseCaseLayer;
 
 
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.jlarrieux.bittrexbot.Entity.Position;
 import com.jlarrieux.bittrexbot.Entity.Positions;
-import com.jlarrieux.bittrexbot.REST.MyBittrexClient;
-import com.jlarrieux.bittrexbot.REST.Response;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Manager.PositionManager;
-import com.jlarrieux.bittrexbot.Util.JsonParserUtil;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,15 +18,14 @@ public class PortFolio {
 
 
 
-    private MyBittrexClient client;
     private Positions positionBooks = new Positions();
     private double total;
     private PositionManager positionManager;
 
 
     @Autowired
-    public PortFolio(MyBittrexClient client, PositionManager manager){
-        this.client = client;
+    public PortFolio( PositionManager manager){
+
         this.positionManager = manager;
 
     }
@@ -46,7 +40,7 @@ public class PortFolio {
 
     private void buildPositionBooks(){
         positionBooks.clear();
-        List<Position> allPostions = positionManager.getAllOpenPositions();
+        List<Position> allPostions = positionManager.getAllPositions();
         if(allPostions!=null){
             for(Position p: allPostions) positionBooks.put(p.getCurrency(), p);
             calculateTotal();
@@ -93,21 +87,9 @@ public class PortFolio {
     }
 
 
-    private JsonArray getBuyBook(String marketName){
-        Response response = client.getMarketOrderBook(marketName);
-        if(response.getResult().length()>50){
-            JsonObject object = JsonParserUtil.getJsonObjectFromJsonString(response.getResult());
-            return object.getAsJsonArray("buy");
-        }
 
-        return null;
-    }
 
-    private JsonObject getMarketSummary(String marketName){
-        Response response = client.getMarketSummary(marketName);
-        if(JsonParserUtil.isAsuccess(response)&& !response.getResult().contains("null"))return JsonParserUtil.getJsonObjectFromJsonString(response.getResult());
-        return null;
-    }
+
 
 
 

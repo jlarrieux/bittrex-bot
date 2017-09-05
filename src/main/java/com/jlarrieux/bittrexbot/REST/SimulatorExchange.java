@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Qualifier(Constants.SIMULATOR)
 @Profile("!live")
 public class SimulatorExchange  implements ExchangeInterface{
-
+    //todo create data structure that will hold data from server
 
     @Override
     public Response getMarkets() {
@@ -42,6 +42,7 @@ public class SimulatorExchange  implements ExchangeInterface{
 
     @Override
     public Response getMarketSummaries() {
+        //todo implement simulation of data feeding
         return null;
     }
 
