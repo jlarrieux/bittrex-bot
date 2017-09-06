@@ -74,4 +74,22 @@ public class MarketOrderBookAdapater {
     }
 
 
+    public double getFirstBuyPrice(){
+        return buyOrderBookEntries.get(0).getPrice();
+    }
+
+    public double getFirstBuyQuantity(){
+        return buyOrderBookEntries.get(0).getQuantity();
+    }
+
+
+    public double getFirstSellPrice(){
+        return  sellOrderBookEntries.get(0).getPrice();
+    }
+
+
+    public double getFirstSellQuantity(){
+        return sellOrderBookEntries.get(0).getQuantity();
+    }
+
 }

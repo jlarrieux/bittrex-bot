@@ -8,10 +8,12 @@ import com.jlarrieux.bittrexbot.Entity.Order;
 import com.jlarrieux.bittrexbot.Entity.Orders;
 import com.jlarrieux.bittrexbot.Entity.Position;
 import com.jlarrieux.bittrexbot.Properties.TradingProperties;
+import com.jlarrieux.bittrexbot.UseCaseLayer.Adapter.MarketOrderBookAdapater;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Adapter.OrderAdapater;
 import lombok.Data;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Clock;
@@ -36,18 +38,23 @@ public class OrderManager {
     private int orderTimeOutInMinutes;
 
 
-
+    MarketOrderBookAdapater marketOrderBookAdapater;
     OrderAdapater orderAdapater;
 
     @Autowired
-    public OrderManager( Orders orders, PositionManager positionManager, TradingProperties properties, OrderAdapater orderAdapater){
+    public OrderManager( Orders orders, PositionManager positionManager, TradingProperties properties, OrderAdapater orderAdapater, MarketOrderBookAdapater marketOrderBookAdapater){
         this.orderAdapater = orderAdapater;
         buyIncrement = properties.getMinimumBtc();
         this.orderBooks = orders;
         this.positionManager = positionManager;
         this.orderTimeOutInMinutes = properties.getOrderTimeOutInMinutes();
+        this.marketOrderBookAdapater = marketOrderBookAdapater;
         getOpenOrders();
     }
+
+
+
+
 
 
 
@@ -94,10 +101,17 @@ public class OrderManager {
     }
 
     public String initiateBuy(String marketName){
-        double unitPrice =-1;//todo calculate true unit price
-        return trueBuying(marketName, unitPrice,0);
+        marketOrderBookAdapater.executeMarketOrderBook(marketName);
+        double unitPrice = marketOrderBookAdapater.getFirstBuyPrice();//todo calculate true unit price
+        double quantity = marketOrderBookAdapater.getFirstBuyQuantity();
+        double fallBackQuantity = buyIncrement/unitPrice;
+        if(fallBackQuantity< quantity) quantity = fallBackQuantity;
+        return trueBuying(marketName, quantity,unitPrice);
 
     }
+
+
+
 
     public String initiateBuy(String marketName,double quantity, double price){
 //        log.info(String.format("Initiate buy: "));
@@ -139,6 +153,26 @@ public class OrderManager {
     private double getSellPrice(String marketName){
 
         return 0;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @Scheduled(fixedRate = 15000)
+    public void checkPendingOrders(){
+        decideOnPendingBuyOrders();
+        decideOnPendingSellOrders();
     }
 
 

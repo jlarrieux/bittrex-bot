@@ -64,13 +64,6 @@ public class SideWaysTrader  extends AbstractTrader{
 
 
 
-
-
-
-
-
-
-
     @Override
     public void makeBuy(Market market) {
         if(okToBuy(market)) orderManager.initiateBuy(market.getMarketName());
