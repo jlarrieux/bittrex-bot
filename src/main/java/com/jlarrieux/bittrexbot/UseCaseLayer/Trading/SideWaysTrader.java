@@ -2,7 +2,7 @@ package com.jlarrieux.bittrexbot.UseCaseLayer.Trading;
 
 
 
-import com.jlarrieux.bittrexbot.Entity.Comparators;
+import com.jlarrieux.bittrexbot.UseCaseLayer.Comparators;
 import com.jlarrieux.bittrexbot.Entity.Market;
 import com.jlarrieux.bittrexbot.Properties.TradingProperties;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Manager.OrderManager;
@@ -22,11 +22,8 @@ import java.util.Collections;
 public class SideWaysTrader  extends AbstractTrader{
 
 
-    private double stopLoss, profitTaking, spreadThreshold, rsiOverBought, rsiOverSold, rsiNoMomentum, tradingMinimum, currentBTCbalance;
+    private double  rsiOverBought, rsiOverSold, rsiNoMomentum;
 
-
-    private OrderManager orderManager;
-    private int orderTimeOutInMinutes;
 
 
 
@@ -41,14 +38,9 @@ public class SideWaysTrader  extends AbstractTrader{
 
         Collections.sort(potentialMarkets, new Comparators.MarketRsiComparatorAscending());
         for(Market m: potentialMarkets){
-//            makeBuy();
+            if(positionManager.contains(m.getMarketName())) evaluateSell(m);
+            evaluateBuy(m);
         }
-    }
-
-
-
-    private void evaluate(Market m){
-
     }
 
 
@@ -61,11 +53,8 @@ public class SideWaysTrader  extends AbstractTrader{
 
 
 
-
-
-
     @Override
-    public void makeBuy(Market market) {
+    public void evaluateBuy(Market market) {
         if(okToBuy(market)) orderManager.initiateBuy(market.getMarketName());
 
     }
@@ -87,7 +76,7 @@ public class SideWaysTrader  extends AbstractTrader{
 
 
     @Override
-    public void makeSell(Market market) {
+    public void evaluateSell(Market market) {
         if(okToSell(market))     orderManager.initiateSell(market.getMarketName());
 
     }
@@ -100,8 +89,6 @@ public class SideWaysTrader  extends AbstractTrader{
         double bollingerLow = market.getBollingerLow();
         double currentPrice = market.getLast();
         double pAndL = orderManager.getPandL(market);
-        log.info(String.format("SELL INDICATOR: currency: %s  currentRSI: %s\t\t currentPrice: %s  "
-                , Constants.addSpace(market.getMarketCurrency()), Constants.addSpaceForDouble(rsi,2,""),Constants.addSpaceForDouble(currentPrice, Constants.CURRENCY_PRECISION, Constants.BTC)) );
 
         if( (rsi>= rsiOverBought  && currentPrice>bollingerLow) || pAndL<= stopLoss || pAndL>= profitTaking) return true;
         else     return false;

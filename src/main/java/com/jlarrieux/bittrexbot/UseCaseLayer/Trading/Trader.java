@@ -8,9 +8,9 @@ import com.jlarrieux.bittrexbot.Entity.Market;
 
 public interface Trader {
 
-    void makeBuy(Market market);
+    void evaluateBuy(Market market);
     void executeStrategy();
-    void makeSell(Market market);
+    void evaluateSell(Market market);
 
 
 
