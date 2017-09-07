@@ -127,4 +127,8 @@ public class ADX {
     }
 
 
+    public double getADXDirection(){
+        return DIplus-DIminus;
+    }
+
 }

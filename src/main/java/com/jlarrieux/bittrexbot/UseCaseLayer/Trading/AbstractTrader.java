@@ -15,10 +15,9 @@ import java.util.List;
 
 public abstract class AbstractTrader implements Trader {
 
-    private PositionManager positionManager;
-    private OrderManager orderManager;
-
-    private double stopLoss, tradingMinimum, profitTaking;
+    protected PositionManager positionManager;
+    protected OrderManager orderManager;
+    protected double stopLoss, tradingMinimum, profitTaking;
     protected List<Market> potentialMarkets = new ArrayList<>();
 
 
