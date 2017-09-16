@@ -2,10 +2,7 @@ package com.jlarrieux.bittrexbot.UseCaseLayer.Manager;
 
 
 
-import com.jlarrieux.bittrexbot.REST.BittrexRestClient;
-import com.jlarrieux.bittrexbot.REST.MyBittrexClient;
-import com.jlarrieux.bittrexbot.REST.Response;
-import com.jlarrieux.bittrexbot.Util.JsonParserUtil;
+import com.jlarrieux.bittrexbot.UseCaseLayer.Adapter.MarketSummaryAdapter;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -20,16 +17,12 @@ public class BittrexDataManager {
 
 
     @Autowired
-    private MyBittrexClient client;
-
-    @Autowired
-    private BittrexRestClient client2;
+    private MarketSummaryAdapter marketSummaryAdapter;
 
     @Autowired
     private MarketManager marketManager;
 
-    @Autowired
-    OrderManager manager;
+
 
 
     public BittrexDataManager(){
