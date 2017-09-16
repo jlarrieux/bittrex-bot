@@ -52,24 +52,18 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     public ResponseTO getMarketSummaries() {
         ResponseTO responseTO = new ResponseTO();
         try {
-            // This will load the MySQL driver, each DB has its own driver
-            Class.forName(JDBC_DRIVER);
-            // Setup the connection with the DB
-            connect = DriverManager
-                    .getConnection(DB_CONNECTTION_URL);
 
-            // Statements allow to issue SQL queries to the database
+            Class.forName(JDBC_DRIVER);
+
+            connect = DriverManager.getConnection(DB_CONNECTTION_URL);
+
             statement = connect.createStatement();
-            // Result set get the result of the SQL query
-            resultSet =
-                    statement.executeQuery("select  * from my_data inner join market"
+
+            resultSet = statement.executeQuery("select  * from my_data inner join market"
                             + " on my_data.market_id=market.id where my_data.date_create='"
                             + dateStack.pop() +"'");
 
-
-
             while (resultSet.next()) {
-
                 Summary summary = new Summary();
                 summary.setAsk(resultSet.getDouble("ask"));
                 summary.setBid(resultSet.getDouble("bid"));
@@ -95,8 +89,6 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
 
                 responseTO.getResult().add(result);
             }
-
-
         } catch (Exception e) {
              e.printStackTrace();
         } finally {
