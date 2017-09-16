@@ -6,7 +6,7 @@ import com.jlarrieux.bittrexbot.Entity.Order;
 import com.jlarrieux.bittrexbot.REST.MyBittrexClient;
 import com.jlarrieux.bittrexbot.REST.Response;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Manager.OrderManager;
-import com.jlarrieux.bittrexbot.UseCaseLayer.MarketSummary;
+import com.jlarrieux.bittrexbot.UseCaseLayer.Adapter.MarketSummaryAdapter;
 import com.jlarrieux.bittrexbot.Util.JsonParserUtil;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -33,7 +33,7 @@ public class OrderManagerAndClientIntegrationTest {
     OrderManager orderManager;
 
     @Autowired
-    MarketSummary marketSummary;
+    MarketSummaryAdapter marketSummary;
 
     static StringBuilder builder = new StringBuilder();
 

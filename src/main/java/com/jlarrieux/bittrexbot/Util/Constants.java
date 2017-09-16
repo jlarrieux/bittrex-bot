@@ -110,6 +110,8 @@ public class Constants {
     public static final double DECIMAL_PRECISION_EQUAL =0.001;
     public static final String TYPE = "Type";
     public static final String ORDER_TYPE = "OrderType";
+    public static final String BUY = "buy";
+    public static final String SELL = "sell";
 
 
 

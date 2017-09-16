@@ -3,19 +3,17 @@ package com.jlarrieux.bittrexbot.UseCaseLayer.Manager;
 
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.jlarrieux.bittrexbot.Entity.Market;
 import com.jlarrieux.bittrexbot.Entity.Order;
 import com.jlarrieux.bittrexbot.Entity.Orders;
 import com.jlarrieux.bittrexbot.Entity.Position;
 import com.jlarrieux.bittrexbot.Properties.TradingProperties;
-import com.jlarrieux.bittrexbot.REST.ExchangeInterface;
-import com.jlarrieux.bittrexbot.REST.Response;
-import com.jlarrieux.bittrexbot.Util.Constants;
-import com.jlarrieux.bittrexbot.Util.JsonParserUtil;
+import com.jlarrieux.bittrexbot.UseCaseLayer.Adapter.MarketOrderBookAdapater;
+import com.jlarrieux.bittrexbot.UseCaseLayer.Adapter.OrderAdapater;
 import lombok.Data;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Clock;
@@ -31,7 +29,7 @@ public class OrderManager {
 
 
     private Orders orderBooks;
-    private ExchangeInterface client;
+
 //    private HashMap<String,Order> initiatedOrders = new HashMap<>();
     private HashMap<String, Order> pendingBuyOrderTracker = new HashMap<>();
     private HashMap<String, Order> pendingSellOrderTracker = new HashMap<>();
@@ -40,23 +38,30 @@ public class OrderManager {
     private int orderTimeOutInMinutes;
 
 
+    MarketOrderBookAdapater marketOrderBookAdapater;
+    OrderAdapater orderAdapater;
+
     @Autowired
-    public OrderManager(ExchangeInterface client, Orders orders, PositionManager positionManager, TradingProperties properties){
-        this.client = client;
+    public OrderManager( Orders orders, PositionManager positionManager, TradingProperties properties, OrderAdapater orderAdapater, MarketOrderBookAdapater marketOrderBookAdapater){
+        this.orderAdapater = orderAdapater;
         buyIncrement = properties.getMinimumBtc();
         this.orderBooks = orders;
         this.positionManager = positionManager;
         this.orderTimeOutInMinutes = properties.getOrderTimeOutInMinutes();
+        this.marketOrderBookAdapater = marketOrderBookAdapater;
         getOpenOrders();
     }
 
 
 
 
+
+
+
+
     public void getOpenOrders(){
         log.info("Getting open orders...");
-        Response response = client.getOpenOrders();
-        if(response.isSuccess())  iterateJsonArrayOrder(JsonParserUtil.getJsonArrayFromJsonString(response.getResult()));
+        iterateJsonArrayOrder(orderAdapater.getAllOpenOrders());
 
     }
 
@@ -70,16 +75,7 @@ public class OrderManager {
 
 
 
-    public void cancelAll() {
-        getOpenOrders();
-        log.info("Orderbook size: "+ orderBooks.size());
-        for(String key: orderBooks.keySet()){
-            Order o = orderBooks.get(key);
-            log.info(String.format("Cancelling order: %s", o.toString()));
-            log.info( client.cancelOrder(o.getOrderUuid()).getResult());
 
-        }
-    }
 
 
     public void cancelOldOrders(LocalDateTime cutoff){
@@ -89,7 +85,7 @@ public class OrderManager {
             Order o = orderBooks.get(key);
             boolean before = o.getOpened().isBefore(cutoff);
 //            log.info(String.format("is it before? %b\t order date: %s \t\t cutoffdate: %s", before, o.getOpened().toString(), cutoff.toString()));
-            if(before) client.cancelOrder(o.getOrderUuid());
+            if(before) orderAdapater.cancelOrder(o.getOrderUuid());//client.cancelOrder(o.getOrderUuid());
         }
     }
 
@@ -97,7 +93,7 @@ public class OrderManager {
         double quantity = positionManager.getQuantityOwn(currency);
         double unitPrice = getSellPrice(currency);
         if (quantity>0){
-            Order order = getOrder( client.sell(currency,quantity,unitPrice));
+            Order order = orderAdapater.sell(currency,quantity,unitPrice);//getOrder( client.sell(currency,quantity,unitPrice))  ord;
             if(order!= null) pendingSellOrderTracker.put(order.getOrderUuid(), order);
         }
 
@@ -105,10 +101,17 @@ public class OrderManager {
     }
 
     public String initiateBuy(String marketName){
-        double unitPrice =-1;//todo calculate true unit price
-        return trueBuying(marketName, unitPrice,0);
+        marketOrderBookAdapater.executeMarketOrderBook(marketName);
+        double unitPrice = marketOrderBookAdapater.getFirstBuyPrice();//todo calculate true unit price
+        double quantity = marketOrderBookAdapater.getFirstBuyQuantity();
+        double fallBackQuantity = buyIncrement/unitPrice;
+        if(fallBackQuantity< quantity) quantity = fallBackQuantity;
+        return trueBuying(marketName, quantity,unitPrice);
 
     }
+
+
+
 
     public String initiateBuy(String marketName,double quantity, double price){
 //        log.info(String.format("Initiate buy: "));
@@ -116,10 +119,10 @@ public class OrderManager {
     }
 
     private String trueBuying(String marketName,  double quantity,double unitPrice){
-        if(quantity==-1) quantity= buyIncrement;
+        if(quantity==-1) quantity= buyIncrement/unitPrice;
         StringBuilder uuid = null;
         log.info(String.format("marketname: %s\tquantity: %f\tunitPrice: %f", marketName, quantity,unitPrice));
-        Order order = getOrder( client.buy(marketName,quantity,unitPrice));
+        Order order = orderAdapater.buy(marketName,quantity,unitPrice);
         if(order!=null){
             uuid = new StringBuilder();
             pendingBuyOrderTracker.put(order.getOrderUuid(), order);
@@ -129,22 +132,7 @@ public class OrderManager {
     }
 
 
-    private Order getOrder(Response response){
 
-        if(JsonParserUtil.isAsuccess( response)){
-
-            JsonObject jsonObject = JsonParserUtil.getJsonObjectFromJsonString(response.getResult());
-            String uuid = JsonParserUtil.getStringFromJsonObject(jsonObject, Constants.UUID);
-
-            Response response1 = client.getOrder(uuid);
-            if(JsonParserUtil.isAsuccess(response1)){
-
-                return new Order(JsonParserUtil.getJsonObjectFromJsonString(response1.getResult()));
-            } else log.severe(response1.getMessage());
-            return null;
-        } else log.severe(response.getMessage());
-        return null;
-    }
 
 
 
@@ -168,26 +156,45 @@ public class OrderManager {
     }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @Scheduled(fixedRate = 15000)
+    public void checkPendingOrders(){
+        decideOnPendingBuyOrders();
+        decideOnPendingSellOrders();
+    }
+
+
     private void decideOnPendingBuyOrders(){
         for(String uuid: pendingBuyOrderTracker.keySet()){
             Order localOrder = pendingBuyOrderTracker.get(uuid);
-            Response responseFromOrderUUID = client.getOrder(localOrder.getOrderUuid());
-            if(JsonParserUtil.isAsuccess(responseFromOrderUUID)){
-                Order remote = new Order(JsonParserUtil.getJsonObjectFromJsonString(responseFromOrderUUID.getResult()));
-                if (!remote.getIsOpen() && !remote.getCancelIniated()){
-                        Position p = createPositionFromOrder(localOrder);
-                        if(p!=null) {
-                            positionManager.add(p);
-                            pendingBuyOrderTracker.remove(uuid);
-                        }
-                }
-                else if (cancelBecauseOfTimeTooOld(remote.getOpened())) {
-                    if(partialUpdateHasOccurred(localOrder,remote)) updateForPartialExecution(localOrder,remote);
-                    client.cancelOrder(remote.getOrderUuid());
-                }
 
-                else if(partialUpdateHasOccurred(localOrder,remote))   updateForPartialExecution(localOrder,remote);
+            Order remote = orderAdapater.getOrder(localOrder.getOrderUuid());//new Order(JsonParserUtil.getJsonObjectFromJsonString(responseFromOrderUUID.getResult()));
+            if (!remote.getIsOpen() && !remote.getCancelIniated()){
+                    Position p = createPositionFromOrder(localOrder);
+                    if(p!=null) {
+                        positionManager.add(p);
+                        pendingBuyOrderTracker.remove(uuid);
+                    }
             }
+            else if (cancelBecauseOfTimeTooOld(remote.getOpened())) {
+                if(partialUpdateHasOccurred(localOrder,remote)) updateForPartialExecution(localOrder,remote);
+                orderAdapater.cancelOrder(remote.getOrderUuid());
+            }
+
+            else if(partialUpdateHasOccurred(localOrder,remote))   updateForPartialExecution(localOrder,remote);
+
         }
     }
 
@@ -195,20 +202,18 @@ public class OrderManager {
     private void decideOnPendingSellOrders(){
         for (String key: pendingSellOrderTracker.keySet()){
             Order localOrder = pendingSellOrderTracker.get(key);
-            Response responseFromOrderUUID = client.getOrder(localOrder.getOrderUuid());
 
-            if(JsonParserUtil.isAsuccess(responseFromOrderUUID)){
-                Order remote = new Order(JsonParserUtil.getJsonObjectFromJsonString(responseFromOrderUUID.getResult()));
-                if(!remote.getIsOpen() && ! remote.getCancelIniated()){
-                    positionManager.remove(key);
-                    pendingSellOrderTracker.remove(key);
-                }
-                else if(cancelBecauseOfTimeTooOld(remote.getOpened())){
-                    if(partialUpdateHasOccurred(localOrder, remote)) updateForPartialExecution(localOrder,remote);
-                    client.cancelOrder(remote.getOrderUuid());
-                }
-                else if (partialUpdateHasOccurred(localOrder,remote));//todo implement negative update
+            Order remote = orderAdapater.getOrder(localOrder.getOrderUuid());
+            if(!remote.getIsOpen() && ! remote.getCancelIniated()){
+                positionManager.remove(key);
+                pendingSellOrderTracker.remove(key);
             }
+            else if(cancelBecauseOfTimeTooOld(remote.getOpened())){
+                if(partialUpdateHasOccurred(localOrder, remote)) updateForPartialExecution(localOrder,remote);
+                orderAdapater.cancelOrder(remote.getOrderUuid());
+            }
+            else if (partialUpdateHasOccurred(localOrder,remote));//todo implement negative update
+
 
         }
     }
@@ -228,7 +233,7 @@ public class OrderManager {
             double diff = localOrder.getQuantity() - localOrder.getQuantityRemaining();
             localOrder.setQuantity(remote.getQuantityRemaining());
             if(localOrder.getType()== Order.orderType.LIMIT_SELL);
-            Position p = new Position(diff, localOrder.getLimit(), getMarketCurrency(localOrder));
+            Position p = new Position(diff, localOrder.getLimit(), "");//todo get market currency
             positionManager.add(p);
     }
 
@@ -247,23 +252,14 @@ public class OrderManager {
 
     private Position createPositionFromOrder( Order localOrder){
         Position p = null;
-        String s = getMarketCurrency(localOrder);
+        String s = "";//todo get market currency
         if(s!=null) p = new Position(localOrder, s);
 
         return  p;
 
     }
 
-    private String getMarketCurrency(Order localOrder){
-        Response r = client.getMarketSummary(localOrder.getMarketName());
-        String result = null;
-        if(JsonParserUtil.isAsuccess(r)){
-            Market m = new Market(JsonParserUtil.getJsonObjectFromJsonString(r.getResult()));
-            return m.getMarketCurrency();
-        }
 
-        return result;
-    }
 
 
 

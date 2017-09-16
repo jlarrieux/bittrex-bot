@@ -181,7 +181,15 @@ public class Market {
         return bollingerSMA.getPercentB();
     }
 
+    public boolean isPriceBelowKeltnerLow(){
+        return last< keltnerChannels.getLow();
+    }
 
+
+
+    public boolean isPriceAboveKeltnerHigh(){
+        return last> keltnerChannels.getHigh();
+    }
 
 
 }
