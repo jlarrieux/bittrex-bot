@@ -12,7 +12,7 @@ public class SpringDBExchangeDAOImpl implements IDBExchangeDAO {
         return null;
     }
 
-    @Override
+
     public ResponseTO getMarketSummaryFor1(int id){
         String sql = "select market_currency from market where id = ?";
         String name = jdbcTemplate.queryForObject(sql,new Object[]{id},String.class);

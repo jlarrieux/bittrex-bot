@@ -23,9 +23,9 @@ public class TestSimulation {
 
         DBExchangeDAOImpl dbExchangeDao = new DBExchangeDAOImpl();
         //dbExchangeDao.printOutStack();
-       ResponseTO responseTO = dbExchangeDao.getMarketSummaryFor1(1);
+       ResponseTO responseTO = dbExchangeDao.getMarketSummaries();
         System.out.println(new Gson().toJson(responseTO));
-        responseTO = dbExchangeDao.getMarketSummaryFor1(1);
+        responseTO = dbExchangeDao.getMarketSummaries();
         System.out.println(new Gson().toJson(responseTO.getResult()));
 
         //JSON Conversion
