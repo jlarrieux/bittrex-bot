@@ -32,7 +32,8 @@ public class BittrexDataManager {
 
     @Scheduled(fixedRate = 30000)
     public void getMarketSummaries(){
-              marketManager.addMarkets(marketSummaryAdapter.getMarketSummaries());
+
+        marketManager.addMarkets(marketSummaryAdapter.getMarketSummaries());
     }
 
 
