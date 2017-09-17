@@ -9,6 +9,7 @@ import com.jlarrieux.bittrexbot.Entity.Orders;
 import com.jlarrieux.bittrexbot.Entity.Position;
 import com.jlarrieux.bittrexbot.Properties.TradingProperties;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Adapter.MarketOrderBookAdapater;
+import com.jlarrieux.bittrexbot.UseCaseLayer.Adapter.MarketSummaryAdapter;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Adapter.OrderAdapater;
 import lombok.Data;
 import lombok.extern.java.Log;
@@ -29,26 +30,26 @@ public class OrderManager {
 
 
     private Orders orderBooks;
-
-//    private HashMap<String,Order> initiatedOrders = new HashMap<>();
     private HashMap<String, Order> pendingBuyOrderTracker = new HashMap<>();
     private HashMap<String, Order> pendingSellOrderTracker = new HashMap<>();
     private PositionManager positionManager ;
     private double buyIncrement;
     private int orderTimeOutInMinutes;
+    private MarketSummaryAdapter marketSummaryAdapter;
 
 
     MarketOrderBookAdapater marketOrderBookAdapater;
     OrderAdapater orderAdapater;
 
     @Autowired
-    public OrderManager( Orders orders, PositionManager positionManager, TradingProperties properties, OrderAdapater orderAdapater, MarketOrderBookAdapater marketOrderBookAdapater){
+    public OrderManager( Orders orders, PositionManager positionManager, TradingProperties properties, OrderAdapater orderAdapater, MarketOrderBookAdapater marketOrderBookAdapater, MarketSummaryAdapter marketSummaryAdapter){
         this.orderAdapater = orderAdapater;
         buyIncrement = properties.getMinimumBtc();
         this.orderBooks = orders;
         this.positionManager = positionManager;
         this.orderTimeOutInMinutes = properties.getOrderTimeOutInMinutes();
         this.marketOrderBookAdapater = marketOrderBookAdapater;
+        this.marketSummaryAdapter = marketSummaryAdapter;
         getOpenOrders();
     }
 
@@ -68,7 +69,7 @@ public class OrderManager {
 
     private void iterateJsonArrayOrder(JsonArray array){
         orderBooks.clear();
-        Order order;
+
         for(int i =0; i<array.size(); i++) orderBooks.add(array,i);
 
     }
@@ -102,7 +103,7 @@ public class OrderManager {
 
     public String initiateBuy(String marketName){
         marketOrderBookAdapater.executeMarketOrderBook(marketName);
-        double unitPrice = marketOrderBookAdapater.getFirstBuyPrice();//todo calculate true unit price
+        double unitPrice = marketOrderBookAdapater.getFirstBuyPrice();
         double quantity = marketOrderBookAdapater.getFirstBuyQuantity();
         double fallBackQuantity = buyIncrement/unitPrice;
         if(fallBackQuantity< quantity) quantity = fallBackQuantity;
@@ -141,11 +142,12 @@ public class OrderManager {
 
     public Double getPandL(Market market) {
         if(positionManager.contains(market.getMarketCurrency())){
-            double total = positionManager.getTotalPricePaid(market.getMarketCurrency());
+            double totalPriceAtBuy = positionManager.getTotalPricePaid(market.getMarketCurrency());
             double quantity = positionManager.getQuantityOwn(market.getMarketCurrency());
+            double currentValueOfQuantity = quantity* market.getLast();
+            return currentValueOfQuantity- totalPriceAtBuy;
         }
 
-        //todo implement
         return null;
     }
 
@@ -154,15 +156,6 @@ public class OrderManager {
 
         return 0;
     }
-
-
-
-
-
-
-
-
-
 
 
 
@@ -212,7 +205,7 @@ public class OrderManager {
                 if(partialUpdateHasOccurred(localOrder, remote)) updateForPartialExecution(localOrder,remote);
                 orderAdapater.cancelOrder(remote.getOrderUuid());
             }
-            else if (partialUpdateHasOccurred(localOrder,remote));//todo implement negative update
+            else if (partialUpdateHasOccurred(localOrder,remote)) updateForPartialExecution(localOrder,remote);//todo implement negative update
 
 
         }
@@ -221,9 +214,9 @@ public class OrderManager {
 
 
     private boolean partialUpdateHasOccurred(Order local, Order remote){
-        boolean hasPariallyExecuted = remote.getQuantity() != remote.getQuantityRemaining();
+        boolean hasPartiallyExecuted = remote.getQuantity() != remote.getQuantityRemaining();
         boolean localIsUnaware = remote.getQuantityRemaining() != local.getQuantityRemaining();
-        return localIsUnaware && hasPariallyExecuted;
+        return localIsUnaware && hasPartiallyExecuted;
 
     }
 
@@ -233,7 +226,7 @@ public class OrderManager {
             double diff = localOrder.getQuantity() - localOrder.getQuantityRemaining();
             localOrder.setQuantity(remote.getQuantityRemaining());
             if(localOrder.getType()== Order.orderType.LIMIT_SELL);
-            Position p = new Position(diff, localOrder.getLimit(), "");//todo get market currency
+            Position p = new Position(diff, localOrder.getLimit(), marketSummaryAdapter.getMarketCurrency(localOrder.getMarketName()));
             positionManager.add(p);
     }
 
@@ -252,7 +245,7 @@ public class OrderManager {
 
     private Position createPositionFromOrder( Order localOrder){
         Position p = null;
-        String s = "";//todo get market currency
+        String s = marketSummaryAdapter.getMarketCurrency(localOrder.getMarketName());
         if(s!=null) p = new Position(localOrder, s);
 
         return  p;

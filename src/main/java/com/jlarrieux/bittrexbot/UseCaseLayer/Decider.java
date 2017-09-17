@@ -56,7 +56,7 @@ public class Decider {
             else sideWaysTrader.addToPotentialMarkets(market);
         }
 
-        executeStrategy();
+//        executeStrategy();
     }
 
 
@@ -67,7 +67,7 @@ public class Decider {
 
     private void executeStrategy(){
         sideWaysTrader.executeStrategy();
-
+        trendingTrader.executeStrategy();
 
     }
 

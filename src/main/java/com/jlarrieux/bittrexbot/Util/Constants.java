@@ -3,12 +3,15 @@ package com.jlarrieux.bittrexbot.Util;
 
 
 import lombok.extern.java.Log;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 
@@ -175,6 +178,10 @@ public class Constants {
     }
 
 
+
+    public static String getDescriptiveStatisticsAsString(DescriptiveStatistics descriptiveStatistics){
+        return getListAsString(Arrays.stream(descriptiveStatistics.getValues()).boxed().collect(Collectors.toList()));
+    }
 
 
 
