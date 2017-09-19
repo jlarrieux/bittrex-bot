@@ -3,11 +3,11 @@ package com.jlarrieux.bittrexbot.simulation.DAO;
 import com.jlarrieux.bittrexbot.simulation.TO.ResponseTO;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-public class SpringDBExchangeDAOImpl implements IDBExchangeDAO {
+public class SpringDBExchangeDAOImpl  {
 
     private JdbcTemplate jdbcTemplate;
 
-    @Override
+
     public ResponseTO getMarketSummaries() {
         return null;
     }
