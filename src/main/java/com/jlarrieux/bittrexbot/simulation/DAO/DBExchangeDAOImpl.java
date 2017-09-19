@@ -1,10 +1,8 @@
 package com.jlarrieux.bittrexbot.simulation.DAO;
 
-import com.jlarrieux.bittrexbot.simulation.TO.ResponseTO;
-import com.jlarrieux.bittrexbot.simulation.TO.Market;
-import com.jlarrieux.bittrexbot.simulation.TO.Result;
-import com.jlarrieux.bittrexbot.simulation.TO.Summary;
+import com.jlarrieux.bittrexbot.simulation.TO.*;
 import org.springframework.jdbc.core.JdbcTemplate;
+
 
 import java.sql.*;
 import java.util.Stack;
@@ -16,6 +14,8 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     private PreparedStatement preparedStatement = null;
     private ResultSet resultSet = null;
     private static Stack dateStack = new Stack();
+    private static String dateInQuestion = "";
+    private static final Double COIN_QUANTITY  = 1000000.0;
 
     private static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
     private static final String DB_CONNECTTION_URL = "jdbc:mysql://localhost/bittrex?user=root&password=root";
@@ -27,20 +27,9 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         System.out.println("Start from most recent date: " + startFromMostRecentDate);
     }
 
-   /* @Override
-    public String getMarketSummaryFor1(int id){
-        String sql = "select market_currency from market where id = ?";
-        String name = jdbcTemplate.queryForObject(sql,new Object[]{id},String.class);
-        return name;
-    }*/
-
-
-
-
-
     public void printOutStack(){
         while (!dateStack.isEmpty()) {
-            System.out.println(dateStack.pop());
+            System.out.println(getNextDateFromDateStack());
         }
     }
 
@@ -54,14 +43,11 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         try {
 
             Class.forName(JDBC_DRIVER);
-
             connect = DriverManager.getConnection(DB_CONNECTTION_URL);
-
             statement = connect.createStatement();
-
             resultSet = statement.executeQuery("select  * from my_data inner join market"
                             + " on my_data.market_id=market.id where my_data.date_create='"
-                            + dateStack.pop() +"'");
+                            + getNextDateFromDateStack() +"'");
 
             while (resultSet.next()) {
                 Summary summary = new Summary();
@@ -97,6 +83,34 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         return responseTO;
     }
 
+    @Override
+    public MarketOrderBookTO getMarketOrderBook(String marketName) {
+        MarketOrderBookTO  marketOrderBookTo = new MarketOrderBookTO();
+
+        try {
+            Class.forName(JDBC_DRIVER);
+            connect = DriverManager.getConnection(DB_CONNECTTION_URL);
+            statement = connect.createStatement();
+            String str = "select my_data.last from my_data inner join "
+                    + "market on my_data.market_id=market.id where my_data.date_create='"
+                    + getDateInQuestion() + "' AND market.market_name='" + marketName +"' limit 0, 1";
+            resultSet = statement.executeQuery(str);
+
+            Double last = 0.0;
+            if(resultSet.next()){
+                last = resultSet.getDouble("last");
+            }
+
+            marketOrderBookTo.createNaddBuy(COIN_QUANTITY, last);
+            marketOrderBookTo.createNaddSell(COIN_QUANTITY, last);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally{
+            close();
+        }
+        return marketOrderBookTo;
+    }
+
     private void fecthMarketInfo(Integer marketId) {
 
     }
@@ -117,6 +131,15 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         } catch (Exception e) {
 
         }
+    }
+
+    private String getNextDateFromDateStack(){
+        dateInQuestion = (String) dateStack.peek();
+        return (String) dateStack.pop();
+    }
+
+    private String getDateInQuestion(){
+        return dateInQuestion ==""? (String) dateStack.peek(): dateInQuestion;
     }
 
 

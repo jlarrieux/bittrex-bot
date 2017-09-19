@@ -42,7 +42,7 @@ public class SimulatorExchange  implements ExchangeInterface{
 
     @Override
     public Response getMarketOrderBook(String marketName) {
-        return null;
+        return new Response(dbExchangeDAO.getMarketOrderBook(marketName));
     }
 
 

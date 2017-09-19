@@ -4,8 +4,10 @@ package com.jlarrieux.bittrexbot.REST;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.jlarrieux.bittrexbot.Entity.Market;
 import com.jlarrieux.bittrexbot.Util.Constants;
 import com.jlarrieux.bittrexbot.Util.JsonParserUtil;
+import com.jlarrieux.bittrexbot.simulation.TO.MarketOrderBookTO;
 import com.jlarrieux.bittrexbot.simulation.TO.ResponseTO;
 import lombok.Data;
 import lombok.extern.java.Log;
@@ -49,6 +51,12 @@ public class Response {
         success = responseTO.getSuccess();
         message = responseTO.getMessage();
         result = new Gson().toJson(responseTO.getResult());
+    }
+
+    public Response(MarketOrderBookTO marketOrderBookTO) {
+        success = marketOrderBookTO.getSuccess();
+        message = marketOrderBookTO.getMessage();
+        result = new Gson().toJson(marketOrderBookTO.getResult());
     }
 
     public String getResult() {
