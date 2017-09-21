@@ -86,7 +86,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
             statement = connect.createStatement();
             resultSet = statement.executeQuery("select  * from my_data inner join market"
                             + " on my_data.market_id=market.id where my_data.date_create='"
-                            + getNextDateFromDateStack() +"'");
+                            + getNextDateFromDateStack() +"' limit 0,199");
 
             while (resultSet.next()) {
                 Summary summary = new Summary();

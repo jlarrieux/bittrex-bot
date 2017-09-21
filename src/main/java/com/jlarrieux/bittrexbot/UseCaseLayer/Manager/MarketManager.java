@@ -59,7 +59,7 @@ public class MarketManager {
         log.info("Inside: " + getClass().getSimpleName() +"\t Method: " + "iterate(JsonArray)" );
         for(int i=0; i<array.size(); i++){
             marketBooks.add(array, i);
-            log.info("Inside: " + getClass().getSimpleName() +"\t Method: " + "iterate(JsonArray) in for loop! Curency is: " +
+            log.info(i+"- Inside: " + getClass().getSimpleName() +"\t Method: " + "iterate(JsonArray) in for loop! Curency is: " +
                     (new Market((JsonObject) array.get(i))).getMarketName() );
         }
         if(decider!=null) decider.evaluate(marketBooks);
