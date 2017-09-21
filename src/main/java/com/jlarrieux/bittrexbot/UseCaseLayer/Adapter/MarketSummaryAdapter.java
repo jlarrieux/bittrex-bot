@@ -125,7 +125,7 @@ public class MarketSummaryAdapter {
 
         private void populate(JsonObject object){
            setMarketCurrency(JsonParserUtil.getStringFromJsonObject(object,Constants.upperCaseFirst(Constants.MARKET_CURRENCY_SHORT)));
-           setMarketCurrencyLong(JsonParserUtil.getStringFromJsonObject(object, Constants.upperCaseFirst(Constants.MARKET_CURRENCY)));
+           setMarketCurrencyLong(JsonParserUtil.getStringFromJsonObject(object, Constants.upperCaseFirst(Constants.MARKET_CURRENCY_LONG)));
            setMarketName(JsonParserUtil.getStringFromJsonObject(object,Constants.MARKET_NAME));
            setMinTradeSize(JsonParserUtil.getDoubleFromJsonObject(object,Constants.MIN_TRADE_SIZE));
            setActive(JsonParserUtil.getBooleanFromJsonObject(object,Constants.IS_ACTIVE));

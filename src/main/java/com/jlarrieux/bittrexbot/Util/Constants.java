@@ -47,9 +47,11 @@ public class Constants {
     public static final String ORDERS = "orders";
     public static final String INITIAL_URL ="https://bittrex.com/api/";
     public static final Exception InvalidStringListException = new Exception("Must be in key-value pairs");
-    public static final String MARKET_CURRENCY = "MarketCurrencyLong";
+    public static final String MARKET_CURRENCY_LONG = "MarketCurrencyLong";
+    public static final String MARKET_CURRENCY = "MarketCurrency";
     public static final String SUMMARY = "Summary";
-    public static final String BASE_CURRENCY = "BaseCurrencyLong";
+    public static final String BASE_CURRENCY_LONG = "BaseCurrencyLong";
+    public static final String BASE_CURRENCY = "BaseCurrency";
     public static final String MARKET_NAME = "MarketName";
     public static final String IS_ACTIVE = "IsActive";
     public static final String MIN_TRADE_SIZE = "MinTradeSize";

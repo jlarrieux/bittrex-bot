@@ -56,7 +56,7 @@ public class Decider {
             else if(adx<adxTrendThreshold) sideWaysTrader.addToPotentialMarkets(market);
         }
 
-//        executeStrategy();
+        executeStrategy();
     }
 
 
