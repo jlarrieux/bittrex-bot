@@ -34,19 +34,19 @@ public class MyController {
 
     @GetMapping("/getcoin")
     public String getCoinInsight(@RequestParam(value = "coin", required = true) String coin){
-        return markets.getCoinInsight(coin);
+        return markets.getCoinInsight(coin.toUpperCase());
     }
 
 
     @GetMapping("/adx")
     public String getADX(@RequestParam(value = "coin", required = true) String coin){
-        return markets.getMarket(coin).getAdx().toString();
+        return markets.getMarket(coin.toUpperCase()).getAdx().toString();
     }
 
 
     @GetMapping("/dx")
     public String getDx(@RequestParam(value ="coin", required =true) String coin){
-        return markets.getMarket(coin).getAdx().getDXqueueAsString();
+        return markets.getMarket(coin.toUpperCase()).getAdx().getDXqueueAsString();
     }
 
 
@@ -57,19 +57,24 @@ public class MyController {
 
     @GetMapping("/keltner")
     public String getKeltner(@RequestParam(value = "coin", required = true)String coin){
-        return markets.getMarket(coin).getKeltnerChannels().toString();
+        return markets.getMarket(coin.toUpperCase()).getKeltnerChannels().toString();
     }
 
     @GetMapping("/keltnerQ")
     public String getKeltnerQueues(@RequestParam(value = "coin", required = true)String coin){
-        return markets.getMarket(coin).getKeltnerChannels().getQueues();
+        return markets.getMarket(coin.toUpperCase()).getKeltnerChannels().getQueues();
     }
 
     @GetMapping("/dmcomponents")
     public String getDMcomponents(@RequestParam(value = "coin", required = true)String coin){
-        return markets.getMarket(coin).getAdx().getDMcomponents();
+        return markets.getMarket(coin.toUpperCase()).getAdx().getDMcomponents();
     }
 
+
+    @GetMapping("/negativedirection")
+    public String getNegativeDirection(){
+        return markets.getANegativeDirection();
+    }
 
 
 }
