@@ -98,7 +98,7 @@ public class MarketManager {
 
 
             return String.format("Coin: %s\n<br>High: %f\t&emsp;&emsp; low: %f\t&emsp;&emsp; volume: %f\t&emsp;&emsp; last priceQueue: %f\n<br># of open buys: %d\t&emsp;&emsp;# of open sells: %d\t&emsp;&emsp;spread: %f\n<br>Adx value: %f\t&emsp;&emsp;with direction: %f\n<br>%s",
-                    m.getMarketCurrency(), m.getHigh(), m.getLow(), m.getVolume(), m.getLast(), m.getOpenBuyOrders(), m.getOpenSellOrders(),m.getSpread(),m.getAdxValue(),m.getAdx().getDIdifference(), suffix.toString());
+                    m.getMarketCurrency(), m.getHigh(), m.getLow(), m.getVolume(), m.getLast(), m.getOpenBuyOrders(), m.getOpenSellOrders(),m.getSpread(),m.getAdxValue(),m.getAdx().getADXDirection(), suffix.toString());
         }
         else return String.format("Market with name '%s' does not exists!", marketName);
     }
@@ -110,7 +110,21 @@ public class MarketManager {
 
 
 
+    public String getANegativeDirection(){
+        StringBuilder builder = new StringBuilder("None");
+        for(String key: marketBooks.keySet()){
+            Market m = marketBooks.get(key);
+            if(m.getAdx().getADXDirection()<0){
+                log.info(String.format("Negative direction with value :%f", m.getAdx().getADXDirection()));
+                builder = new StringBuilder();
+                builder.append(String.format("Coin: %s\n<br>High: %f\t&emsp;&emsp; low: %f\t&emsp;&emsp; volume: %f\t&emsp;&emsp; last priceQueue: %f\n<br># of open buys: %d\t&emsp;&emsp;# of open sells: %d\t&emsp;&emsp;spread: %f\n<br>Adx value: %f\t&emsp;&emsp;with direction: %f\n<br>",
+                        m.getMarketCurrency(), m.getHigh(), m.getLow(), m.getVolume(), m.getLast(), m.getOpenBuyOrders(), m.getOpenSellOrders(),m.getSpread(),m.getAdxValue(),m.getAdx().getADXDirection()));
+                break;
+            }
+        }
 
+        return builder.toString();
+    }
 
 
 
