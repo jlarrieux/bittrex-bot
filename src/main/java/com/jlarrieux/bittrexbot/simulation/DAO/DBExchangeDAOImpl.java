@@ -98,6 +98,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
                 summary.setOpenBuyOrders(resultSet.getInt("open_buy_orders"));
                 summary.setOpenSellOrders(resultSet.getInt("open_sell_orders"));
                 summary.setVolume(resultSet.getDouble("volume"));
+                summary.setMarketName(resultSet.getString("market_name"));
 
                 Market market = new Market();
                 market.setBaseCurrency(resultSet.getString("base_currency"));

@@ -49,14 +49,18 @@ public class MarketManager {
 //        log.info(String.valueOf(marketBooks.size()));
    //     if(marketBooks.size()==0)    getDataFromServer();
 
+        log.info("Inside: " + getClass().getSimpleName() +"\t Method: " + "addMarkets(JsonArray)" );
         iterate(array);
+
 
     }
 
     private void iterate(JsonArray array){
-
+        log.info("Inside: " + getClass().getSimpleName() +"\t Method: " + "iterate(JsonArray)" );
         for(int i=0; i<array.size(); i++){
             marketBooks.add(array, i);
+            log.info("Inside: " + getClass().getSimpleName() +"\t Method: " + "iterate(JsonArray) in for loop! Curency is: " +
+                    (new Market((JsonObject) array.get(i))).getMarketName() );
         }
         if(decider!=null) decider.evaluate(marketBooks);
     }

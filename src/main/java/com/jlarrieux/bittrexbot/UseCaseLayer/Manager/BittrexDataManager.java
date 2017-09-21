@@ -30,9 +30,9 @@ public class BittrexDataManager {
     }
 
 
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 1)
     public void getMarketSummaries(){
-
+        log.info("Inside: " + getClass().getSimpleName() +"\t Method: " + "getMarketSummaries()");
         marketManager.addMarkets(marketSummaryAdapter.getMarketSummaries());
     }
 
