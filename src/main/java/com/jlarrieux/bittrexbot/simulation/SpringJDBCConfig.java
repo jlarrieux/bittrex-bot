@@ -28,10 +28,10 @@ public class SpringJDBCConfig {
         return jdbcTemplate;
     }
 
-    @Bean
+   /* @Bean
     public IDBExchangeDAO IDbexchangeDAO(){
         SpringDBExchangeDAOImpl dbExchangeDao = new SpringDBExchangeDAOImpl();
         dbExchangeDao.setJdbcTemplate(jdbcTemplate());
         return dbExchangeDao;
-    }
+    }*/
 }

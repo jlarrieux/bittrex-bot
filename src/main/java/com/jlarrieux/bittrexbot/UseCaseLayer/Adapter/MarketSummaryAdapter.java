@@ -38,6 +38,12 @@ public class MarketSummaryAdapter {
         return null;
     }
 
+    public Response getMarketSummaries_2(){
+        Response response = client.getMarketSummaries();
+
+        return response;
+    }
+
 
     public void executeMarketSearch(String marketName){
         build(marketName);

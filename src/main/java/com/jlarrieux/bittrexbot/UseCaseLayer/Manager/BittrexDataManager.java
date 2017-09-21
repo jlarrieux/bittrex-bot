@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 
 @Log
@@ -32,9 +33,10 @@ public class BittrexDataManager {
     }
 
 
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 1000)
     public void getMarketSummaries(){
-        Response response = new Response("yeah");// marketSummaryAdapter.getMarketSummaries();
+        Response response =  marketSummaryAdapter.getMarketSummaries_2();
+        log.info("Inside BittrexDataManger");
         //client2.cancelOrder("");
 //        Response r = client2.placeOrder("","btc-vtr","","1","0.00004218","1","","");
         if(response.isSuccess())

@@ -32,9 +32,9 @@ public class Market {
     private double minTradeSize, high, low, volume, last, bid, ask, spread, currentRSI =-1;
 
     private int openBuyOrders, openSellOrders;
-    private BollingerIndicator bollingerSMA = new BollingerIndicator(1);
+    private BollingerIndicator bollingerSMA = new BollingerIndicator(Constants.DATA_WINDOW);
     private ADX adx = new ADX(2);
-    private KeltnerChannels keltnerChannels = new KeltnerChannels(1);
+    private KeltnerChannels keltnerChannels = new KeltnerChannels(Constants.DATA_WINDOW);
     private double atr=-1;
 
     public Market(){
