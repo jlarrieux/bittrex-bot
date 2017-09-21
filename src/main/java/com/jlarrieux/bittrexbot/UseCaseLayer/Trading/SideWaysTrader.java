@@ -2,12 +2,11 @@ package com.jlarrieux.bittrexbot.UseCaseLayer.Trading;
 
 
 
-import com.jlarrieux.bittrexbot.UseCaseLayer.Comparators;
 import com.jlarrieux.bittrexbot.Entity.Market;
 import com.jlarrieux.bittrexbot.Properties.TradingProperties;
+import com.jlarrieux.bittrexbot.UseCaseLayer.Comparators;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Manager.OrderManager;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Manager.PositionManager;
-import com.jlarrieux.bittrexbot.Util.Constants;
 import lombok.Data;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;

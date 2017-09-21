@@ -3,6 +3,7 @@ package com.jlarrieux.bittrexbot.Entity;
 
 
 import lombok.Data;
+import lombok.ToString;
 import lombok.extern.java.Log;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
@@ -10,6 +11,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 @Log
 @Data
+@ToString(exclude = "priceQueue")
 public class BollingerIndicator {
 
     private double high= Double.NaN, mid= Double.NaN, low= Double.NaN;

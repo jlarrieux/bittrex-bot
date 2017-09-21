@@ -6,6 +6,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.jlarrieux.bittrexbot.Entity.Market;
 import com.jlarrieux.bittrexbot.Entity.Markets;
+import com.jlarrieux.bittrexbot.Properties.TradingProperties;
 import com.jlarrieux.bittrexbot.REST.JLarrieuxRestClient;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Decider;
 import com.jlarrieux.bittrexbot.Util.Constants;
@@ -27,14 +28,15 @@ public class MarketManager {
     private Decider decider;
     private JLarrieuxRestClient jLarrieuxRestClient;
     private long marketCount;
-
+    private double adxTrendThreshold;
 
 
     @Autowired
-    public MarketManager(JLarrieuxRestClient client, Decider decider , Markets markets) {
+    public MarketManager(JLarrieuxRestClient client, Decider decider , Markets markets, TradingProperties tradingProperties) {
         jLarrieuxRestClient = client;
         this.decider = decider;
         marketBooks = markets;
+        adxTrendThreshold = tradingProperties.getAdxTrendThreshold();
         getMarketCount();
     }
 
@@ -65,11 +67,12 @@ public class MarketManager {
         long start = System.currentTimeMillis();
         log.info("~~~~~~~~Getting 1 time data from server...this may take up to 5 minutes...~~~~~~~~~~");
         for(int i=1; i<marketCount+1; i++){
-
+            long s = System.currentTimeMillis();
             Market market = new Market();
             JsonObject object = JsonParserUtil.getJsonObjectFromJsonString(jLarrieuxRestClient.getMarketById(i));
-            market.alternateConstruction(object);
-            log.info(String.format("Downloaded market #%s out of %s (%s)", Constants.addSpaceForInt(i, ""),Constants.addSpaceForLong( marketCount+1,""), market.getMarketCurrency()));
+            market.alternateConstruction(object, true);
+            log.info(String.format("Downloaded market #%s out of %s (%s, %S)\t%.2f seconds",
+                    Constants.addSpaceForInt(i, ""),Constants.addSpaceForLong( marketCount+1,""), market.getMarketCurrency(),market.getMarketName(), Double.valueOf(System.currentTimeMillis()-s)/1000));
 //            log.info(market.toString());
             marketBooks.add(market);
         }
@@ -89,17 +92,39 @@ public class MarketManager {
         String marketName = Constants.buildBtcMarketName(coin);
         if(marketBooks.containsKey(marketName)){
             Market m = marketBooks.get(marketName);
-            return String.format("Coin: %s\nHigh: %f\t low: %f\t volume: %f\t last priceQueue: %f\n# of open buys: %d\t# of open sells: %d\tspread: %f\ncurrentRSI: %f\n bollinger: %s",
-                    m.getMarketCurrency(), m.getHigh(), m.getLow(), m.getVolume(), m.getLast(), m.getOpenBuyOrders(), m.getOpenSellOrders(),m.getSpread(), m.getCurrentRSI(), m.bollingerToString());
+            StringBuilder suffix = new StringBuilder();
+            if(m.getAdxValue()>=adxTrendThreshold) suffix.append(String.format("KeltnerHigh: %f\t&emsp;&emsp;KeltnerMid: %f\t&emsp;&emsp;KeltnerLow: %f<br>\n", m.getKeltnerChannels().getHigh(), m.getKeltnerChannels().getMid(), m.getKeltnerChannels().getLow()));
+            else suffix.append(String.format("RSI value: %f\n<br>Bollinger: %s", m.getCurrentRSI(), m.getBollingerSMA().toString()));
+
+
+            return String.format("Coin: %s\n<br>High: %f\t&emsp;&emsp; low: %f\t&emsp;&emsp; volume: %f\t&emsp;&emsp; last priceQueue: %f\n<br># of open buys: %d\t&emsp;&emsp;# of open sells: %d\t&emsp;&emsp;spread: %f\n<br>Adx value: %f\t&emsp;&emsp;with direction: %f\n<br>%s",
+                    m.getMarketCurrency(), m.getHigh(), m.getLow(), m.getVolume(), m.getLast(), m.getOpenBuyOrders(), m.getOpenSellOrders(),m.getSpread(),m.getAdxValue(),m.getAdx().getADXDirection(), suffix.toString());
         }
-        else return String.format("No such '%s' exists", marketName);
+        else return String.format("Market with name '%s' does not exists!", marketName);
+    }
+
+
+    public Market getMarket(String coin){
+        return marketBooks.get(Constants.buildBtcMarketName(coin));
     }
 
 
 
+    public String getANegativeDirection(){
+        StringBuilder builder = new StringBuilder("None");
+        for(String key: marketBooks.keySet()){
+            Market m = marketBooks.get(key);
+            if(m.getAdx().getADXDirection()<0){
+                log.info(String.format("Negative direction with value :%f", m.getAdx().getADXDirection()));
+                builder = new StringBuilder();
+                builder.append(String.format("Coin: %s\n<br>High: %f\t&emsp;&emsp; low: %f\t&emsp;&emsp; volume: %f\t&emsp;&emsp; last priceQueue: %f\n<br># of open buys: %d\t&emsp;&emsp;# of open sells: %d\t&emsp;&emsp;spread: %f\n<br>Adx value: %f\t&emsp;&emsp;with direction: %f\n<br>",
+                        m.getMarketCurrency(), m.getHigh(), m.getLow(), m.getVolume(), m.getLast(), m.getOpenBuyOrders(), m.getOpenSellOrders(),m.getSpread(),m.getAdxValue(),m.getAdx().getADXDirection()));
+                break;
+            }
+        }
 
-
-
+        return builder.toString();
+    }
 
 
 

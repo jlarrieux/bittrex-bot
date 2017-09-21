@@ -5,6 +5,7 @@ package com.jlarrieux.bittrexbot.Entity;
 import com.jlarrieux.bittrexbot.Util.Constants;
 import com.jlarrieux.bittrexbot.Util.IndicatorUtil;
 import lombok.Data;
+import lombok.ToString;
 import lombok.extern.java.Log;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
@@ -15,11 +16,12 @@ import java.util.stream.Collectors;
 
 @Log
 @Data
+@ToString(exclude = {"trueRangeQueue","DMplusQueue", "DMminusQueue","DXqueue"})
 public class ADX {
 
-    double previousTrPeriod =-1, previousDMplusPeriod=-1, previousDMminusPeriod=-1, previousADX=-1;
+    double previousTrPeriod =-1, previousDMplusPeriod=-1, previousDMminusPeriod=-1, previousADX=-1, highCurrentMinusPrevious, lowPreviousMinusCurrent;
     double DMplus,  DMminus, DIplus, DIminus, DIdifference, DIsum, DX,currentADX, currentTrueRange, previousPrice, previousHigh, previousLow, trPeriod,DMplusPeriod, DMminusPeriod;
-
+    String marketName;
     DescriptiveStatistics trueRangeQueue = new DescriptiveStatistics(), DMplusQueue= new DescriptiveStatistics(), DMminusQueue= new DescriptiveStatistics(), DXqueue= new DescriptiveStatistics();
     int period, firstLayerPeriod;
     long counter=-1;
@@ -47,6 +49,7 @@ public class ADX {
 
     public void update(double high, double low, double currentPrice){
         counter++;
+//        log.info(String.format("UPDATING: hig: %f\t low: %f\t price: %f\t", high, low, currentPrice));
         if(counter>0) {
             currentTrueRange = IndicatorUtil.calculateTrueRange(high,low,previousPrice);
             calculateDMs(high,low);
@@ -56,19 +59,21 @@ public class ADX {
         if(counter>=period-1) calculateADX();
 
         previousPrice = currentPrice;
-        previousHigh = high;
         previousLow = low;
+        previousHigh = high;
     }
 
 
     private void calculateDMs(double currentHigh, double currentLow){
         DMplus =0;
         DMminus = 0;
-        double highCurrentMinusPrevious = currentHigh -previousHigh;
-        double lowPreviousMinusCurrent = previousLow- currentLow;
+        highCurrentMinusPrevious = currentHigh -previousHigh;
+        lowPreviousMinusCurrent = previousLow- currentLow;
         if( highCurrentMinusPrevious>0 && highCurrentMinusPrevious> lowPreviousMinusCurrent) DMplus = highCurrentMinusPrevious;
         if(lowPreviousMinusCurrent>0 && lowPreviousMinusCurrent>highCurrentMinusPrevious)DMminus = lowPreviousMinusCurrent;
 
+        //log.info(String.format("Calculating DMs: DMplus = %f\tDMminus = %f\nPrevious high = %f\tPrevious Low = %f\nCurrent high = %f\tCurrent low = %f\n\n",
+           //     DMplus, DMminus, previousHigh, previousLow, currentHigh, currentLow));
         DMplusQueue.addValue(DMplus);
         DMminusQueue.addValue(DMminus);
 
@@ -89,6 +94,11 @@ public class ADX {
         DIdifference = Math.abs(DIplus-DIminus);
         DIsum = DIplus+ DIminus;
         DX = 100*DIdifference/DIsum;
+
+//        log.info(String.format("DX: %.18f\tDMplus: %.18f\tDMminus: %.18f\tcounter: %d\tmarket: %s\n\n", DX, DMplus, DMminus, counter, marketName));
+           // log.info(String.format("\nDX = %f\t with DIdifference = %f\tDIsum = %f\tDIplus = %f\tDIminus = %f\tTrPeriod = %f\tPrevioustrPeriod = %f\tMarket: %s\n\n",
+              //      DX,DIdifference,DIsum,DIplus, DIminus, trPeriod, previousTrPeriod, marketName));
+
         DXqueue.addValue(DX);
     }
 
@@ -96,8 +106,9 @@ public class ADX {
 
 
     private double updateFirstLayerItem(double previous,  DescriptiveStatistics holder){
+//        log.info(String.format("holder q to string: %s", Constants.getListAsString(Arrays.stream(holder.getValues()).boxed().collect(Collectors.toList()))));
         double result;
-        if(previous==-1){
+        if(previous==-1 || Double.isNaN(previous)){
             result = holder.getSum();
             previous = result;
             return result;
@@ -115,9 +126,11 @@ public class ADX {
 
     private void calculateADX(){
         currentADX = IndicatorUtil.calculateATR(DXqueue, previousADX);
-//        log.info(String.format("~~~calculating adx: %f\t previousAdx: %f\t counter: %d\nDIdiff: %f\t DIsum: %f\tDIminus: %f\t DIplus: %f\nDMplusPeriod: %f\t DMminusPeriod: %f\ttrPeriod: %f\tpreviousTrPeriod: %f\nDmMinus: %f\t DMplus: %f\nWith dx q: %s\n\n"
-//                , currentADX, previousADX, counter, DIdifference,DIsum,DIminus,DIplus,DMplusPeriod,DMminusPeriod,trPeriod, previousTrPeriod, DMminus, DMplus,     Constants.getListAsString(Arrays.stream(DXqueue.getValues()).boxed().collect(Collectors.toList()))));
+//        if(counter>period)
+//        log.info(String.format("~~~(%s)calculating adx: %f\t previousAdx: %f\t counter: %d\nDIdiff: %f\t DIsum: %f\tDIminus: %f\t DIplus: %f\nDMplusPeriod: %f\t DMminusPeriod: %f\ttrPeriod: %f\tpreviousTrPeriod: %f\nDmMinus: %f\t DMplus: %f\nWith dx q: %s\n\n"
+//                ,marketName, currentADX, previousADX, counter, DIdifference,DIsum,DIminus,DIplus,DMplusPeriod,DMminusPeriod,trPeriod, previousTrPeriod, DMminus, DMplus,     Constants.getListAsString(Arrays.stream(DXqueue.getValues()).boxed().collect(Collectors.toList()))));
         previousADX = currentADX;
+
     }
 
 
@@ -129,6 +142,12 @@ public class ADX {
 
     public double getADXDirection(){
         return DIplus-DIminus;
+    }
+
+
+    public String getDMcomponents(){
+        return String.format("DMplus: %f\t\t&emsp;&emsp;DMminus: %f\n\n<br><br>highCurrentMinusPrevious: %f\t\t&emsp;&emsp;lowPreviousMinusCurrent: %f"
+                ,DMplus, DMminus, highCurrentMinusPrevious, lowPreviousMinusCurrent);
     }
 
 }

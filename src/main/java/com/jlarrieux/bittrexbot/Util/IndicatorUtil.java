@@ -39,7 +39,7 @@ public class IndicatorUtil {
 
 
     public static double calculateATR(DescriptiveStatistics TRholder, double oldATR){
-        if(oldATR==-1)         return TRholder.getMean();
+        if(oldATR==-1 || Double.isNaN(oldATR))         return TRholder.getMean();
         else{
             double lastTR= TRholder.getElement((int) (TRholder.getN()-1));
             double numerator = oldATR*(TRholder.getN()-1)+lastTR;

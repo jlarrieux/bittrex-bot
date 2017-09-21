@@ -56,6 +56,7 @@ public class JsonParserUtil {
 
 
     public static String getStringFromJsonObject(JsonObject jsonObject, String key) {
+//        System.out.println(jsonObject);
         return jsonObject.getAsJsonPrimitive(key).getAsString();
     }
 
