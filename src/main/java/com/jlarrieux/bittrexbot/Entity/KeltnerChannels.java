@@ -2,13 +2,18 @@ package com.jlarrieux.bittrexbot.Entity;
 
 
 
+import com.jlarrieux.bittrexbot.Util.Constants;
 import com.jlarrieux.bittrexbot.Util.IndicatorUtil;
 import lombok.Data;
+import lombok.ToString;
 import lombok.extern.java.Log;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
+
+
 @Log
 @Data
+@ToString(exclude = {"priceQueue","trueRangeQueue"})
 public class KeltnerChannels {
 
     double previousAverageTrueRange=-1, previousMid=-1;
@@ -37,8 +42,6 @@ public class KeltnerChannels {
         trueRangeQueue.addValue(trueRange);
         if(priceQueue.getN()>= priceQueue.getWindowSize()) calculateKeltner();
         previousPrice = price;
-
-
     }
 
 
@@ -52,6 +55,9 @@ public class KeltnerChannels {
     }
 
 
+    public String getQueues(){
+        return String.format("PriceQueue: %s\n<br>TrueRange: %s", Constants.getDescriptiveStatisticsAsString(priceQueue), Constants.getDescriptiveStatisticsAsString(trueRangeQueue));
+    }
 
 
 

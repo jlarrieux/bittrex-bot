@@ -109,6 +109,14 @@ class ADXtest extends  Specification{
 
     }
 
+    def "Direction check"(){
+        when:
+        adx.setDIminus(diMinus[0])
+        adx.setDIplus(diPlus[0])
+
+        then:
+        assert adx.getADXDirection()<0
+    }
 
     def "DX check"(){
         when:

@@ -53,10 +53,10 @@ public class Decider {
             Market market = marketBooks.get(key);
             double adx = market.getAdxValue();
             if(adx>= adxTrendThreshold) trendingTrader.addToPotentialMarkets(market);
-            else sideWaysTrader.addToPotentialMarkets(market);
+            else if(adx<adxTrendThreshold) sideWaysTrader.addToPotentialMarkets(market);
         }
 
-        executeStrategy();
+//        executeStrategy();
     }
 
 
@@ -67,7 +67,7 @@ public class Decider {
 
     private void executeStrategy(){
         sideWaysTrader.executeStrategy();
-
+        trendingTrader.executeStrategy();
 
     }
 

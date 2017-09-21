@@ -68,7 +68,7 @@ public class OtherTestThreads {
             JLarrieuxRestClient jLarrieuxRestClient = new JLarrieuxRestClient();
             JsonObject object = JsonParserUtil.getJsonObjectFromJsonString(jLarrieuxRestClient.getMarketById(marketId));
             Market market = new Market();
-            market.alternateConstruction(object);
+            market.alternateConstruction(object, true);
             long finish = System.currentTimeMillis();
             long milli = finish - start;
             double seconds = (double) milli/1000;
