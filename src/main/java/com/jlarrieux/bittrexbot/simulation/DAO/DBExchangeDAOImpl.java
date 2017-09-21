@@ -17,7 +17,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     private static String dateInQuestion = "";
     private static final Double COIN_QUANTITY  = 1000000.0;
 
-    private static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
+    private static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
     private static final String DB_CONNECTTION_URL = "jdbc:mysql://localhost/bittrex?user=root&password=root";
 
 
@@ -31,6 +31,45 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         while (!dateStack.isEmpty()) {
             System.out.println(getNextDateFromDateStack());
         }
+    }
+
+    @Override
+    public MarketSummaryTO getMarketSummary(String marketName) {
+        MarketSummaryTO marketSummaryTO = new MarketSummaryTO();
+
+        try {
+            Class.forName(JDBC_DRIVER);
+            connect = DriverManager.getConnection(DB_CONNECTTION_URL);
+            statement = connect.createStatement();
+            String str = "select * from my_data inner join "
+                    + "market on my_data.market_id=market.id where my_data.date_create='"
+                    + getDateInQuestion() + "' AND market.market_name='" + marketName +"' limit 0, 1";
+            resultSet = statement.executeQuery(str);
+
+            while (resultSet.next()) {
+
+                MarketSummaryTO.Result result = marketSummaryTO.createResult();
+                marketSummaryTO.setMessage("");
+                marketSummaryTO.setSuccess(true);
+                marketSummaryTO.getResult().add(result);
+
+                result.setMarketName(resultSet.getString("market_name"));
+                result.setAsk(resultSet.getDouble("ask"));
+                result.setBid(resultSet.getDouble("bid"));
+                result.setHigh((resultSet.getDouble("high")));
+                result.setLast(resultSet.getDouble("last"));
+                result.setLow(resultSet.getDouble("low"));
+                result.setOpenBuyOrders(resultSet.getInt("open_buy_orders"));
+                result.setOpenSellOrders(resultSet.getInt("open_sell_orders"));
+                result.setVolume(resultSet.getDouble("volume"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            close();
+        }
+
+        return marketSummaryTO;
     }
 
     public void setJdbcTemplate (JdbcTemplate jdbcTemplate){

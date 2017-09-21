@@ -49,7 +49,7 @@ public class OrderManager {
         this.positionManager = positionManager;
         this.orderTimeOutInMinutes = properties.getOrderTimeOutInMinutes();
         this.marketOrderBookAdapater = marketOrderBookAdapater;
-        getOpenOrders();
+        //getOpenOrders();
     }
 
 
@@ -169,7 +169,7 @@ public class OrderManager {
 
 
 
-    @Scheduled(fixedRate = 15000)
+    //@Scheduled(fixedRate = 1500)
     public void checkPendingOrders(){
         decideOnPendingBuyOrders();
         decideOnPendingSellOrders();

@@ -45,7 +45,7 @@ public class MarketManager {
 
     public void addMarkets(JsonArray array){
 //        log.info(String.valueOf(marketBooks.size()));
-        if(marketBooks.size()==0)    getDataFromServer();
+   //     if(marketBooks.size()==0)    getDataFromServer();
 
         iterate(array);
 

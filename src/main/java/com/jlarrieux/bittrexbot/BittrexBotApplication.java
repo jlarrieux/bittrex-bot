@@ -16,14 +16,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class BittrexBotApplication {
 
 	public static void main(String[] args) {
-		ConfigurableApplicationContext ctx = SpringApplication.run(BittrexBotApplication.class, args);
-
+		ConfigurableApplicationContext ctx = SpringApplication.run(BittrexBotApplication.class);
+		System.out.println("Message from sysout");
+		log.info("message from log info");
 	}
 
 
-	@Configuration
-	@ComponentScan(lazyInit = true)
-	static class localConfig{
 
-	}
 }

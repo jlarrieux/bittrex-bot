@@ -2,10 +2,7 @@ package com.jlarrieux.bittrexbot.simulation;
 
 import com.google.gson.Gson;
 import com.jlarrieux.bittrexbot.simulation.DAO.DBExchangeDAOImpl;
-import com.jlarrieux.bittrexbot.simulation.TO.Buy;
-import com.jlarrieux.bittrexbot.simulation.TO.MarketOrderBookTO;
-import com.jlarrieux.bittrexbot.simulation.TO.ResponseTO;
-import com.jlarrieux.bittrexbot.simulation.TO.Sell;
+import com.jlarrieux.bittrexbot.simulation.TO.*;
 
 public class TestSimulation {
 
@@ -40,7 +37,15 @@ public class TestSimulation {
         MarketOrderBookTO marketOrderBookTO = dbExchangeDao.getMarketOrderBook("BTC-1ST");
         System.out.println(new Gson().toJson(marketOrderBookTO));
         marketOrderBookTO = dbExchangeDao.getMarketOrderBook("BTC-2GIVE");
-        System.out.println(new Gson().toJson(marketOrderBookTO.getResult()));
+        System.out.println(new Gson().toJson(marketOrderBookTO));
+
+        /*DBExchangeDAOImpl dbExchangeDao = new DBExchangeDAOImpl();
+        //dbExchangeDao.printOutStack();
+        //Example of Market BTC-1ST BTC-2GIVE BTC-ABY
+        MarketSummaryTO marketSummaryTO = dbExchangeDao.getMarketSummary("BTC-1ST");
+        System.out.println(new Gson().toJson(marketSummaryTO));
+        marketSummaryTO = dbExchangeDao.getMarketSummary("BTC-2GIVE");
+        System.out.println(new Gson().toJson(marketSummaryTO));*/
 
         /*Buy buy = new Buy();
         buy.setQuantity(1.0);
