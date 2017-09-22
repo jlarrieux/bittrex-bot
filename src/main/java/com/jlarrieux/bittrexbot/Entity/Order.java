@@ -6,6 +6,8 @@ import com.google.gson.JsonObject;
 import com.jlarrieux.bittrexbot.Util.Constants;
 import com.jlarrieux.bittrexbot.Util.JsonParserUtil;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -17,12 +19,23 @@ import java.time.LocalDateTime;
 public class Order {
 
 
+    @Getter @Setter
     private String marketName;
+    @Getter @Setter
     private double quantity, quantityRemaining, limit;
+
+    @Getter @Setter
     private String orderUuid;
+
+    @Getter @Setter
     private LocalDateTime opened;
+
+    @Getter @Setter
     private Boolean isOpen=null, cancelIniated = null;
+
+    @Getter @Setter
     private orderType type;
+
 
     public enum orderType{
         LIMIT_BUY, LIMIT_SELL

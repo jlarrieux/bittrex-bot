@@ -1,10 +1,12 @@
 package com.jlarrieux.bittrexbot.simulation.DAO;
 
+import com.jlarrieux.bittrexbot.Entity.Order;
 import com.jlarrieux.bittrexbot.simulation.TO.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.Stack;
 
 public class DBExchangeDAOImpl implements IDBExchangeDAO {
@@ -20,6 +22,9 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     private static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
     private static final String DB_CONNECTTION_URL = "jdbc:mysql://localhost/bittrex?user=root&password=root";
 
+    //todo use properties instead of hardcoding
+    //todo refactor create connection
+    //todo Used prepared statement
 
     public DBExchangeDAOImpl() {
         boolean startFromMostRecentDate = false;
@@ -70,10 +75,6 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         }
 
         return marketSummaryTO;
-    }
-
-    public void setJdbcTemplate (JdbcTemplate jdbcTemplate){
-        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
@@ -149,6 +150,48 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
             close();
         }
         return marketOrderBookTo;
+    }
+
+    @Override
+    public Order buy(String uuid, String marketName, double quantity, double price) {
+
+        try {
+            Class.forName(JDBC_DRIVER);
+            connect = DriverManager.getConnection(DB_CONNECTTION_URL);
+            statement = connect.createStatement();
+
+            LocalDateTime localTime = LocalDateTime.now();
+
+            String sql = "Insert into order_simulation values (?,?,?,?,?)";
+
+            java.sql.Date  sqldDate = Date.valueOf(localTime.toLocalDate());
+
+            PreparedStatement preparedStmt = connect.prepareStatement(sql);
+            preparedStmt.setString(1, uuid);
+            preparedStmt.setString(2, marketName);
+            preparedStmt.setDouble(3, quantity);
+            preparedStmt.setDouble(4, price);
+            preparedStmt.setDate(5,sqldDate);
+            preparedStmt.execute();
+
+            Order order = new Order();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally{
+            close();
+        }
+        return marketOrderBookTo;
+        return null;
+    }
+
+    @Override
+    public Order sell(String marketName, double quantity, double price) {
+        return null;
+    }
+
+    public void setJdbcTemplate (JdbcTemplate jdbcTemplate){
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     private void fecthMarketInfo(Integer marketId) {

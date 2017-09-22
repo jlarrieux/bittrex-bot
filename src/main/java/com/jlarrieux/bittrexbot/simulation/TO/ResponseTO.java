@@ -9,7 +9,7 @@ public class ResponseTO {
     private String message = "";
     private List<Result> result = new ArrayList<>();
     //private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-
+    //todo change outsides classes into inner classes
     public Boolean getSuccess() {
         return success;
     }

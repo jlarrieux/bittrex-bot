@@ -2,28 +2,28 @@ package com.jlarrieux.bittrexbot.simulation.TO;
 
 public class Sell {
 
-    private Double quantity;
-    private Double rate;
+    private Double Quantity;
+    private Double Rate;
 
     public Sell(Double quantity, Double rate) {
-        this.quantity = quantity;
-        this.rate = rate;
+        this.Quantity = quantity;
+        this.Rate = rate;
     }
 
     public Double getQuantity() {
-        return quantity;
+        return Quantity;
     }
 
     public void setQuantity(Double quantity) {
-        this.quantity = quantity;
+        this.Quantity = quantity;
     }
 
     public Double getRate() {
-        return rate;
+        return Rate;
     }
 
     public void setRate(Double rate) {
-        this.rate = rate;
+        this.Rate = rate;
     }
 
 }

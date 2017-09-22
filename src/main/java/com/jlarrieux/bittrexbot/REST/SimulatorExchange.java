@@ -2,6 +2,7 @@ package com.jlarrieux.bittrexbot.REST;
 
 
 
+import com.google.gson.Gson;
 import com.jlarrieux.bittrexbot.Util.Constants;
 import com.jlarrieux.bittrexbot.simulation.DAO.DBExchangeDAOImpl;
 import com.jlarrieux.bittrexbot.simulation.DAO.IDBExchangeDAO;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
 
 
 @Component
@@ -84,14 +86,14 @@ public class SimulatorExchange  implements ExchangeInterface{
 
     @Override
     public Response buy(String marketName, double quantity, double price) {
-        return null;
+        return createBuyOrSellResponse();
     }
 
 
 
     @Override
     public Response sell(String marketName, double quantity, double price) {
-        return null;
+        return createBuyOrSellResponse();
     }
 
 
@@ -107,4 +109,24 @@ public class SimulatorExchange  implements ExchangeInterface{
     public Response getOrder(String uuid) {
         return null;
     }
+
+    private Response createBuyOrSellResponse(){
+        String uuid = UUID.randomUUID().toString();
+        Result result = new Result(uuid);
+        Response response = new Response(true, new Gson().toJson(result), "");
+        return response;
+    }
+
+    public class Result {
+
+        private String uuid;
+
+        public String getUuid() {
+            return uuid;
+        }
+
+        public Result(String uuid) {
+            this.uuid = uuid;
+        }
+        }
 }
