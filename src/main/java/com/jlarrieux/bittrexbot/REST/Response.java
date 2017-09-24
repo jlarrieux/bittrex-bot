@@ -4,12 +4,9 @@ package com.jlarrieux.bittrexbot.REST;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.jlarrieux.bittrexbot.Entity.Market;
 import com.jlarrieux.bittrexbot.Util.Constants;
 import com.jlarrieux.bittrexbot.Util.JsonParserUtil;
-import com.jlarrieux.bittrexbot.simulation.TO.MarketOrderBookTO;
-import com.jlarrieux.bittrexbot.simulation.TO.MarketSummaryTO;
-import com.jlarrieux.bittrexbot.simulation.TO.ResponseTO;
+import com.jlarrieux.bittrexbot.simulation.TO.*;
 import lombok.Data;
 import lombok.extern.java.Log;
 
@@ -48,10 +45,10 @@ public class Response {
         result = object.get(Constants.RESULT).toString();
     }
 
-    public Response(ResponseTO responseTO) {
-        success = responseTO.getSuccess();
-        message = responseTO.getMessage();
-        result = new Gson().toJson(responseTO.getResult());
+    public Response(MarketSummariesTO marketSummariesTO) {
+        success = marketSummariesTO.getSuccess();
+        message = marketSummariesTO.getMessage();
+        result = new Gson().toJson(marketSummariesTO.getResult());
     }
 
     public Response(MarketOrderBookTO marketOrderBookTO) {
@@ -64,6 +61,24 @@ public class Response {
         success = marketNameTO.getSuccess();
         message = marketNameTO.getMessage();
         result = new Gson().toJson(marketNameTO.getResult());
+    }
+
+    public Response(BuyTO buyTO) {
+        success = buyTO.getSuccess();
+        message = buyTO.getMessage();
+        result = new Gson().toJson(buyTO.getResult());
+    }
+
+    public Response(SellTO sellTO) {
+        success = sellTO.getSuccess();
+        message = sellTO.getMessage();
+        result = new Gson().toJson(sellTO.getResult());
+    }
+
+    public Response(OrderTO orderTO) {
+        success = orderTO.getSuccess();
+        message = orderTO.getMessage();
+        result = new Gson().toJson(orderTO.getResult());
     }
 
     public String getResult() {

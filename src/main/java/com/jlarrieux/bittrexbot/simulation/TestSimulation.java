@@ -4,12 +4,16 @@ import com.google.gson.Gson;
 import com.jlarrieux.bittrexbot.simulation.DAO.DBExchangeDAOImpl;
 import com.jlarrieux.bittrexbot.simulation.TO.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.UUID;
+
 public class TestSimulation {
 
     public static void main(String[] args) {
        /*
         JSON Conversion
-        ResponseTO responseTO = new ResponseTO();
+        MarketSummariesTO responseTO = new MarketSummariesTO();
         System.out.println(new Gson().toJson(responseTO));*/
 
        /* AnnotationConfigApplicationContext applicationContext =
@@ -25,19 +29,36 @@ public class TestSimulation {
 
        DBExchangeDAOImpl dbExchangeDao = new DBExchangeDAOImpl();
         //dbExchangeDao.printOutStack();
-       ResponseTO responseTO = dbExchangeDao.getMarketSummaries();
+       MarketSummariesTO responseTO = dbExchangeDao.getMarketSummaries();
         System.out.println(new Gson().toJson(responseTO));
         responseTO = dbExchangeDao.getMarketSummaries();
         System.out.println(new Gson().toJson(responseTO.getResult()));*/
 
 
-        DBExchangeDAOImpl dbExchangeDao = new DBExchangeDAOImpl();
+        /*DBExchangeDAOImpl dbExchangeDao = new DBExchangeDAOImpl();
         //dbExchangeDao.printOutStack();
         //Example of Market BTC-1ST BTC-2GIVE BTC-ABY
         MarketOrderBookTO marketOrderBookTO = dbExchangeDao.getMarketOrderBook("BTC-1ST");
         System.out.println(new Gson().toJson(marketOrderBookTO));
         marketOrderBookTO = dbExchangeDao.getMarketOrderBook("BTC-2GIVE");
-        System.out.println(new Gson().toJson(marketOrderBookTO));
+        System.out.println(new Gson().toJson(marketOrderBookTO));*/
+
+        DBExchangeDAOImpl dbExchangeDAO = new DBExchangeDAOImpl();
+        dbExchangeDAO.buy(UUID.randomUUID().toString(), "BTC-2GIVE",
+        0.0404001, 0.3423432);
+
+       /* java.util.Date dt = new java.util.Date();
+        java.text.SimpleDateFormat sdf =
+                new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String currentTime = sdf.format(dt);
+        System.out.println("Current Time from Date: " + currentTime);*/
+
+        /*DateTimeFormatter dtfDate = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        DateTimeFormatter dtfTime = DateTimeFormatter.ofPattern("HH:mm:ss");
+        LocalDateTime localDateTime = LocalDateTime.now();
+        System.out.println("This is date: " + dtfDate.format(localDateTime));
+        System.out.println("This is hour: " + dtfTime.format(localDateTime));*/
+
 
         /*DBExchangeDAOImpl dbExchangeDao = new DBExchangeDAOImpl();
         //dbExchangeDao.printOutStack();
@@ -74,7 +95,7 @@ public class TestSimulation {
 
 
         //JSON Conversion
-       /* ResponseTO responseTO = new ResponseTO();
+       /* MarketSummariesTO responseTO = new MarketSummariesTO();
 
         Market market = new Market();
         market.setMarketCurrency("1ST");
