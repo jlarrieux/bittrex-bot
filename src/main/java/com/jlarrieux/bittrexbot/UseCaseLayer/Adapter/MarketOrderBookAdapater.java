@@ -33,6 +33,8 @@ public class MarketOrderBookAdapater {
     }
 
     public void executeMarketOrderBook(String marketName){
+        buyOrderBookEntries.clear();
+        sellOrderBookEntries.clear();
         build(marketName);
     }
 

@@ -8,9 +8,11 @@ import com.jlarrieux.bittrexbot.REST.Response;
 import com.jlarrieux.bittrexbot.Util.Constants;
 import com.jlarrieux.bittrexbot.Util.JsonParserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 
 
+@Component
 public class BalanceAdapter {
 
     ExchangeInterface client;
