@@ -1,6 +1,5 @@
 package com.jlarrieux.bittrexbot.simulation.DAO;
 
-import com.jlarrieux.bittrexbot.Entity.Order;
 import com.jlarrieux.bittrexbot.simulation.TO.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -10,7 +9,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
 import java.util.Stack;
 
 public class DBExchangeDAOImpl implements IDBExchangeDAO {
@@ -159,6 +157,15 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     }
 
     @Override
+    public BalanceTO getBalance(String currency) {
+        BalanceTO balanceTO = new BalanceTO();
+        BalanceTO.Result result = balanceTO.createResult();
+        result.setAvailable(1000.0);
+        balanceTO.setResult(result);
+        return balanceTO;
+    }
+
+    @Override
     public BuyTO buy(String uuid, String marketName, double quantity, double price) {
         BuyTO buyTO = null;
         try {
@@ -225,6 +232,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
                 result.setOrderUuid(resultSet.getString("uuid"));
                 result.setQuantity(resultSet.getDouble("quantity"));
                 result.setPrice(resultSet.getDouble("price"));
+                result.setExchange(resultSet.getString("market_name"));
             }
 
         } catch (Exception e) {

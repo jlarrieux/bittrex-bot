@@ -5,9 +5,9 @@ import java.util.List;
 
 public class MarketSummaryTO {
 
-    private Boolean success;
-    private String message;
-    private List<Result> result = null;
+    private Boolean success = true;
+    private String message = "";
+    private List<Result> result = new ArrayList<>();
 
     public Boolean getSuccess() {
         return success;
@@ -41,57 +41,57 @@ public class MarketSummaryTO {
     ******************/
      public class Result {
 
-        private String marketName;
-        private Double high;
-        private Double low;
-        private Double volume;
-        private Double last;
+        private String MarketName;
+        private Double High;
+        private Double Low;
+        private Double Volume;
+        private Double Last;
         private String timeStamp;
-        private Double bid;
-        private Double ask;
-        private Integer openBuyOrders;
-        private Integer openSellOrders;
-        private Double prevDay;
+        private Double Bid;
+        private Double Ask;
+        private Integer OpenBuyOrders;
+        private Integer OpenSellOrders;
+        private Double PrevDay;
 
 
         public String getMarketName() {
-            return marketName;
+            return MarketName;
         }
 
         public void setMarketName(String marketName) {
-            this.marketName = marketName;
+            this.MarketName = marketName;
         }
 
         public Double getHigh() {
-            return high;
+            return High;
         }
 
         public void setHigh(Double high) {
-            this.high = high;
+            this.High = high;
         }
 
         public Double getLow() {
-            return low;
+            return Low;
         }
 
         public void setLow(Double low) {
-            this.low = low;
+            this.Low = low;
         }
 
         public Double getVolume() {
-            return volume;
+            return Volume;
         }
 
         public void setVolume(Double volume) {
-            this.volume = volume;
+            this.Volume = volume;
         }
 
         public Double getLast() {
-            return last;
+            return Last;
         }
 
         public void setLast(Double last) {
-            this.last = last;
+            this.Last = last;
         }
 
         public String getTimeStamp() {
@@ -103,43 +103,43 @@ public class MarketSummaryTO {
         }
 
         public Double getBid() {
-            return bid;
+            return Bid;
         }
 
         public void setBid(Double bid) {
-            this.bid = bid;
+            this.Bid = bid;
         }
 
         public Double getAsk() {
-            return ask;
+            return Ask;
         }
 
         public void setAsk(Double ask) {
-            this.ask = ask;
+            this.Ask = ask;
         }
 
         public Integer getOpenBuyOrders() {
-            return openBuyOrders;
+            return OpenBuyOrders;
         }
 
         public void setOpenBuyOrders(Integer openBuyOrders) {
-            this.openBuyOrders = openBuyOrders;
+            this.OpenBuyOrders = openBuyOrders;
         }
 
         public Integer getOpenSellOrders() {
-            return openSellOrders;
+            return OpenSellOrders;
         }
 
         public void setOpenSellOrders(Integer openSellOrders) {
-            this.openSellOrders = openSellOrders;
+            this.OpenSellOrders = openSellOrders;
         }
 
         public Double getPrevDay() {
-            return prevDay;
+            return PrevDay;
         }
 
         public void setPrevDay(Double prevDay) {
-            this.prevDay = prevDay;
+            this.PrevDay = prevDay;
         }
     }
 

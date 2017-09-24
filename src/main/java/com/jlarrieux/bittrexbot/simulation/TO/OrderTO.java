@@ -1,5 +1,8 @@
 package com.jlarrieux.bittrexbot.simulation.TO;
 
+import lombok.Data;
+
+@Data
 public class OrderTO {
 
     private Boolean success = true;
@@ -37,21 +40,23 @@ public class OrderTO {
 
     public class Result {
 
-        private String orderUuid;
+        private String OrderUuid;
         private String type;
         private Double quantity;
         private Double price;
         private String opened;
         private Object closed;
-        private Boolean isOpen;
+        private Boolean IsOpen = false;
+        private Boolean CancelInitiated = false;
+        private String Exchange;
 
 
         public String getOrderUuid() {
-            return orderUuid;
+            return OrderUuid;
         }
 
         public void setOrderUuid(String orderUuid) {
-            this.orderUuid = orderUuid;
+            this.OrderUuid = orderUuid;
         }
 
         public String getType() {
@@ -96,11 +101,19 @@ public class OrderTO {
         }
 
         public Boolean getIsOpen() {
-            return isOpen;
+            return IsOpen;
         }
 
         public void setIsOpen(Boolean isOpen) {
-            this.isOpen = isOpen;
+            this.IsOpen = isOpen;
+        }
+
+        public String getExchange() {
+            return Exchange;
+        }
+
+        public void setExchange(String exchange) {
+            Exchange = exchange;
         }
     }
 }

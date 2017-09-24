@@ -12,6 +12,8 @@ import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -43,7 +45,7 @@ public class PortFolio {
 
     private void buildPositionBooks(){
         positionBooks.clear();
-        List<Position> allPostions = positionManager.getAllPositions();
+        Collection<Position> allPostions =  positionManager.getPositionBooks().values();
         if(allPostions!=null){
             for(Position p: allPostions) positionBooks.put(p.getCurrency(), p);
             calculateTotal();

@@ -10,5 +10,6 @@ public interface IDBExchangeDAO {
     public BuyTO buy(String uuid, String marketName, double quantity, double price);
     public SellTO sell(String uuid, String marketName, double quantity, double price);
     public OrderTO getOrder(String uuid);
+    public BalanceTO getBalance(String currency);
 
 }
