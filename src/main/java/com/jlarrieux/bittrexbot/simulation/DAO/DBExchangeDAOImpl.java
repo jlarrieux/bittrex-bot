@@ -6,7 +6,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 
 import java.sql.*;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.Stack;
 
 public class DBExchangeDAOImpl implements IDBExchangeDAO {
@@ -22,6 +26,8 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     private static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
     private static final String DB_CONNECTTION_URL = "jdbc:mysql://localhost/bittrex?user=root&password=root";
 
+    private DateTimeFormatter dtfDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private DateTimeFormatter dtfTime = DateTimeFormatter.ofPattern("HH:mm:ss");
     //todo use properties instead of hardcoding
     //todo refactor create connection
     //todo Used prepared statement
@@ -78,8 +84,8 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     }
 
     @Override
-    public ResponseTO getMarketSummaries() {
-        ResponseTO responseTO = new ResponseTO();
+    public MarketSummariesTO getMarketSummaries() {
+        MarketSummariesTO marketSummariesTO = new MarketSummariesTO();
         try {
 
             Class.forName(JDBC_DRIVER);
@@ -90,7 +96,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
                             + getNextDateFromDateStack() +"' limit 0,199");
 
             while (resultSet.next()) {
-                Summary summary = new Summary();
+                MarketSummariesTO.Summary  summary = new MarketSummariesTO().createSummary();
                 summary.setAsk(resultSet.getDouble("ask"));
                 summary.setBid(resultSet.getDouble("bid"));
                 summary.setHigh((resultSet.getDouble("high")));
@@ -101,7 +107,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
                 summary.setVolume(resultSet.getDouble("volume"));
                 summary.setMarketName(resultSet.getString("market_name"));
 
-                Market market = new Market();
+                MarketSummariesTO.Market market = new MarketSummariesTO().createMarket();
                 market.setBaseCurrency(resultSet.getString("base_currency"));
                 market.setMarketName(resultSet.getString("market_name"));
                 market.setMinTradeSize(resultSet.getDouble("min_trade_size"));
@@ -109,19 +115,19 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
                 market.setMarketCurrency(resultSet.getString("market_currency"));
                 market.setCreated(resultSet.getString("date_create"));
 
-                Result result = new Result();
+                MarketSummariesTO.Result result = new MarketSummariesTO().createResult();
                 result.setSummary(summary);
                 result.setMarket(market);
                 result.setIsVerified(false);
 
-                responseTO.getResult().add(result);
+                marketSummariesTO.getResult().add(result);
             }
         } catch (Exception e) {
              e.printStackTrace();
         } finally {
             close();
         }
-        return responseTO;
+        return marketSummariesTO;
     }
 
     @Override
@@ -153,42 +159,111 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     }
 
     @Override
-    public Order buy(String uuid, String marketName, double quantity, double price) {
-
+    public BuyTO buy(String uuid, String marketName, double quantity, double price) {
+        BuyTO buyTO = null;
         try {
             Class.forName(JDBC_DRIVER);
             connect = DriverManager.getConnection(DB_CONNECTTION_URL);
             statement = connect.createStatement();
 
-            LocalDateTime localTime = LocalDateTime.now();
+            insertOrder(uuid, marketName, quantity, price, "buy", statement, connect);
 
-            String sql = "Insert into order_simulation values (?,?,?,?,?)";
-
-            java.sql.Date  sqldDate = Date.valueOf(localTime.toLocalDate());
-
-            PreparedStatement preparedStmt = connect.prepareStatement(sql);
-            preparedStmt.setString(1, uuid);
-            preparedStmt.setString(2, marketName);
-            preparedStmt.setDouble(3, quantity);
-            preparedStmt.setDouble(4, price);
-            preparedStmt.setDate(5,sqldDate);
-            preparedStmt.execute();
-
-            Order order = new Order();
+            buyTO = new BuyTO();
+            BuyTO.Result result = buyTO.createResult();
+            result.setUuid(uuid);
+            buyTO.setResult(result);
 
         } catch (Exception e) {
             e.printStackTrace();
         } finally{
             close();
         }
-        return marketOrderBookTo;
-        return null;
+
+        return buyTO;
     }
 
     @Override
-    public Order sell(String marketName, double quantity, double price) {
-        return null;
+    public SellTO sell(String uuid, String marketName, double quantity, double price) {
+        SellTO sellTO = null;
+        try {
+            Class.forName(JDBC_DRIVER);
+            connect = DriverManager.getConnection(DB_CONNECTTION_URL);
+            statement = connect.createStatement();
+
+            insertOrder(uuid, marketName, quantity, price, "sell", statement, connect);
+
+            sellTO = new SellTO();
+            SellTO.Result result = sellTO.createResult();
+            result.setUuid(uuid);
+            sellTO.setResult(result);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally{
+            close();
+        }
+
+        return sellTO;
     }
+
+    @Override
+    public OrderTO getOrder(String uuid) {
+        OrderTO orderTO = new OrderTO();
+        try {
+            Class.forName(JDBC_DRIVER);
+            connect = DriverManager.getConnection(DB_CONNECTTION_URL);
+            statement = connect.createStatement();
+
+            String str = "select * from orders_sim where uuid = '" + uuid + "'";
+            resultSet = statement.executeQuery(str);
+
+            orderTO = new OrderTO();
+            OrderTO.Result result = orderTO.createResult();
+            orderTO.setResult(result);
+
+            while (resultSet.next()) {
+                result.setOrderUuid(resultSet.getString("uuid"));
+                result.setQuantity(resultSet.getDouble("quantity"));
+                result.setPrice(resultSet.getDouble("price"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally{
+            close();
+        }
+        return orderTO;
+    }
+
+    private void insertOrder(String uuid, String marketName, double quantity,
+                             double price, String orderType, Statement statement,
+                             Connection connect ) throws SQLException {
+        String sql = "Insert into orders_sim values (?,?,?,?,?,?,?,?)";
+
+        long timeInMilis = System.currentTimeMillis();
+
+        LocalDateTime localDateTime =
+                LocalDateTime.ofInstant(Instant.ofEpochMilli(timeInMilis), ZoneId.systemDefault());
+        String datePortionOfTime = dtfDate.format(localDateTime);
+        String timePortionOfTime = dtfTime.format(localDateTime);
+
+        java.sql.Timestamp timeInTimeStamp = new java.sql.Timestamp(timeInMilis);
+
+        PreparedStatement preparedStmt = connect.prepareStatement(sql);
+        preparedStmt.setString(1, uuid);
+        preparedStmt.setString(2, marketName);
+        preparedStmt.setDouble(3, quantity);
+        preparedStmt.setDouble(4, price);
+        preparedStmt.setTimestamp(5,timeInTimeStamp);
+        preparedStmt.setString(6,datePortionOfTime);
+        preparedStmt.setString(7,timePortionOfTime);
+        preparedStmt.setString(8, orderType); //todo use enum in code, constraints in db
+
+        preparedStmt.execute();
+
+    }
+
+
 
     public void setJdbcTemplate (JdbcTemplate jdbcTemplate){
         this.jdbcTemplate = jdbcTemplate;

@@ -86,35 +86,28 @@ public class SimulatorExchange  implements ExchangeInterface{
 
     @Override
     public Response buy(String marketName, double quantity, double price) {
-        return createBuyOrSellResponse();
+        return new Response(dbExchangeDAO.buy(generateUUID(),marketName, quantity, price));
     }
 
 
 
     @Override
     public Response sell(String marketName, double quantity, double price) {
-        return createBuyOrSellResponse();
+        return new Response(dbExchangeDAO.sell(generateUUID(),marketName, quantity, price));
     }
-
-
 
     @Override
     public Response getOrderHistory(String marketName) {
         return null;
     }
 
-
-
     @Override
     public Response getOrder(String uuid) {
-        return null;
+        return new Response(dbExchangeDAO.getOrder(uuid));
     }
 
-    private Response createBuyOrSellResponse(){
-        String uuid = UUID.randomUUID().toString();
-        Result result = new Result(uuid);
-        Response response = new Response(true, new Gson().toJson(result), "");
-        return response;
+    private String generateUUID(){//TODO use enum on orderType
+       return  UUID.randomUUID().toString();
     }
 
     public class Result {
