@@ -8,6 +8,7 @@ import com.jlarrieux.bittrexbot.simulation.DAO.DBExchangeDAOImpl;
 import com.jlarrieux.bittrexbot.simulation.DAO.IDBExchangeDAO;
 import lombok.Data;
 import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -25,12 +26,13 @@ public class SimulatorExchange  implements ExchangeInterface{
     private IDBExchangeDAO dbExchangeDAO;
 
     public SimulatorExchange(){
+
         dbExchangeDAO = new DBExchangeDAOImpl();
     }
 
     @Override
     public Response getMarkets() {
-        return null;
+        return new MyBittrexClient().getMarkets();
     }
 
 
@@ -65,7 +67,7 @@ public class SimulatorExchange  implements ExchangeInterface{
 
     @Override
     public Response getBalance(String currency) {
-        return null;
+        return new Response(dbExchangeDAO.getBalance(currency));
     }
 
 

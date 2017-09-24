@@ -81,6 +81,12 @@ public class Response {
         result = new Gson().toJson(orderTO.getResult());
     }
 
+    public Response(BalanceTO balanceTO) {
+        success = balanceTO.getSuccess();
+        message = balanceTO.getMessage();
+        result = new Gson().toJson(balanceTO.getResult());
+    }
+
     public String getResult() {
         return result;
     }

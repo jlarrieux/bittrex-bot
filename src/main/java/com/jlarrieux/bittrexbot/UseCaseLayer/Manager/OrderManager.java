@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-
+import java.util.concurrent.ConcurrentHashMap;
 
 
 @Log
@@ -30,8 +30,8 @@ public class OrderManager {
 
 
     private Orders orderBooks;
-    private HashMap<String, Order> pendingBuyOrderTracker = new HashMap<>();
-    private HashMap<String, Order> pendingSellOrderTracker = new HashMap<>();
+    private ConcurrentHashMap<String, Order> pendingBuyOrderTracker = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, Order> pendingSellOrderTracker = new ConcurrentHashMap<>();
     private PositionManager positionManager ;
     private double buyIncrement;
     private int orderTimeOutInMinutes;
@@ -157,12 +157,7 @@ public class OrderManager {
         return 0;
     }
 
-
-
-
-
-
-    //@Scheduled(fixedRate = 1500)
+    @Scheduled(fixedRate = 1500)
     public void checkPendingOrders(){
         decideOnPendingBuyOrders();
         decideOnPendingSellOrders();
