@@ -91,7 +91,9 @@ public class MarketSummaryAdapter {
             Response response = client.getMarkets();
             if(JsonParserUtil.isAsuccess(response)){
                 populateMarketHashMap(JsonParserUtil.getJsonArrayFromJsonString(response.getResult()));
-                return marketHashMap.get(marketName).getMarketCurrency();
+                return marketHashMap.get(marketName) == null ?
+                                                        null:
+                        marketHashMap.get(marketName).getMarketCurrency();
             }
         }
 

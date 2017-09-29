@@ -41,11 +41,11 @@ public class OrderTO {
     public class Result {
 
         private String OrderUuid;
-        private String type;
-        private Double quantity;
-        private Double price;
-        private String opened;
-        private Object closed;
+        private String Type;
+        private Double Quantity;
+        private Double Price;
+        private String Opened;
+        private Object Closed;
         private Boolean IsOpen = false;
         private Boolean CancelInitiated = false;
         private String Exchange;
@@ -60,44 +60,44 @@ public class OrderTO {
         }
 
         public String getType() {
-            return type;
+            return Type;
         }
 
         public void setType(String type) {
-            this.type = type;
+            this.Type = type;
         }
 
         public Double getQuantity() {
-            return quantity;
+            return Quantity;
         }
 
         public void setQuantity(Double quantity) {
-            this.quantity = quantity;
+            this.Quantity = quantity;
         }
 
 
         public Double getPrice() {
-            return price;
+            return Price;
         }
 
         public void setPrice(Double price) {
-            this.price = price;
+            this.Price = price;
         }
 
         public String getOpened() {
-            return opened;
+            return Opened;
         }
 
         public void setOpened(String opened) {
-            this.opened = opened;
+            this.Opened = opened;
         }
 
         public Object getClosed() {
-            return closed;
+            return Closed;
         }
 
         public void setClosed(Object closed) {
-            this.closed = closed;
+            this.Closed = closed;
         }
 
         public Boolean getIsOpen() {

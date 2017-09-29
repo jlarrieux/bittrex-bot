@@ -113,7 +113,8 @@ public class TestSimulation {
         responseTO.getResult().add(result);
         System.out.println(new Gson().toJson(responseTO));*/
 
-
+        DBExchangeDAOImpl dbExchangeDao = new DBExchangeDAOImpl();
+        dbExchangeDAO.printOutStack();
 
     }
 }

@@ -16,7 +16,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     private Connection connect = null;
     private Statement statement = null;
     private PreparedStatement preparedStatement = null;
-    private ResultSet resultSet = null;
+    //private ResultSet resultSet = null;
     private static Stack dateStack = new Stack();
     private static String dateInQuestion = "";
     private static final Double COIN_QUANTITY  = 1000000.0;
@@ -26,11 +26,14 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
 
     private DateTimeFormatter dtfDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private DateTimeFormatter dtfTime = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+    private DBConnectionPool dbcConnecPool;
     //todo use properties instead of hardcoding
     //todo refactor create connection
     //todo Used prepared statement
 
     public DBExchangeDAOImpl() {
+
         boolean startFromMostRecentDate = false;
         dateStack = getDateStack(startFromMostRecentDate);
         System.out.println("Start from most recent date: " + startFromMostRecentDate);
@@ -45,10 +48,13 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     @Override
     public MarketSummaryTO getMarketSummary(String marketName) {
         MarketSummaryTO marketSummaryTO = new MarketSummaryTO();
+        Connection connect = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
 
         try {
             Class.forName(JDBC_DRIVER);
-            connect = DriverManager.getConnection(DB_CONNECTTION_URL);
+            connect =  getConnection();//DriverManager.getConnection(DB_CONNECTTION_URL);
             statement = connect.createStatement();
             String str = "select * from my_data inner join "
                     + "market on my_data.market_id=market.id where my_data.date_create='"
@@ -75,7 +81,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            close();
+            close(resultSet, statement, connect);
         }
 
         return marketSummaryTO;
@@ -84,10 +90,13 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     @Override
     public MarketSummariesTO getMarketSummaries() {
         MarketSummariesTO marketSummariesTO = new MarketSummariesTO();
+        Connection connect = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
         try {
 
             Class.forName(JDBC_DRIVER);
-            connect = DriverManager.getConnection(DB_CONNECTTION_URL);
+            connect = getConnection();//DriverManager.getConnection(DB_CONNECTTION_URL);
             statement = connect.createStatement();
             resultSet = statement.executeQuery("select  * from my_data inner join market"
                             + " on my_data.market_id=market.id where my_data.date_create='"
@@ -123,7 +132,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         } catch (Exception e) {
              e.printStackTrace();
         } finally {
-            close();
+            close(resultSet, statement, connect);
         }
         return marketSummariesTO;
     }
@@ -132,9 +141,13 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     public MarketOrderBookTO getMarketOrderBook(String marketName) {
         MarketOrderBookTO  marketOrderBookTo = new MarketOrderBookTO();
 
+        Connection connect = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+
         try {
             Class.forName(JDBC_DRIVER);
-            connect = DriverManager.getConnection(DB_CONNECTTION_URL);
+            connect = getConnection();//DriverManager.getConnection(DB_CONNECTTION_URL);
             statement = connect.createStatement();
             String str = "select my_data.last from my_data inner join "
                     + "market on my_data.market_id=market.id where my_data.date_create='"
@@ -151,7 +164,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally{
-            close();
+            close(resultSet, statement, connect);
         }
         return marketOrderBookTo;
     }
@@ -167,10 +180,13 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
 
     @Override
     public BuyTO buy(String uuid, String marketName, double quantity, double price) {
+        Connection connect = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
         BuyTO buyTO = null;
         try {
             Class.forName(JDBC_DRIVER);
-            connect = DriverManager.getConnection(DB_CONNECTTION_URL);
+            connect = getConnection();//DriverManager.getConnection(DB_CONNECTTION_URL);
             statement = connect.createStatement();
 
             insertOrder(uuid, marketName, quantity, price, "buy", statement, connect);
@@ -183,7 +199,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally{
-            close();
+            close(resultSet, statement, connect);
         }
 
         return buyTO;
@@ -191,10 +207,13 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
 
     @Override
     public SellTO sell(String uuid, String marketName, double quantity, double price) {
+        Connection connect = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
         SellTO sellTO = null;
         try {
             Class.forName(JDBC_DRIVER);
-            connect = DriverManager.getConnection(DB_CONNECTTION_URL);
+            connect = getConnection();//DriverManager.getConnection(DB_CONNECTTION_URL);
             statement = connect.createStatement();
 
             insertOrder(uuid, marketName, quantity, price, "sell", statement, connect);
@@ -207,7 +226,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally{
-            close();
+            close(resultSet, statement, connect);
         }
 
         return sellTO;
@@ -215,10 +234,13 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
 
     @Override
     public OrderTO getOrder(String uuid) {
+        Connection connect = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
         OrderTO orderTO = new OrderTO();
         try {
             Class.forName(JDBC_DRIVER);
-            connect = DriverManager.getConnection(DB_CONNECTTION_URL);
+            connect = getConnection();//DriverManager.getConnection(DB_CONNECTTION_URL);
             statement = connect.createStatement();
 
             String str = "select * from orders_sim where uuid = '" + uuid + "'";
@@ -238,7 +260,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally{
-            close();
+            close(resultSet, statement, connect);
         }
         return orderTO;
     }
@@ -281,7 +303,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
 
     }
 
-    private void close () {
+    private void close (ResultSet resultSet, Statement statement, Connection connect) {
         try {
             if (resultSet != null) {
                 resultSet.close();
@@ -295,7 +317,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
                 connect.close();
             }
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
 
@@ -311,14 +333,18 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
 
     private Stack getDateStack(boolean startFromMostRecentDate)  {
         Stack resultStack = new Stack();
-
+        Connection connect = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
         try {
 
             String dateOrder = "desc";
 
-            Class.forName(JDBC_DRIVER);
+            //Class.forName(JDBC_DRIVER);
 
-            connect = DriverManager.getConnection(DB_CONNECTTION_URL);
+            //connect = DriverManager.getConnection(DB_CONNECTTION_URL);
+
+            connect = getConnection();//.getConnection(DB_CONNECTTION_URL);
 
             statement = connect.createStatement();
 
@@ -336,9 +362,27 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            close();
+            close(resultSet, statement, connect);
         }
         return resultStack;
+    }
+
+    private Connection getConnection(){
+        if (dbcConnecPool == null) {
+            try {
+                dbcConnecPool = DBConnectionPool.getInstance();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        Connection connect = null;
+        try {
+            connect = dbcConnecPool.getConnection();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return connect;
     }
 }
 
