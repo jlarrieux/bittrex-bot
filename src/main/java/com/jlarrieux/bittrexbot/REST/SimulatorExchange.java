@@ -23,11 +23,14 @@ import java.util.UUID;
 @Profile("!live")
 public class SimulatorExchange  implements ExchangeInterface{
 
+
+    @Autowired
     private IDBExchangeDAO dbExchangeDAO;
 
-    public SimulatorExchange(){
 
-        dbExchangeDAO = new DBExchangeDAOImpl();
+    public SimulatorExchange(IDBExchangeDAO dbExchangeDAO){
+
+       // this.dbExchangeDAO = new DBExchangeDAOImpl();
     }
 
     @Override
