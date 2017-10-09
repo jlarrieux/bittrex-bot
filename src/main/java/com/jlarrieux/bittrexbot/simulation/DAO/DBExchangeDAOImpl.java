@@ -1,7 +1,12 @@
 package com.jlarrieux.bittrexbot.simulation.DAO;
 
+import com.jlarrieux.bittrexbot.Properties.SimulationProperties;
 import com.jlarrieux.bittrexbot.simulation.TO.*;
+import com.jlarrieux.bittrexbot.simulation.db.DBConnectionPool;
+import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
 
 
 import java.sql.*;
@@ -10,33 +15,47 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Stack;
+import java.util.concurrent.TimeUnit;
 
+@Log
+@Component
 public class DBExchangeDAOImpl implements IDBExchangeDAO {
-    private JdbcTemplate jdbcTemplate;
-    private Connection connect = null;
-    private Statement statement = null;
-    private PreparedStatement preparedStatement = null;
-    //private ResultSet resultSet = null;
+
     private static Stack dateStack = new Stack();
     private static String dateInQuestion = "";
-    private static final Double COIN_QUANTITY  = 1000000.0;
 
-    private static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-    private static final String DB_CONNECTTION_URL = "jdbc:mysql://localhost/bittrex?user=root&password=root";
+    private static SimulationProperties simulationProperties;
 
-    private DateTimeFormatter dtfDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    private DateTimeFormatter dtfTime = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private static final Double COIN_QUANTITY = 1000000.0; // TODO: 10/8/2017 Needs to be taken from proprty file
 
-    private DBConnectionPool dbcConnecPool;
+    private DateTimeFormatter dtfDate;
+    private DateTimeFormatter dtfTime;
+
+    private DBConnectionPool dbConnectionPool;
+
     //todo use properties instead of hardcoding
     //todo refactor create connection
     //todo Used prepared statement
 
-    public DBExchangeDAOImpl() {
+    @Autowired
+    public DBExchangeDAOImpl(DBConnectionPool dbConnectionPool, SimulationProperties simulationProperties) {
 
-        boolean startFromMostRecentDate = false;
+        log.info("Creating DBExchangeDAO...");
+        this.simulationProperties = simulationProperties;
+        boolean startFromMostRecentDate = simulationProperties.isStartFromRecentDate();
+        this.dbConnectionPool = dbConnectionPool;
+        dtfDate = DateTimeFormatter.ofPattern(simulationProperties.getDateFormatter());
+        dtfTime = DateTimeFormatter.ofPattern(simulationProperties.getTimeFormatter());
+
+        log.info("Retrieving DateStack...");
+        long startTime = System.nanoTime();
         dateStack = getDateStack(startFromMostRecentDate);
-        System.out.println("Start from most recent date: " + startFromMostRecentDate);
+        long totalTime = System.nanoTime() - startTime;
+        log.info("Retrieving DateStack complete. Time elapsed: " +
+                String.format("%d min, %d sec", TimeUnit.NANOSECONDS.toHours(totalTime),
+                TimeUnit.NANOSECONDS.toSeconds(totalTime) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.NANOSECONDS.toMinutes(totalTime))));
+        log.info("DBExchangeDAO creation successful!");
     }
 
     public void printOutStack(){
@@ -53,8 +72,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         ResultSet resultSet = null;
 
         try {
-            Class.forName(JDBC_DRIVER);
-            connect =  getConnection();//DriverManager.getConnection(DB_CONNECTTION_URL);
+            connect =  getConnection();
             statement = connect.createStatement();
             String str = "select * from my_data inner join "
                     + "market on my_data.market_id=market.id where my_data.date_create='"
@@ -94,9 +112,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         Statement statement = null;
         ResultSet resultSet = null;
         try {
-
-            Class.forName(JDBC_DRIVER);
-            connect = getConnection();//DriverManager.getConnection(DB_CONNECTTION_URL);
+            connect = getConnection();
             statement = connect.createStatement();
             resultSet = statement.executeQuery("select  * from my_data inner join market"
                             + " on my_data.market_id=market.id where my_data.date_create='"
@@ -146,8 +162,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         ResultSet resultSet = null;
 
         try {
-            Class.forName(JDBC_DRIVER);
-            connect = getConnection();//DriverManager.getConnection(DB_CONNECTTION_URL);
+            connect = getConnection();
             statement = connect.createStatement();
             String str = "select my_data.last from my_data inner join "
                     + "market on my_data.market_id=market.id where my_data.date_create='"
@@ -185,8 +200,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         ResultSet resultSet = null;
         BuyTO buyTO = null;
         try {
-            Class.forName(JDBC_DRIVER);
-            connect = getConnection();//DriverManager.getConnection(DB_CONNECTTION_URL);
+            connect = getConnection();
             statement = connect.createStatement();
 
             insertOrder(uuid, marketName, quantity, price, "buy", statement, connect);
@@ -195,7 +209,6 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
             BuyTO.Result result = buyTO.createResult();
             result.setUuid(uuid);
             buyTO.setResult(result);
-
         } catch (Exception e) {
             e.printStackTrace();
         } finally{
@@ -212,8 +225,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         ResultSet resultSet = null;
         SellTO sellTO = null;
         try {
-            Class.forName(JDBC_DRIVER);
-            connect = getConnection();//DriverManager.getConnection(DB_CONNECTTION_URL);
+            connect = getConnection();
             statement = connect.createStatement();
 
             insertOrder(uuid, marketName, quantity, price, "sell", statement, connect);
@@ -239,8 +251,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         ResultSet resultSet = null;
         OrderTO orderTO = new OrderTO();
         try {
-            Class.forName(JDBC_DRIVER);
-            connect = getConnection();//DriverManager.getConnection(DB_CONNECTTION_URL);
+            connect = getConnection();
             statement = connect.createStatement();
 
             String str = "select * from orders_sim where uuid = '" + uuid + "'";
@@ -293,12 +304,6 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
 
     }
 
-
-
-    public void setJdbcTemplate (JdbcTemplate jdbcTemplate){
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
     private void fecthMarketInfo(Integer marketId) {
 
     }
@@ -333,56 +338,68 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
 
     private Stack getDateStack(boolean startFromMostRecentDate)  {
         Stack resultStack = new Stack();
-        Connection connect = null;
+        Connection connection = null;
         Statement statement = null;
         ResultSet resultSet = null;
         try {
 
             String dateOrder = "desc";
 
-            //Class.forName(JDBC_DRIVER);
+            connection = getConnection();
 
-            //connect = DriverManager.getConnection(DB_CONNECTTION_URL);
-
-            connect = getConnection();//.getConnection(DB_CONNECTTION_URL);
-
-            statement = connect.createStatement();
+            statement = connection.createStatement();
 
             if (startFromMostRecentDate) {
                 dateOrder = "asc";
             }
 
             // select dates in reverse order
-            resultSet = statement.executeQuery("select distinct date_create from my_data order by date_create " + dateOrder);
+            resultSet = statement.executeQuery("select distinct date_create from " +
+                    "my_data order by date_create " + dateOrder);
 
+            int dateCount = 0;
+            String firstDate = "";
+            String lastDate = "";
             while (resultSet.next()) {
-                resultStack.push(resultSet.getString("date_create"));
+                dateCount++;
+                String tempStr = resultSet.getString("date_create");
 
+                if(dateCount == 1){firstDate = tempStr;}
+
+                resultStack.push(tempStr);
+
+                lastDate = tempStr;
             }
+            log.info("Number of dates in stack: " + dateCount);
+            log.info("First date in Stack: " + firstDate);
+            log.info("Last Date in Stack: " + lastDate);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            close(resultSet, statement, connect);
+            close(resultSet, statement, connection);
         }
         return resultStack;
     }
 
     private Connection getConnection(){
-        if (dbcConnecPool == null) {
+        // TODO: 10/8/2017 Remember to remove comment block
+        /* if (dbConnectionPool == null) {
             try {
-                dbcConnecPool = DBConnectionPool.getInstance();
+                dbConnectionPool = DBConnectionPool.getInstance();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
+        }*/
 
         Connection connect = null;
         try {
-            connect = dbcConnecPool.getConnection();
+            connect = dbConnectionPool.getConnection();
         } catch (Exception e) {
             e.printStackTrace();
         }
         return connect;
     }
+
+
 }
 

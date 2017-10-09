@@ -43,9 +43,9 @@ public class TestSimulation {
         marketOrderBookTO = dbExchangeDao.getMarketOrderBook("BTC-2GIVE");
         System.out.println(new Gson().toJson(marketOrderBookTO));*/
 
-        DBExchangeDAOImpl dbExchangeDAO = new DBExchangeDAOImpl();
+        /*DBExchangeDAOImpl dbExchangeDAO = new DBExchangeDAOImpl();
         dbExchangeDAO.buy(UUID.randomUUID().toString(), "BTC-2GIVE",
-        0.0404001, 0.3423432);
+        0.0404001, 0.3423432);*/
 
        /* java.util.Date dt = new java.util.Date();
         java.text.SimpleDateFormat sdf =
@@ -113,8 +113,8 @@ public class TestSimulation {
         responseTO.getResult().add(result);
         System.out.println(new Gson().toJson(responseTO));*/
 
-        DBExchangeDAOImpl dbExchangeDao = new DBExchangeDAOImpl();
-        dbExchangeDAO.printOutStack();
+        /*DBExchangeDAOImpl dbExchangeDao = new DBExchangeDAOImpl();
+        dbExchangeDAO.printOutStack();*/
 
     }
 }
