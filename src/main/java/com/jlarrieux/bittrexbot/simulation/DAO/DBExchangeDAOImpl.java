@@ -5,7 +5,6 @@ import com.jlarrieux.bittrexbot.simulation.TO.*;
 import com.jlarrieux.bittrexbot.simulation.db.DBConnectionPool;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 
@@ -22,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 public class DBExchangeDAOImpl implements IDBExchangeDAO {
 
     private static Stack dateStack = new Stack();
-    private static String dateInQuestion = "";
+    private static String dateCurrentlyInProcess = "";
 
     private static SimulationProperties simulationProperties;
 
@@ -78,7 +77,9 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
                     + "market on my_data.market_id=market.id where my_data.date_create='"
                     + getDateInQuestion() + "' AND market.market_name='" + marketName +"' limit 0, 1";
             resultSet = statement.executeQuery(str);
-
+            log.info("Inside: " + getClass().getSimpleName() +"\t Method: getMarketSummary()" +
+                    "\t Date & Time currently in process" +
+                    dateCurrentlyInProcess );
             while (resultSet.next()) {
 
                 MarketSummaryTO.Result result = marketSummaryTO.createResult();
@@ -117,6 +118,9 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
             resultSet = statement.executeQuery("select  * from my_data inner join market"
                             + " on my_data.market_id=market.id where my_data.date_create='"
                             + getNextDateFromDateStack() +"' limit 0,199");
+            log.info("Inside: " + getClass().getSimpleName() +"\t Method: getMarketSummaries()" +
+                    "\t Date & Time currently in process" +
+                    dateCurrentlyInProcess );
 
             while (resultSet.next()) {
                 MarketSummariesTO.Summary  summary = new MarketSummariesTO().createSummary();
@@ -327,12 +331,12 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     }
 
     private String getNextDateFromDateStack(){
-        dateInQuestion = (String) dateStack.peek();
+        dateCurrentlyInProcess = (String) dateStack.peek();
         return (String) dateStack.pop();
     }
 
     private String getDateInQuestion(){
-        return dateInQuestion ==""? (String) dateStack.peek(): dateInQuestion;
+        return dateCurrentlyInProcess ==""? (String) dateStack.peek(): dateCurrentlyInProcess;
     }
 
 

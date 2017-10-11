@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -95,6 +94,7 @@ public class OrderManager {
         double unitPrice = getSellPrice(currency);
         if (quantity>0){
             Order order = orderAdapater.sell(currency,quantity,unitPrice);//getOrder( client.sell(currency,quantity,unitPrice))  ord;
+            log.info(String.format("SELL \tcurrency: %s\tquantity: %f\tunitPrice: %f", currency, quantity,unitPrice));
             if(order!= null) pendingSellOrderTracker.put(order.getOrderUuid(), order);
         }
 
@@ -122,7 +122,7 @@ public class OrderManager {
     private String trueBuying(String marketName,  double quantity,double unitPrice){
         if(quantity==-1) quantity= buyIncrement/unitPrice;
         StringBuilder uuid = null;
-        log.info(String.format("marketname: %s\tquantity: %f\tunitPrice: %f", marketName, quantity,unitPrice));
+        log.info(String.format("TRUE_BUY \tmarketname: %s\tquantity: %f\tunitPrice: %f", marketName, quantity,unitPrice));
         Order order = orderAdapater.buy(marketName,quantity,unitPrice);
         if(order!=null){
             uuid = new StringBuilder();
