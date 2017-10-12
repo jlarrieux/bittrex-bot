@@ -49,6 +49,7 @@ public class OrderTO {
         private Boolean IsOpen = false;
         private Boolean CancelInitiated = false;
         private String Exchange;
+        private double Limit;
 
 
         public String getOrderUuid() {
@@ -81,7 +82,12 @@ public class OrderTO {
         }
 
         public void setPrice(Double price) {
+            Limit = price;
             this.Price = price;
+        }
+
+        public double getLimit(){
+            return Limit;
         }
 
         public String getOpened() {

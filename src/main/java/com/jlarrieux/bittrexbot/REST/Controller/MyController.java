@@ -80,7 +80,7 @@ public class MyController {
     @GetMapping("/pandl")
     public String getPandL(){
         return String.format("Current Value: %f<br><br>P and L:%f"
-                , portFolio.getCurrentPortFolioValue(), portFolio.getCurrentPortFolioValue());
+                , portFolio.getCurrentPortFolioValue(), portFolio.profitAndLossPercentage());
     }
 
 

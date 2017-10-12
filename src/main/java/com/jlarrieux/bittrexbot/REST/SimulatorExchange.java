@@ -23,7 +23,7 @@ import java.util.UUID;
 @Qualifier(Constants.SIMULATOR)
 @Profile("!live")
 public class SimulatorExchange  implements ExchangeInterface{
-    double availableBalance =1000;
+    double availableBalance =1;
 
     @Autowired
     private IDBExchangeDAO dbExchangeDAO;
@@ -98,7 +98,11 @@ public class SimulatorExchange  implements ExchangeInterface{
     @Override
     public Response buy(String marketName, double quantity, double price) {
         double value = quantity*price;
-        if(value>availableBalance) return null;
+        if(value>availableBalance){
+            Response r = new Response(new BuyTO());
+            r.setSuccess(false);
+            return r;
+        }
         else {
             BuyTO buyTO = dbExchangeDAO.buy(generateUUID(), marketName, quantity, price);
             availableBalance -= value;
