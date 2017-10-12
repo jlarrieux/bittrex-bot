@@ -41,4 +41,8 @@ dependencies {
 	compile 'com.google.guava:guava:22.0'
 	compile 'org.apache.commons:commons-math3:3.+'
 	compile 'com.sun.jersey:jersey-client:1.+'
+
+	compile files('lib/c3p0-0.9.5.2.jar', 'lib/mchange-commons-java-0.2.11.jar')
+
+	compile 'mysql:mysql-connector-java:6.0.+'
 }

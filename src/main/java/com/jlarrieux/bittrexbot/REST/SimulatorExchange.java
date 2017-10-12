@@ -2,13 +2,18 @@ package com.jlarrieux.bittrexbot.REST;
 
 
 
+import com.google.gson.Gson;
 import com.jlarrieux.bittrexbot.Util.Constants;
+import com.jlarrieux.bittrexbot.simulation.DAO.DBExchangeDAOImpl;
+import com.jlarrieux.bittrexbot.simulation.DAO.IDBExchangeDAO;
 import lombok.Data;
 import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
 
 
 @Component
@@ -17,33 +22,41 @@ import org.springframework.stereotype.Component;
 @Qualifier(Constants.SIMULATOR)
 @Profile("!live")
 public class SimulatorExchange  implements ExchangeInterface{
-    //todo create data structure that will hold data from server
+
+
+    @Autowired
+    private IDBExchangeDAO dbExchangeDAO;
+
+
+    public SimulatorExchange(IDBExchangeDAO dbExchangeDAO){
+
+       // this.dbExchangeDAO = new DBExchangeDAOImpl();
+    }
 
     @Override
     public Response getMarkets() {
-        return null;
+        return new MyBittrexClient().getMarkets();
     }
 
 
 
     @Override
     public Response getMarketSummary(String marketName) {
-        return null;
+        return new Response(dbExchangeDAO.getMarketSummary(marketName));
     }
 
 
 
     @Override
     public Response getMarketOrderBook(String marketName) {
-        return null;
+        return new Response(dbExchangeDAO.getMarketOrderBook(marketName));
     }
 
 
 
     @Override
     public Response getMarketSummaries() {
-        //todo implement simulation of data feeding
-        return null;
+        return new Response(dbExchangeDAO.getMarketSummaries());
     }
 
 
@@ -57,7 +70,7 @@ public class SimulatorExchange  implements ExchangeInterface{
 
     @Override
     public Response getBalance(String currency) {
-        return null;
+        return new Response(dbExchangeDAO.getBalance(currency));
     }
 
 
@@ -78,27 +91,40 @@ public class SimulatorExchange  implements ExchangeInterface{
 
     @Override
     public Response buy(String marketName, double quantity, double price) {
-        return null;
+        return new Response(dbExchangeDAO.buy(generateUUID(),marketName, quantity, price));
     }
 
 
 
     @Override
     public Response sell(String marketName, double quantity, double price) {
-        return null;
+        return new Response(dbExchangeDAO.sell(generateUUID(),marketName, quantity, price));
     }
-
-
 
     @Override
     public Response getOrderHistory(String marketName) {
         return null;
     }
 
-
-
     @Override
     public Response getOrder(String uuid) {
-        return null;
+        return new Response(dbExchangeDAO.getOrder(uuid));
     }
+
+    private String generateUUID(){//TODO use enum on orderType
+       return  UUID.randomUUID().toString();
+    }
+
+    public class Result {
+
+        private String uuid;
+
+        public String getUuid() {
+            return uuid;
+        }
+
+        public Result(String uuid) {
+            this.uuid = uuid;
+        }
+        }
 }

@@ -42,13 +42,9 @@ public class MarketSummaryAdapter {
         if(JsonParserUtil.isAsuccess(response)) return JsonParserUtil.getJsonArrayFromJsonString(response.getResult());
         return null;
     }
-
-
-    public void executeMarketSearch(String marketName){
+public void executeMarketSearch(String marketName){
         build(marketName);
     }
-
-
 
     private void build(String marketName){
         Response response = client.getMarketSummary(marketName);
@@ -56,7 +52,6 @@ public class MarketSummaryAdapter {
 
 
     }
-
 
     private void populate(String jsonString){
         JsonArray array = JsonParserUtil.getJsonArrayFromJsonString(jsonString);
@@ -85,7 +80,9 @@ public class MarketSummaryAdapter {
             Response response = client.getMarkets();
             if(JsonParserUtil.isAsuccess(response)){
                 populateMarketHashMap(JsonParserUtil.getJsonArrayFromJsonString(response.getResult()));
-                return marketHashMap.get(marketName).getMarketCurrency();
+                return marketHashMap.get(marketName) == null ?
+                                                        null:
+                        marketHashMap.get(marketName).getMarketCurrency();
             }
         }
 
@@ -119,7 +116,7 @@ public class MarketSummaryAdapter {
 
         private void populate(JsonObject object){
            setMarketCurrency(JsonParserUtil.getStringFromJsonObject(object,Constants.upperCaseFirst(Constants.MARKET_CURRENCY_SHORT)));
-           setMarketCurrencyLong(JsonParserUtil.getStringFromJsonObject(object, Constants.upperCaseFirst(Constants.MARKET_CURRENCY)));
+           setMarketCurrencyLong(JsonParserUtil.getStringFromJsonObject(object, Constants.upperCaseFirst(Constants.MARKET_CURRENCY_LONG)));
            setMarketName(JsonParserUtil.getStringFromJsonObject(object,Constants.MARKET_NAME));
            setMinTradeSize(JsonParserUtil.getDoubleFromJsonObject(object,Constants.MIN_TRADE_SIZE));
            setActive(JsonParserUtil.getBooleanFromJsonObject(object,Constants.IS_ACTIVE));
