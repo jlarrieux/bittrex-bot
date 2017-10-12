@@ -122,14 +122,16 @@ public class OrderManager {
     private String actualBuying(String marketName, double quantity, double unitPrice){
         if(quantity==-1) quantity= buyIncrement/unitPrice;
         StringBuilder uuid = null;
-        log.finest(String.format("TRUE_BUY \tmarketname: %s\tquantity: %f\tunitPrice: %f", marketName, quantity,unitPrice));
+        log.info(String.format("TRUE_BUY \tmarketname: %s\tquantity: %f\tunitPrice: %f", marketName, quantity,unitPrice));
         Order order = orderAdapater.buy(marketName,quantity,unitPrice);
         if(order!=null){
             uuid = new StringBuilder();
             pendingBuyOrderTracker.put(order.getOrderUuid(), order);
             uuid.append(order.getOrderUuid());
         }
-        return uuid.toString();
+        StringBuilder builder = new StringBuilder();
+        if(uuid!=null) builder.append(uuid.toString());
+        return builder.toString();
     }
 
 
@@ -165,12 +167,12 @@ public class OrderManager {
 
 
     private void decideOnPendingBuyOrders(){
-        log.info("~~about to check pending buys\n");
+
         for(String uuid: pendingBuyOrderTracker.keySet()){
             Order localOrder = pendingBuyOrderTracker.get(uuid);
             Order remote = orderAdapater.getOrder(localOrder.getOrderUuid());//new Order(JsonParserUtil.getJsonObjectFromJsonString(responseFromOrderUUID.getResult()));
             if (!remote.getIsOpen() && !remote.getCancelIniated()){
-                log.info("!!!!decided good to add to position Manager");
+
                     Position p = createPositionFromOrder(localOrder);
                     if(p!=null) {
                         positionManager.add(p);
