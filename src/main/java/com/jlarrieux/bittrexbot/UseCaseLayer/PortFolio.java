@@ -12,9 +12,7 @@ import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 
 @Log
@@ -76,11 +74,7 @@ public class PortFolio {
 
 
 
-
-
-
-
-
-
-
+    public PositionManager getPositionManager() {
+        return positionManager;
+    }
 }

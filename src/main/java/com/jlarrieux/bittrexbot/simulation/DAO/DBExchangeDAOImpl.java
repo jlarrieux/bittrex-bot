@@ -20,6 +20,8 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class DBExchangeDAOImpl implements IDBExchangeDAO {
 
+
+    public double AVAILABLE_BALANCE = 1000.0;
     private static Stack dateStack = new Stack();
     private static String dateCurrentlyInProcess = "";
 
@@ -188,11 +190,12 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         return marketOrderBookTo;
     }
 
+    //todo: clean this mess up see simulator line 45
     @Override
     public BalanceTO getBalance(String currency) {
         BalanceTO balanceTO = new BalanceTO();
         BalanceTO.Result result = balanceTO.createResult();
-        result.setAvailable(1000.0);
+        result.setAvailable(AVAILABLE_BALANCE);
         balanceTO.setResult(result);
         return balanceTO;
     }
@@ -228,6 +231,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         Statement statement = null;
         ResultSet resultSet = null;
         SellTO sellTO = null;
+        AVAILABLE_BALANCE += quantity*price;
         try {
             connect = getConnection();
             statement = connect.createStatement();

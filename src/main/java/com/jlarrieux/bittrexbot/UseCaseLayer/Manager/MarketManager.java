@@ -49,7 +49,7 @@ public class MarketManager {
 //        log.info(String.valueOf(marketBooks.size()));
    //     if(marketBooks.size()==0)    getDataFromServer();
 
-        log.info("Inside: " + getClass().getSimpleName() +"\t Method: " + "addMarkets(JsonArray)" );
+        log.finest("Inside: " + getClass().getSimpleName() +"\t Method: " + "addMarkets(JsonArray)" );
         iterate(array);
 
 
