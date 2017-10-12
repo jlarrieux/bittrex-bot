@@ -12,10 +12,6 @@ import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.Clock;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -122,15 +118,15 @@ public class PositionManager {
 
 
 
-    public static void main(String[] args){
-        LocalDateTime localDateTime = LocalDateTime.now();
-        LocalDateTime utc = LocalDateTime.now(Clock.systemUTC());
-        String s = "2017-08-27T04:49:17.36";
-        LocalDateTime localDateTime1 = LocalDateTime.parse(s);
-        ZonedDateTime zonedDateTime = localDateTime1.atZone(ZoneId.of("UTC"));
-
-        log.info(String.format("Local: %s\nUTC: %s\nlocal from string: %s\nUtc2: %s", localDateTime.toString(),utc.toString(), localDateTime1.toString(), zonedDateTime.toString()));
-    }
+//    public static void main(String[] args){
+//        LocalDateTime localDateTime = LocalDateTime.now();
+//        LocalDateTime utc = LocalDateTime.now(Clock.systemUTC());
+//        String s = "2017-08-27T04:49:17.36";
+//        LocalDateTime localDateTime1 = LocalDateTime.parse(s);
+//        ZonedDateTime zonedDateTime = localDateTime1.atZone(ZoneId.of("UTC"));
+//
+//        log.info(String.format("Local: %s\nUTC: %s\nlocal from string: %s\nUtc2: %s", localDateTime.toString(),utc.toString(), localDateTime1.toString(), zonedDateTime.toString()));
+//    }
 
 
 }
