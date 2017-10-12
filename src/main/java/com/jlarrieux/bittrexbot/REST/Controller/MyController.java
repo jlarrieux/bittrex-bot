@@ -2,6 +2,7 @@ package com.jlarrieux.bittrexbot.REST.Controller;
 
 
 
+import com.jlarrieux.bittrexbot.Entity.Positions;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Decider;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Manager.MarketManager;
 import com.jlarrieux.bittrexbot.UseCaseLayer.PortFolio;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Set;
 
 
 
@@ -78,6 +81,19 @@ public class MyController {
     public String getPandL(){
         return String.format("Current Value: %f<br><br>P and L:%f"
                 , portFolio.getCurrentPortFolioValue(), portFolio.getCurrentPortFolioValue());
+    }
+
+
+    @GetMapping("/hodl")
+    public String getHodl(){
+        StringBuilder b = new StringBuilder();
+        Positions positions = portFolio.getPositionManager().getPositionBooks();
+        Set<String> list = positions.keySet();
+        for(String s: list){
+            b.append(positions.get(s).toString()+"</br>");
+        }
+        return b.toString();
+
     }
 
 

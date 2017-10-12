@@ -7,6 +7,11 @@
       "type": "com.jlarrieux.bittrexbot.Properties.BittrexProperties"
     },
     {
+      "sourceType": "com.jlarrieux.bittrexbot.Properties.SimulationProperties",
+      "name": "simulation",
+      "type": "com.jlarrieux.bittrexbot.Properties.SimulationProperties"
+    },
+    {
       "sourceType": "com.jlarrieux.bittrexbot.Properties.TradingProperties",
       "name": "trading",
       "type": "com.jlarrieux.bittrexbot.Properties.TradingProperties"
@@ -26,6 +31,65 @@
     {
       "sourceType": "com.jlarrieux.bittrexbot.Properties.BittrexProperties",
       "name": "bittrex.secret",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.jlarrieux.bittrexbot.Properties.SimulationProperties",
+      "defaultValue": 0,
+      "name": "simulation.acquire-increment",
+      "type": "java.lang.Integer"
+    },
+    {
+      "sourceType": "com.jlarrieux.bittrexbot.Properties.SimulationProperties",
+      "name": "simulation.coin-quantity",
+      "type": "java.lang.Double"
+    },
+    {
+      "sourceType": "com.jlarrieux.bittrexbot.Properties.SimulationProperties",
+      "name": "simulation.connection-url",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.jlarrieux.bittrexbot.Properties.SimulationProperties",
+      "name": "simulation.date-formatter",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.jlarrieux.bittrexbot.Properties.SimulationProperties",
+      "name": "simulation.jdbc-driver",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.jlarrieux.bittrexbot.Properties.SimulationProperties",
+      "defaultValue": 0,
+      "name": "simulation.max-pool-size",
+      "type": "java.lang.Integer"
+    },
+    {
+      "sourceType": "com.jlarrieux.bittrexbot.Properties.SimulationProperties",
+      "defaultValue": 0,
+      "name": "simulation.min-pool-size",
+      "type": "java.lang.Integer"
+    },
+    {
+      "sourceType": "com.jlarrieux.bittrexbot.Properties.SimulationProperties",
+      "name": "simulation.password",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.jlarrieux.bittrexbot.Properties.SimulationProperties",
+      "defaultValue": false,
+      "name": "simulation.start-from-recent-date",
+      "type": "java.lang.Boolean"
+    },
+    {
+      "sourceType": "com.jlarrieux.bittrexbot.Properties.SimulationProperties",
+      "name": "simulation.time-formatter",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.jlarrieux.bittrexbot.Properties.SimulationProperties",
+      "name": "simulation.user",
       "type": "java.lang.String"
     },
     {
