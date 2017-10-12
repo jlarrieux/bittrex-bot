@@ -1,0 +1,13 @@
+# Script for new table orders_sim. Used to simulator exchange
+
+CREATE TABLE `orders_sim` (
+  `uuid` varchar(45) NOT NULL,
+  `market_name` varchar(32) DEFAULT NULL,
+  `quantity` double DEFAULT NULL,
+  `price` double DEFAULT NULL,
+  `date_time` datetime DEFAULT NULL,
+  `date` varchar(10) DEFAULT NULL,
+  `time` varchar(10) DEFAULT NULL,
+  `order_type` varchar(5) DEFAULT NULL,
+  PRIMARY KEY (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

@@ -20,7 +20,7 @@ public class Constants {
 
 
     public static final String RATE_CapitalFIRST = "Rate";
-    public static final int DATA_WINDOW = 1440;
+    public static final int DATA_WINDOW = 5;
     public static final String BITTREX_BASE_URL="https://bittrex.com/api/v1.1/";
     public static final String BITTREX_BASE_URL2 = "https://bittrex.com/api/v2.0/";
     public static final String ENCRYPTION_ALGORITHM = "HmacSHA512";
@@ -47,9 +47,11 @@ public class Constants {
     public static final String ORDERS = "orders";
     public static final String INITIAL_URL ="https://bittrex.com/api/";
     public static final Exception InvalidStringListException = new Exception("Must be in key-value pairs");
-    public static final String MARKET_CURRENCY = "MarketCurrencyLong";
+    public static final String MARKET_CURRENCY_LONG = "MarketCurrencyLong";
+    public static final String MARKET_CURRENCY = "MarketCurrency";
     public static final String SUMMARY = "Summary";
-    public static final String BASE_CURRENCY = "BaseCurrencyLong";
+    public static final String BASE_CURRENCY_LONG = "BaseCurrencyLong";
+    public static final String BASE_CURRENCY = "BaseCurrency";
     public static final String MARKET_NAME = "MarketName";
     public static final String IS_ACTIVE = "IsActive";
     public static final String MIN_TRADE_SIZE = "MinTradeSize";

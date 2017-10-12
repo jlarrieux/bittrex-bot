@@ -22,6 +22,9 @@ public class BittrexDataManager {
     @Autowired
     private MarketManager marketManager;
 
+    private final String GET_MARKET_SUMMARIES_LOG_DIVIDER = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" +
+            "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
+
 
 
 
@@ -30,9 +33,10 @@ public class BittrexDataManager {
     }
 
 
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 100)
     public void getMarketSummaries(){
-
+        log.info(GET_MARKET_SUMMARIES_LOG_DIVIDER);
+        log.info("Inside: " + getClass().getSimpleName() +"\t Method: " + "getMarketSummaries()");
         marketManager.addMarkets(marketSummaryAdapter.getMarketSummaries());
     }
 

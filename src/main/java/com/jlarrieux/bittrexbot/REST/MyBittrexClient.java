@@ -29,15 +29,14 @@ public class MyBittrexClient extends RestClient implements ExchangeInterface {
     private String apikey;
     private String secret;
 
-
-
-    
     public MyBittrexClient(BittrexProperties properties){
         if(properties!=null) {
             apikey = properties.getKey();
             secret = properties.getSecret();
         }
     }
+
+    public MyBittrexClient(){}
 
     @Override
     protected Response getResponseBody(String jsonString) {
@@ -49,8 +48,6 @@ public class MyBittrexClient extends RestClient implements ExchangeInterface {
 
         return getResponseBody(getJsonAsString(Constants.BITTREX_BASE_URL+Constants.PUBLIC+"/getmarkets"));
     }
-
-
     public Response getMarketSummaries(){
         return getResponseBody(getJsonAsString(Constants.BITTREX_BASE_URL2+ Constants.PUB +Constants.MARKETS + Constants.GETMARKETSUMMARIES));
     }
@@ -128,7 +125,7 @@ public class MyBittrexClient extends RestClient implements ExchangeInterface {
     public Response buy(String marketName, double quantity, double price){
 
         try {
-            log.info(String.format("marketname: %s\tquantity: %f\tunitPrice: %f", marketName, quantity,price));
+            log.info(String.format("BUY \tmarketname: %s\tquantity: %f\tunitPrice: %f", marketName, quantity,price));
             String url = Constants.BITTREX_BASE_URL+ Constants.MARKET+ Constants.BUYLIMIT +Constants.APIKEY+apikey+Constants.NONCE + EncryptionUtil.generateNonce()+ Constants.MARKET_URL +marketName+ Constants.QUANTITY_URL +String.valueOf( quantity)+ Constants.RATE +String.valueOf( price);
             ClientResponse response = buildPrivateUrl(url);
             return getResponseBody(response.getEntity(String.class));
@@ -144,6 +141,7 @@ public class MyBittrexClient extends RestClient implements ExchangeInterface {
     public Response sell(String marketName, double quantity, double price){
 
         try {
+            log.info(String.format("SELL \tmarketname: %s\tquantity: %f\tunitPrice: %f", marketName, quantity,price));
             String url = Constants.BITTREX_BASE_URL+ Constants.MARKET+ "/selllimit"+Constants.APIKEY+apikey+Constants.NONCE + EncryptionUtil.generateNonce()+ Constants.MARKET_URL +marketName+ Constants.QUANTITY_URL +quantity+ Constants.RATE +price;
             ClientResponse response = buildPrivateUrl(url);
             return getResponseBody(response.getEntity(String.class));
