@@ -2,10 +2,11 @@ package com.jlarrieux.bittrexbot.REST;
 
 
 
-import com.google.gson.Gson;
 import com.jlarrieux.bittrexbot.Util.Constants;
-import com.jlarrieux.bittrexbot.simulation.DAO.DBExchangeDAOImpl;
 import com.jlarrieux.bittrexbot.simulation.DAO.IDBExchangeDAO;
+import com.jlarrieux.bittrexbot.simulation.TO.BalanceTO;
+import com.jlarrieux.bittrexbot.simulation.TO.BuyTO;
+import com.jlarrieux.bittrexbot.simulation.TO.SellTO;
 import lombok.Data;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +23,14 @@ import java.util.UUID;
 @Qualifier(Constants.SIMULATOR)
 @Profile("!live")
 public class SimulatorExchange  implements ExchangeInterface{
-
+    double availableBalance =1;
 
     @Autowired
     private IDBExchangeDAO dbExchangeDAO;
 
 
     public SimulatorExchange(IDBExchangeDAO dbExchangeDAO){
+
 
        // this.dbExchangeDAO = new DBExchangeDAOImpl();
     }
@@ -70,7 +72,11 @@ public class SimulatorExchange  implements ExchangeInterface{
 
     @Override
     public Response getBalance(String currency) {
-        return new Response(dbExchangeDAO.getBalance(currency));
+        BalanceTO balanceTO = new BalanceTO();
+        BalanceTO.Result result = balanceTO.createResult();
+        result.setAvailable(availableBalance);
+        balanceTO.setResult(result);
+        return new Response(balanceTO);
     }
 
 
@@ -91,14 +97,29 @@ public class SimulatorExchange  implements ExchangeInterface{
 
     @Override
     public Response buy(String marketName, double quantity, double price) {
-        return new Response(dbExchangeDAO.buy(generateUUID(),marketName, quantity, price));
+        double value = quantity*price;
+        if(value>availableBalance){
+            Response r = new Response(new BuyTO());
+            r.setSuccess(false);
+            return r;
+        }
+        else {
+            BuyTO buyTO = dbExchangeDAO.buy(generateUUID(), marketName, quantity, price);
+            availableBalance -= value;
+            return new Response(buyTO);
+        }
     }
 
 
 
     @Override
     public Response sell(String marketName, double quantity, double price) {
-        return new Response(dbExchangeDAO.sell(generateUUID(),marketName, quantity, price));
+        SellTO  sellTO= dbExchangeDAO.sell(generateUUID(),marketName, quantity, price);
+        if(sellTO!=null) {
+            availableBalance += quantity*price;
+            return new Response(dbExchangeDAO.sell(generateUUID(), marketName, quantity, price));
+        }
+        return null;
     }
 
     @Override

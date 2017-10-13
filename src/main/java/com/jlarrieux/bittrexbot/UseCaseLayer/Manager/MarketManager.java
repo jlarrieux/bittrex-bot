@@ -86,9 +86,10 @@ public class MarketManager {
 
 
     private void getMarketCount(){
-        String response = jLarrieuxRestClient.getCount();
-        JsonObject object = JsonParserUtil.getJsonObjectFromJsonString(response);
-        marketCount = JsonParserUtil.getLongFromJsonObject(object,"numberOfMarkets");
+//        String response = jLarrieuxRestClient.getCount();
+//        JsonObject object = JsonParserUtil.getJsonObjectFromJsonString(response);
+        //todo do this right!
+        marketCount = 200;//JsonParserUtil.getLongFromJsonObject(object,"numberOfMarkets");
         log.info(String.valueOf(marketCount));
     }
 

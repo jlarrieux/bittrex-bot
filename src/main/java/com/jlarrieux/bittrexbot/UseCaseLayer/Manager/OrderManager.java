@@ -107,7 +107,7 @@ public class OrderManager {
         double quantity = marketOrderBookAdapater.getFirstBuyQuantity();
         double fallBackQuantity = buyIncrement/unitPrice;
         if(fallBackQuantity< quantity) quantity = fallBackQuantity;
-        return trueBuying(marketName, quantity,unitPrice);
+        return actualBuying(marketName, quantity,unitPrice);
 
     }
 
@@ -116,10 +116,10 @@ public class OrderManager {
 
     public String initiateBuy(String marketName,double quantity, double price){
 //        log.info(String.format("Initiate buy: "));
-        return trueBuying(marketName,quantity, price);
+        return actualBuying(marketName,quantity, price);
     }
 
-    private String trueBuying(String marketName,  double quantity,double unitPrice){
+    private String actualBuying(String marketName, double quantity, double unitPrice){
         if(quantity==-1) quantity= buyIncrement/unitPrice;
         StringBuilder uuid = null;
         log.info(String.format("TRUE_BUY \tmarketname: %s\tquantity: %f\tunitPrice: %f", marketName, quantity,unitPrice));
@@ -129,7 +129,9 @@ public class OrderManager {
             pendingBuyOrderTracker.put(order.getOrderUuid(), order);
             uuid.append(order.getOrderUuid());
         }
-        return uuid.toString();
+        StringBuilder builder = new StringBuilder();
+        if(uuid!=null) builder.append(uuid.toString());
+        return builder.toString();
     }
 
 
@@ -165,11 +167,12 @@ public class OrderManager {
 
 
     private void decideOnPendingBuyOrders(){
+
         for(String uuid: pendingBuyOrderTracker.keySet()){
             Order localOrder = pendingBuyOrderTracker.get(uuid);
-
             Order remote = orderAdapater.getOrder(localOrder.getOrderUuid());//new Order(JsonParserUtil.getJsonObjectFromJsonString(responseFromOrderUUID.getResult()));
             if (!remote.getIsOpen() && !remote.getCancelIniated()){
+
                     Position p = createPositionFromOrder(localOrder);
                     if(p!=null) {
                         positionManager.add(p);

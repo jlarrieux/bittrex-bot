@@ -37,7 +37,7 @@ public class SideWaysTrader  extends AbstractTrader{
 
         Collections.sort(potentialMarkets, new Comparators.MarketRsiComparatorAscending());
         for(Market m: potentialMarkets){
-            if(positionManager.contains(m.getMarketName())) evaluateSell(m);
+            if(positionManager.contains(m.getMarketCurrency())) evaluateSell(m);
             evaluateBuy(m);
         }
     }
