@@ -51,7 +51,7 @@ public class OrderAdapater {
         Response response= null;
         if(type==orderType.Buy) response =client.buy(marketName, quantity, price);
         else if(type==orderType.Sell) response = client.sell(marketName,quantity, price);
-        if(JsonParserUtil.isAsuccess(response)){
+        if(response!=null && JsonParserUtil.isAsuccess(response)){
             JsonObject jsonObject =JsonParserUtil.getJsonObjectFromJsonString(response.getResult());
             String uuid = JsonParserUtil.getStringFromJsonObject(jsonObject, Constants.UUID);
             return getOrder(uuid);

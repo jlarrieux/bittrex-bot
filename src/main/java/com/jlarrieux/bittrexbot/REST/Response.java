@@ -16,7 +16,7 @@ import lombok.extern.java.Log;
 @Data
 public class Response {
 
-
+    //todo get rid of all those constructors
     private boolean success;
     private int responseCode;
     private String result;
