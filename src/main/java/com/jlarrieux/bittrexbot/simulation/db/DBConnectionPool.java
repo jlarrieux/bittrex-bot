@@ -28,7 +28,9 @@ public class DBConnectionPool {
         cpds.setMinPoolSize(simulationProperties.getMinPoolSize());
         cpds.setAcquireIncrement(simulationProperties.getAcquireIncrement());
         cpds.setMaxPoolSize(simulationProperties.getMaxPoolSize());
-        log.info("Connection pool creation successful!");
+
+        //todo put good control to check connection is successful before after configuration
+        log.info("Connection pool Configured!");
     }
 
     public static DBConnectionPool getInstance() throws IOException, SQLException, PropertyVetoException {

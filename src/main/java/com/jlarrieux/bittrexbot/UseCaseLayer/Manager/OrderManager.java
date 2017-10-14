@@ -94,7 +94,7 @@ public class OrderManager {
         double unitPrice = getSellPrice(currency);
         if (quantity>0){
             Order order = orderAdapater.sell(currency,quantity,unitPrice);//getOrder( client.sell(currency,quantity,unitPrice))  ord;
-            log.info(String.format("SELL \tcurrency: %s\tquantity: %f\tunitPrice: %f", currency, quantity,unitPrice));
+            log.info(String.format("TRUE_SELL \tcurrency: %s\tquantity: %f\tunitPrice: %f", currency, quantity,unitPrice));
             if(order!= null) pendingSellOrderTracker.put(order.getOrderUuid(), order);
         }
 
