@@ -5,6 +5,7 @@ import com.jlarrieux.bittrexbot.UseCaseLayer.Adapter.MarketSummaryAdapter;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
@@ -38,7 +39,7 @@ public class BittrexDataManager {
     }
 
 
-    //@Scheduled(fixedRate = 100)
+    @Scheduled(fixedDelay = 1)
     public void getMarketSummaries(){
 
         long startTime = System.nanoTime();

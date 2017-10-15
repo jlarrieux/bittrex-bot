@@ -1,7 +1,6 @@
 package com.jlarrieux.bittrexbot.REST;
 
 
-
 import com.jlarrieux.bittrexbot.Util.Constants;
 import com.jlarrieux.bittrexbot.simulation.DAO.IDBExchangeDAO;
 import com.jlarrieux.bittrexbot.simulation.TO.BalanceTO;
@@ -23,17 +22,17 @@ import java.util.UUID;
 @Qualifier(Constants.SIMULATOR)
 @Profile("!live")
 public class SimulatorExchange  implements ExchangeInterface{
+
     double availableBalance =1;
 
     @Autowired
+    @Qualifier("inMemoryDbDAO")
     private IDBExchangeDAO dbExchangeDAO;
 
 
-    public SimulatorExchange(IDBExchangeDAO dbExchangeDAO){
-
-
-       // this.dbExchangeDAO = new DBExchangeDAOImpl();
-    }
+    /*public SimulatorExchange(IDBExchangeDAO dbExchangeDAO){
+        this.dbExchangeDAO = dbExchangeDAO;
+    }*/
 
     @Override
     public Response getMarkets() {
