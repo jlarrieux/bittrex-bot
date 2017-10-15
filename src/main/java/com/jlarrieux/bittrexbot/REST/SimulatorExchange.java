@@ -60,6 +60,10 @@ public class SimulatorExchange  implements ExchangeInterface{
         return new Response(dbExchangeDAO.getMarketSummaries());
     }
 
+    @Override
+    public Response getMarketSummaries(String marName) {
+        return new Response(dbExchangeDAO.getMarketSummaries(marName));
+    }
 
 
     @Override

@@ -42,6 +42,12 @@ public class MarketSummaryAdapter {
         if(JsonParserUtil.isAsuccess(response)) return JsonParserUtil.getJsonArrayFromJsonString(response.getResult());
         return null;
     }
+
+    public JsonArray getMarketSummaries(String marketName){
+        Response response = client.getMarketSummaries(marketName);
+        if(JsonParserUtil.isAsuccess(response)) return JsonParserUtil.getJsonArrayFromJsonString(response.getResult());
+        return null;
+    }
 public void executeMarketSearch(String marketName){
         build(marketName);
     }

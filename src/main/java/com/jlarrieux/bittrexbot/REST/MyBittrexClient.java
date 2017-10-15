@@ -52,6 +52,11 @@ public class MyBittrexClient extends RestClient implements ExchangeInterface {
         return getResponseBody(getJsonAsString(Constants.BITTREX_BASE_URL2+ Constants.PUB +Constants.MARKETS + Constants.GETMARKETSUMMARIES));
     }
 
+    @Override
+    public Response getMarketSummaries(String marName) {
+        return null;
+    }
+
     public Response getMarketSummary(String marketName){
         return getResponseBody(getJsonAsString(Constants.BITTREX_BASE_URL+ Constants.PUBLIC+"/getmarketsummary?"+Constants.MARKET+Constants.EQUAL +marketName.toUpperCase()));
     }
