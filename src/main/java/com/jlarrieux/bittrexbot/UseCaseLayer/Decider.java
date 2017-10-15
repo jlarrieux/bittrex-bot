@@ -49,6 +49,7 @@ public class Decider {
 
     public void evaluate(Markets marketBooks){
         this.markets = marketBooks;
+
         for(String key: marketBooks.keySet()){
             Market market = marketBooks.get(key);
             double adx = market.getAdxValue();
@@ -68,6 +69,8 @@ public class Decider {
     private void executeStrategy(){
         sideWaysTrader.executeStrategy();
         trendingTrader.executeStrategy();
+        sideWaysTrader.clearAllTempMarkets();
+        trendingTrader.clearAllTempMarkets();
 
     }
 

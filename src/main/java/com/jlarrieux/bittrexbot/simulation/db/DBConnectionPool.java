@@ -20,7 +20,8 @@ public class DBConnectionPool {
     @Autowired
     private DBConnectionPool(SimulationProperties simulationProperties) throws IOException, SQLException, PropertyVetoException {
         log.info("Creating connection Pool...");
-        cpds = new ComboPooledDataSource();
+        log.info(String.format("Sim start: %b", simulationProperties.isStartFromRecentDate()));
+        cpds = new ComboPooledDataSource(true);
         cpds.setDriverClass(simulationProperties.getJdbcDriver());
         cpds.setJdbcUrl(simulationProperties.getConnection_url());
         cpds.setUser(simulationProperties.getUser());
@@ -30,6 +31,7 @@ public class DBConnectionPool {
         cpds.setMaxPoolSize(simulationProperties.getMaxPoolSize());
 
         //todo put good control to check connection is successful before after configuration
+        log.info(cpds.toString());
         log.info("Connection pool Configured!");
     }
 

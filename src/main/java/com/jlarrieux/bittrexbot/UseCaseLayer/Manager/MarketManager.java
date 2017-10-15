@@ -62,7 +62,10 @@ public class MarketManager {
             /*log.info(i+"- Inside: " + getClass().getSimpleName() +"\t Method: " + "iterate(JsonArray) in for loop! Curency is: " +
                     (new Market((JsonObject) array.get(i))).getMarketName() );*/ // TODO: 10/10/2017 Remove comments
         }
-        if(decider!=null) decider.evaluate(marketBooks);
+        String firstKey = (String) marketBooks.keySet().toArray()[0];
+        Market first = marketBooks.get(firstKey);
+
+        if(first.getNumberOfPoints()==Constants.DATA_WINDOW) decider.evaluate(marketBooks);
     }
 
 

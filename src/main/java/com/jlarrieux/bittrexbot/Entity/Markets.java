@@ -32,4 +32,9 @@ public class Markets extends HashMap<String, Market> implements Container{
         return m;
     }
 
+
+    public Market getMarket(String marketName){
+        return get(marketName);
+    }
+
 }

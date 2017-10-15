@@ -1,16 +1,42 @@
 package com.jlarrieux.bittrexbot.simulation;
 
-import com.google.gson.Gson;
+
+
 import com.jlarrieux.bittrexbot.simulation.DAO.DBExchangeDAOImpl;
-import com.jlarrieux.bittrexbot.simulation.TO.*;
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+import lombok.Data;
+import lombok.extern.java.Log;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.UUID;
+import java.sql.Connection;
 
+
+
+@Log
+@Data
 public class TestSimulation {
 
     public static void main(String[] args) {
+
+        log.info("Creating connection Pool...");
+        ComboPooledDataSource cpds = new ComboPooledDataSource();
+        try {
+            cpds.setDriverClass("com.mysql.jdbc.Driver");
+            cpds.setJdbcUrl("jdbc:mysql://localhost:8888/bittrex");
+            cpds.setUser("root");
+            cpds.setPassword("dancehall1");
+            cpds.setMinPoolSize(5);
+            cpds.setAcquireIncrement(5);
+            cpds.setMaxPoolSize(100);
+            Connection connection= cpds.getConnection();
+            DBExchangeDAOImpl dbExchangeDAO = new DBExchangeDAOImpl();
+            dbExchangeDAO.printOutStack();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        //todo put good control to check connection is successful before after configuration
+        log.info("Connection pool Configured!");
        /*
         JSON Conversion
         MarketSummariesTO responseTO = new MarketSummariesTO();
