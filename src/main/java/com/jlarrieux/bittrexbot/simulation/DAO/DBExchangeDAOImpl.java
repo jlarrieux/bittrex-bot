@@ -7,7 +7,6 @@ import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-
 import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -21,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 public class DBExchangeDAOImpl implements IDBExchangeDAO {
 
 
-    public double AVAILABLE_BALANCE = 1000.0;
+    public double availableBalance = 1000.0; //TODO needs to be taken from property file
     private static Stack dateStack = new Stack();
     private static String dateCurrentlyInProcess = "";
 
@@ -34,7 +33,6 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
 
     private DBConnectionPool dbConnectionPool;
 
-    //todo use properties instead of hardcoding
     //todo refactor create connection
     //todo Used prepared statement
 
@@ -59,6 +57,9 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         log.info("DBExchangeDAO creation successful!");
     }
 
+    public DBExchangeDAOImpl() {
+
+    }
     public void printOutStack(){
         while (!dateStack.isEmpty()) {
             System.out.println(getNextDateFromDateStack());
@@ -195,7 +196,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     public BalanceTO getBalance(String currency) {
         BalanceTO balanceTO = new BalanceTO();
         BalanceTO.Result result = balanceTO.createResult();
-        result.setAvailable(AVAILABLE_BALANCE);
+        result.setAvailable(availableBalance);
         balanceTO.setResult(result);
         return balanceTO;
     }
@@ -231,7 +232,8 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         Statement statement = null;
         ResultSet resultSet = null;
         SellTO sellTO = null;
-        AVAILABLE_BALANCE += quantity*price;
+        updateAvailalbeBalance(quantity, price);
+
         try {
             connect = getConnection();
             statement = connect.createStatement();
@@ -406,6 +408,14 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
             e.printStackTrace();
         }
         return connect;
+    }
+
+    protected void populateInstances(DBConnectionPool dbConnectionPool, SimulationProperties simulationProperties) {
+        this.dbConnectionPool = dbConnectionPool;
+        this.simulationProperties = simulationProperties;
+    }
+    protected void updateAvailalbeBalance(double quantity, double price) {
+        availableBalance += quantity*price;
     }
 
 
