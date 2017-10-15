@@ -167,6 +167,9 @@ public class Market {
 
     }
 
+    public long getNumberOfPoints(){
+        return priceQueue.getN();
+    }
     public double getBollingerHigh(){
         return bollingerSMA.getHigh();
     }

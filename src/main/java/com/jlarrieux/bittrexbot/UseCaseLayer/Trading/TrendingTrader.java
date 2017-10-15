@@ -6,7 +6,6 @@ import com.jlarrieux.bittrexbot.Entity.Market;
 import com.jlarrieux.bittrexbot.Properties.TradingProperties;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Comparators;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Manager.OrderManager;
-import com.jlarrieux.bittrexbot.UseCaseLayer.Manager.PositionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,8 +17,8 @@ public class TrendingTrader extends AbstractTrader {
 
 
     @Autowired
-    public TrendingTrader(TradingProperties tradingProperties, PositionManager positionManager, OrderManager orderManager) {
-        super(tradingProperties, positionManager, orderManager);
+    public TrendingTrader(TradingProperties tradingProperties, OrderManager orderManager) {
+        super(tradingProperties,  orderManager);
     }
 
 

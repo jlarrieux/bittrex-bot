@@ -3,10 +3,11 @@ package com.jlarrieux.bittrexbot.UseCaseLayer.Trading;
 
 
 import com.jlarrieux.bittrexbot.Entity.Market;
+import com.jlarrieux.bittrexbot.Entity.Position;
 import com.jlarrieux.bittrexbot.Properties.TradingProperties;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Comparators;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Manager.OrderManager;
-import com.jlarrieux.bittrexbot.UseCaseLayer.Manager.PositionManager;
+import com.jlarrieux.bittrexbot.Util.Constants;
 import lombok.Data;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +28,8 @@ public class SideWaysTrader  extends AbstractTrader{
 
 
     @Autowired
-    public SideWaysTrader( TradingProperties properties, PositionManager positionManager, OrderManager orderManager){
-        super(properties,positionManager,orderManager);
+    public SideWaysTrader(TradingProperties properties, OrderManager orderManager){
+        super(properties,orderManager );
 
     }
 
@@ -39,6 +40,9 @@ public class SideWaysTrader  extends AbstractTrader{
         for(Market m: potentialMarkets){
             if(positionManager.contains(m.getMarketCurrency())) evaluateSell(m);
             evaluateBuy(m);
+        }
+        for(Position p: positionManager.getPositionBooks().values()){
+            Market current = getMarketBook().getMarket(Constants.buildBtcMarketName(p.getCurrency()));
         }
     }
 
