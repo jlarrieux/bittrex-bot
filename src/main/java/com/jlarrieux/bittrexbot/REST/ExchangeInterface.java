@@ -8,6 +8,7 @@ public interface ExchangeInterface {
     Response getMarketSummary(String marketName);
     Response getMarketOrderBook(String marketName);
     Response getMarketSummaries();
+    Response getMarketSummaries(String marName);
     Response getOpenOrders();
     Response getBalance(String currency);
     Response getBalances();

@@ -46,7 +46,7 @@ public class BittrexDataManager {
 
         log.info(GET_MARKET_SUMMARIES_LOG_DIVIDER);
         log.info("Inside: " + getClass().getSimpleName() +"\t Method: " + "getMarketSummaries()");
-        marketManager.addMarkets(marketSummaryAdapter.getMarketSummaries());
+        marketManager.addMarkets(marketSummaryAdapter.getMarketSummaries("BTC-CLUB"));
 
         long totalTime = System.nanoTime() - startTime;
 
