@@ -69,8 +69,8 @@ public class Decider {
     private void executeStrategy(){
         sideWaysTrader.executeStrategy();
         trendingTrader.executeStrategy();
-        sideWaysTrader.clearAllTempMarkets();
-        trendingTrader.clearAllTempMarkets();
+//        sideWaysTrader.clearAllTempMarkets();
+//        trendingTrader.clearAllTempMarkets();
 
     }
 
