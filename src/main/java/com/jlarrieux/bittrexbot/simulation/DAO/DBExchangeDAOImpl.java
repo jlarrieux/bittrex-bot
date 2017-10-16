@@ -3,7 +3,7 @@ package com.jlarrieux.bittrexbot.simulation.DAO;
 import com.jlarrieux.bittrexbot.Properties.SimulationProperties;
 import com.jlarrieux.bittrexbot.simulation.TO.*;
 import com.jlarrieux.bittrexbot.simulation.db.DBConnectionPool;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 
-@Log
+@Log4j2
 @Component
 public class DBExchangeDAOImpl implements IDBExchangeDAO {
 

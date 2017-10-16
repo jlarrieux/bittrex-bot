@@ -2,7 +2,7 @@ package com.jlarrieux.bittrexbot.UseCaseLayer.Manager;
 
 
 import com.jlarrieux.bittrexbot.UseCaseLayer.Adapter.MarketSummaryAdapter;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -11,7 +11,8 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.TimeUnit;
 
 
-@Log
+
+@Log4j2
 @Component
 @Profile("!test")
 public class BittrexDataManager {
@@ -49,6 +50,7 @@ public class BittrexDataManager {
         marketManager.addMarkets(marketSummaryAdapter.getMarketSummaries("BTC-CLUB"));
 
         long totalTime = System.nanoTime() - startTime;
+
 
 
         numberOfExecution++;
