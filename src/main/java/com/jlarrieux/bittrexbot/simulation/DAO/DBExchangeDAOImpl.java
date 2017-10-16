@@ -161,6 +161,60 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     }
 
     @Override
+    public MarketSummariesTO getMarketSummaries(String marketName) {
+        MarketSummariesTO marketSummariesTO = new MarketSummariesTO();
+        Connection connect = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        try {
+            connect = getConnection();
+
+            statement = connect.createStatement();
+
+            resultSet = statement.executeQuery("select  * from my_data inner join market"
+                    + " on my_data.market_id=market.id where my_data.date_create='"
+                    + getNextDateFromDateStack() +"' AND market.market_name='"
+                    + marketName + "'limit 0,1");
+
+            log.info("Inside: " + getClass().getSimpleName() +"\t Method: getMarketSummaries()" +
+                    "\t Date & Time currently in process" +
+                    dateCurrentlyInProcess );
+
+            while (resultSet.next()) {
+                MarketSummariesTO.Summary  summary = new MarketSummariesTO().createSummary();
+                summary.setAsk(resultSet.getDouble("ask"));
+                summary.setBid(resultSet.getDouble("bid"));
+                summary.setHigh((resultSet.getDouble("high")));
+                summary.setLast(resultSet.getDouble("last"));
+                summary.setLow(resultSet.getDouble("low"));
+                summary.setOpenBuyOrders(resultSet.getInt("open_buy_orders"));
+                summary.setOpenSellOrders(resultSet.getInt("open_sell_orders"));
+                summary.setVolume(resultSet.getDouble("volume"));
+                summary.setMarketName(resultSet.getString("market_name"));
+
+                MarketSummariesTO.Market market = new MarketSummariesTO().createMarket();
+                market.setBaseCurrency(resultSet.getString("base_currency"));
+                market.setMarketName(resultSet.getString("market_name"));
+                market.setMinTradeSize(resultSet.getDouble("min_trade_size"));
+                market.setIsActive(resultSet.getBoolean("is_active"));
+                market.setMarketCurrency(resultSet.getString("market_currency"));
+                market.setCreated(resultSet.getString("date_create"));
+
+                MarketSummariesTO.Result result = new MarketSummariesTO().createResult();
+                result.setSummary(summary);
+                result.setMarket(market);
+                result.setIsVerified(false);
+
+                marketSummariesTO.getResult().add(result);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            close(resultSet, statement, connect);
+        }
+        return marketSummariesTO;
+    }
+    @Override
     public MarketOrderBookTO getMarketOrderBook(String marketName) {
         MarketOrderBookTO  marketOrderBookTo = new MarketOrderBookTO();
 
