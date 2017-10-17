@@ -33,27 +33,56 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
 
     private DBConnectionPool dbConnectionPool;
 
-    //todo refactor create connection
-    //todo Used prepared statement
+    private final String GET_MARKET_SUMMARIES_MARKET_NAME =
+            "select  * from my_data inner join market on my_data.market_id = " +
+            "market.id where my_data.date_create = ?" +
+            "AND market.market_name = ? limit 0,1";
+
+    private final String GET_MARKET_SUMMARIES = "select  * from my_data inner join market"
+            + " on my_data.market_id=market.id where my_data.date_create= ? limit 0,199";
+
+    private final String GET_ORDER_BOOK = "select my_data.last from my_data inner join "
+            + "market on my_data.market_id=market.id where my_data.date_create = ? " +
+            "AND market.market_name= ? limit 0, 1";
+
+    private final String GET_ORDER = "select * from orders_sim where uuid = ?";
+
+    private final String GET_MARKET_SUMMARY = "select * from my_data inner join "
+            + "market on my_data.market_id=market.id where my_data.date_create= ? "
+            + "AND market.market_name= ? limit 0, 1";
+
+    private final String GET_DATE_STACK = "select distinct date_create from " +
+            "my_data order by date_create";
+
+    private final String INSERT_ORDER = "Insert into orders_sim values (?,?,?,?,?,?,?,?)";
 
     @Autowired
     public DBExchangeDAOImpl(DBConnectionPool dbConnectionPool, SimulationProperties simulationProperties) {
 
         log.info("Creating DBExchangeDAO...");
+
         this.simulationProperties = simulationProperties;
+
         boolean startFromMostRecentDate = simulationProperties.isStartFromRecentDate();
+
         this.dbConnectionPool = dbConnectionPool;
+
         dtfDate = DateTimeFormatter.ofPattern(simulationProperties.getDateFormatter());
         dtfTime = DateTimeFormatter.ofPattern(simulationProperties.getTimeFormatter());
 
         log.info("Retrieving DateStack...");
+
         long startTime = System.nanoTime();
+
         dateStack = getDateStack(startFromMostRecentDate);
+
         long totalTime = System.nanoTime() - startTime;
+
         log.info("Retrieving DateStack complete. Time elapsed: " +
                 String.format("%d min, %d sec", TimeUnit.NANOSECONDS.toHours(totalTime),
                 TimeUnit.NANOSECONDS.toSeconds(totalTime) -
                         TimeUnit.MINUTES.toSeconds(TimeUnit.NANOSECONDS.toMinutes(totalTime))));
+
         log.info("DBExchangeDAO creation successful!");
     }
 
@@ -70,19 +99,21 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     public MarketSummaryTO getMarketSummary(String marketName) {
         MarketSummaryTO marketSummaryTO = new MarketSummaryTO();
         Connection connect = null;
-        Statement statement = null;
+        PreparedStatement preparedStatment = null;
         ResultSet resultSet = null;
 
         try {
             connect =  getConnection();
-            statement = connect.createStatement();
-            String str = "select * from my_data inner join "
-                    + "market on my_data.market_id=market.id where my_data.date_create='"
-                    + getDateInQuestion() + "' AND market.market_name='" + marketName +"' limit 0, 1";
-            resultSet = statement.executeQuery(str);
-            log.info("Inside: " + getClass().getSimpleName() +"\t Method: getMarketSummary()" +
-                    "\t Date & Time currently in process" +
-                    dateCurrentlyInProcess );
+
+            preparedStatment = connect.prepareStatement(GET_MARKET_SUMMARY);
+            preparedStatment.setString(1, getDateInQuestion());
+            preparedStatment.setString(2, marketName);
+
+            resultSet = preparedStatment.executeQuery();
+
+            log.debug("Inside: " + getClass().getSimpleName() +"\t Method: getMarketSummary()" +
+                    "\t Date & Time currently in process: " + dateCurrentlyInProcess );
+
             while (resultSet.next()) {
 
                 MarketSummaryTO.Result result = marketSummaryTO.createResult();
@@ -103,7 +134,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            close(resultSet, statement, connect);
+            close(resultSet, preparedStatment, connect);
         }
 
         return marketSummaryTO;
@@ -113,17 +144,17 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     public MarketSummariesTO getMarketSummaries() {
         MarketSummariesTO marketSummariesTO = new MarketSummariesTO();
         Connection connect = null;
-        Statement statement = null;
+        PreparedStatement prepStatement = null;
         ResultSet resultSet = null;
         try {
             connect = getConnection();
-            statement = connect.createStatement();
-            resultSet = statement.executeQuery("select  * from my_data inner join market"
-                            + " on my_data.market_id=market.id where my_data.date_create='"
-                            + getNextDateFromDateStack() +"' limit 0,199");
-            log.info("Inside: " + getClass().getSimpleName() +"\t Method: getMarketSummaries()" +
-                    "\t Date & Time currently in process" +
-                    dateCurrentlyInProcess );
+
+            prepStatement = connect.prepareStatement(GET_MARKET_SUMMARIES);
+            prepStatement.setString(1,getNextDateFromDateStack());
+            resultSet = prepStatement.executeQuery();
+
+            log.debug("Inside: " + getClass().getSimpleName() +"\t Method: getMarketSummaries()" +
+                    "\n Date & Time currently in process: " + dateCurrentlyInProcess );
 
             while (resultSet.next()) {
                 MarketSummariesTO.Summary  summary = new MarketSummariesTO().createSummary();
@@ -155,7 +186,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         } catch (Exception e) {
              e.printStackTrace();
         } finally {
-            close(resultSet, statement, connect);
+            close(resultSet, prepStatement, connect);
         }
         return marketSummariesTO;
     }
@@ -164,21 +195,19 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     public MarketSummariesTO getMarketSummaries(String marketName) {
         MarketSummariesTO marketSummariesTO = new MarketSummariesTO();
         Connection connect = null;
-        Statement statement = null;
+        PreparedStatement prepStatement = null;
         ResultSet resultSet = null;
         try {
             connect = getConnection();
 
-            statement = connect.createStatement();
+            prepStatement = connect.prepareStatement(GET_MARKET_SUMMARIES_MARKET_NAME);
+            prepStatement.setString(1,getNextDateFromDateStack());
+            prepStatement.setString(2,marketName);
 
-            resultSet = statement.executeQuery("select  * from my_data inner join market"
-                    + " on my_data.market_id=market.id where my_data.date_create='"
-                    + getNextDateFromDateStack() +"' AND market.market_name='"
-                    + marketName + "'limit 0,1");
+            resultSet = prepStatement.executeQuery();
 
-            log.info("Inside: " + getClass().getSimpleName() +"\t Method: getMarketSummaries()" +
-                    "\t Date & Time currently in process" +
-                    dateCurrentlyInProcess );
+            log.debug("Inside: " + getClass().getSimpleName() +"\t Method: getMarketSummaries("+marketName+")" +
+                    "\n Date & Time currently in process: " + dateCurrentlyInProcess );
 
             while (resultSet.next()) {
                 MarketSummariesTO.Summary  summary = new MarketSummariesTO().createSummary();
@@ -210,27 +239,30 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            close(resultSet, statement, connect);
+            close(resultSet, prepStatement, connect);
         }
         return marketSummariesTO;
     }
     @Override
     public MarketOrderBookTO getMarketOrderBook(String marketName) {
+
         MarketOrderBookTO  marketOrderBookTo = new MarketOrderBookTO();
 
         Connection connect = null;
-        Statement statement = null;
+        PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
 
         try {
             connect = getConnection();
-            statement = connect.createStatement();
-            String str = "select my_data.last from my_data inner join "
-                    + "market on my_data.market_id=market.id where my_data.date_create='"
-                    + getDateInQuestion() + "' AND market.market_name='" + marketName +"' limit 0, 1";
-            resultSet = statement.executeQuery(str);
+
+            preparedStatement = connect.prepareStatement(GET_ORDER_BOOK);
+            preparedStatement.setString(1,getDateInQuestion());
+            preparedStatement.setString(2, marketName);
+
+            resultSet = preparedStatement.executeQuery();
 
             Double last = 0.0;
+
             if(resultSet.next()){
                 last = resultSet.getDouble("last");
             }
@@ -240,7 +272,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally{
-            close(resultSet, statement, connect);
+            close(resultSet, preparedStatement, connect);
         }
         return marketOrderBookTo;
     }
@@ -258,14 +290,13 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     @Override
     public BuyTO buy(String uuid, String marketName, double quantity, double price) {
         Connection connect = null;
-        Statement statement = null;
+        PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         BuyTO buyTO = null;
         try {
             connect = getConnection();
-            statement = connect.createStatement();
 
-            insertOrder(uuid, marketName, quantity, price, "buy", statement, connect);
+            insertOrder(uuid, marketName, quantity, price, "buy", preparedStatement, connect);
 
             buyTO = new BuyTO();
             BuyTO.Result result = buyTO.createResult();
@@ -274,7 +305,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally{
-            close(resultSet, statement, connect);
+            close(resultSet, preparedStatement, connect);
         }
 
         return buyTO;
@@ -283,16 +314,14 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     @Override
     public SellTO sell(String uuid, String marketName, double quantity, double price) {
         Connection connect = null;
-        Statement statement = null;
+        PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         SellTO sellTO = null;
         updateAvailalbeBalance(quantity, price);
 
         try {
             connect = getConnection();
-            statement = connect.createStatement();
-
-            insertOrder(uuid, marketName, quantity, price, "sell", statement, connect);
+            insertOrder(uuid, marketName, quantity, price, "sell", preparedStatement, connect);
 
             sellTO = new SellTO();
             SellTO.Result result = sellTO.createResult();
@@ -302,7 +331,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally{
-            close(resultSet, statement, connect);
+            close(resultSet, preparedStatement, connect);
         }
 
         return sellTO;
@@ -311,15 +340,16 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     @Override
     public OrderTO getOrder(String uuid) {
         Connection connect = null;
-        Statement statement = null;
+        PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         OrderTO orderTO = new OrderTO();
         try {
             connect = getConnection();
-            statement = connect.createStatement();
 
-            String str = "select * from orders_sim where uuid = '" + uuid + "'";
-            resultSet = statement.executeQuery(str);
+            preparedStatement = connect.prepareStatement(GET_ORDER);
+            preparedStatement.setString(1,uuid);
+
+            resultSet = preparedStatement.executeQuery();
 
             orderTO = new OrderTO();
             OrderTO.Result result = orderTO.createResult();
@@ -335,15 +365,14 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally{
-            close(resultSet, statement, connect);
+            close(resultSet, preparedStatement, connect);
         }
         return orderTO;
     }
 
     private void insertOrder(String uuid, String marketName, double quantity,
-                             double price, String orderType, Statement statement,
+                             double price, String orderType, PreparedStatement preparedStmt,
                              Connection connect ) throws SQLException {
-        String sql = "Insert into orders_sim values (?,?,?,?,?,?,?,?)";
 
         long timeInMilis = System.currentTimeMillis();
 
@@ -354,7 +383,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
 
         java.sql.Timestamp timeInTimeStamp = new java.sql.Timestamp(timeInMilis);
 
-        PreparedStatement preparedStmt = connect.prepareStatement(sql);
+        preparedStmt = connect.prepareStatement(INSERT_ORDER);
         preparedStmt.setString(1, uuid);
         preparedStmt.setString(2, marketName);
         preparedStmt.setDouble(3, quantity);
@@ -372,14 +401,14 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
 
     }
 
-    private void close (ResultSet resultSet, Statement statement, Connection connect) {
+    private void close (ResultSet resultSet, PreparedStatement preparedStatement, Connection connect) {
         try {
             if (resultSet != null) {
                 resultSet.close();
             }
 
-            if (statement != null) {
-                statement.close();
+            if (preparedStatement != null) {
+                preparedStatement.close();
             }
 
             if (connect != null) {
@@ -403,23 +432,17 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     private Stack getDateStack(boolean startFromMostRecentDate)  {
         Stack resultStack = new Stack();
         Connection connection = null;
-        Statement statement = null;
+        PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try {
 
-            String dateOrder = "desc";
+            String dateOrder = startFromMostRecentDate ? "asc" : "desc";
 
             connection = getConnection();
 
-            statement = connection.createStatement();
+            preparedStatement = connection.prepareStatement(GET_DATE_STACK + " " + dateOrder);
 
-            if (startFromMostRecentDate) {
-                dateOrder = "asc";
-            }
-
-            // select dates in reverse order
-            resultSet = statement.executeQuery("select distinct date_create from " +
-                    "my_data order by date_create " + dateOrder);
+            resultSet = preparedStatement.executeQuery();
 
             int dateCount = 0;
             String firstDate = "";
@@ -435,26 +458,17 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
                 lastDate = tempStr;
             }
             log.info("Number of dates in stack: " + dateCount);
-            log.info("First date in Stack: " + firstDate);
-            log.info("Last Date in Stack: " + lastDate);
+            log.info("First Date to be processed: " + lastDate);
+            log.info("Last Date to be processed: " + firstDate);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            close(resultSet, statement, connection);
+            close(resultSet, preparedStatement, connection);
         }
         return resultStack;
     }
 
     private Connection getConnection(){
-        // TODO: 10/8/2017 Remember to remove comment block
-        /* if (dbConnectionPool == null) {
-            try {
-                dbConnectionPool = DBConnectionPool.getInstance();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }*/
-
         Connection connect = null;
         try {
             connect = dbConnectionPool.getConnection();
