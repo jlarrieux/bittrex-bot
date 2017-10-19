@@ -16,8 +16,8 @@ public class Markets extends HashMap<String, Market> implements Container{
 
     @Override
     public Market add(JsonArray array, int i){
-        Market market = new Market((JsonObject) array.get(i)) ;
-        if(market.getBaseCurrency().equals("Bitcoin")) return add(market);
+        MarketShell marketShell = new MarketShell((JsonObject) array.get(i)) ;
+        if(marketShell.getBaseCurrency().equals("Bitcoin")) return add(marketShell.getMarket());
         else return null;
 
     }

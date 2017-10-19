@@ -36,13 +36,15 @@ public class SideWaysTrader  extends AbstractTrader{
     @Override
     public void executeStrategy() {
 
-        Collections.sort(potentialMarkets, new Comparators.MarketRsiComparatorAscending());
-        for(Market m: potentialMarkets){
-            if(positionManager.contains(m.getMarketCurrency())) evaluateSell(m);
+        Collections.sort(potentialBuyMarkets, new Comparators.MarketRsiComparatorAscending());
+        for(Market m: potentialBuyMarkets){
             evaluateBuy(m);
         }
+        potentialBuyMarkets.clear();
         for(Position p: positionManager.getPositionBooks().values()){
-            Market current = getMarketBook().getMarket(Constants.buildBtcMarketName(p.getCurrency()));
+            Market current = getMarketBook().getMarket(Constants.buildBtcMarketName(p.getShortCurrency()));
+            double adx = current.getAdxValue();
+            if(adx<= adxTrendThreshold) evaluateSell(current);
         }
     }
 

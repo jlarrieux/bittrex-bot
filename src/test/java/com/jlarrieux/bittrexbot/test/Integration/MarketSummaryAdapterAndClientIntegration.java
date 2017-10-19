@@ -28,8 +28,8 @@ public class MarketSummaryAdapterAndClientIntegration {
     public void testMarketCurrency() {
         String marketName = "BTC-ETH";
         String marketCurrency = "ETH";
-        System.out.println(marketSummaryAdapter.getMarketCurrency(marketName));
-        Assert.assertTrue(marketCurrency.equals(marketSummaryAdapter.getMarketCurrency(marketName)));
+        System.out.println(marketSummaryAdapter.getMarketCurrencyShort(marketName));
+        Assert.assertTrue(marketCurrency.equals(marketSummaryAdapter.getMarketCurrencyShort(marketName)));
     }
 
 

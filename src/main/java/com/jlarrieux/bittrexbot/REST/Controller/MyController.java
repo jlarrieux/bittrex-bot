@@ -79,7 +79,7 @@ public class MyController {
 
     @GetMapping("/pandl")
     public String getPandL(){
-        return String.format("Current Value: %f<br><br>P and L:%f"
+        return String.format("Current Value: %f<br><br>P and L: %f %%"
                 , portFolio.getCurrentPortFolioValue(), portFolio.profitAndLossPercentage());
     }
 
@@ -90,7 +90,7 @@ public class MyController {
         Positions positions = portFolio.getPositionManager().getPositionBooks();
         Set<String> list = positions.keySet();
         for(String s: list){
-            b.append(positions.get(s).toString()+"</br>");
+            b.append(positions.get(s).toString()+"<br><br><br>");
         }
         return b.toString();
 
