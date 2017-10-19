@@ -11,7 +11,7 @@ import lombok.extern.java.Log;
 public class Position {
 
 
-    private String currency;
+    private String currency, shortCurrency;
     private double  available,  averagePurchasedPrice,  quantity, total=0;
 
 
@@ -24,9 +24,10 @@ public class Position {
     }
 
 
-    public Position(Order order, String currency){
+    public Position(Order order, String shortCurrency, String longCurrency){
 
-        this.currency = currency;
+        this.currency = longCurrency;
+        this.shortCurrency = shortCurrency;
         available = order.getQuantity();
         averagePurchasedPrice = order.getLimit();
         quantity = order.getQuantity();

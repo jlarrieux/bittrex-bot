@@ -19,8 +19,10 @@ public abstract class AbstractTrader implements Trader {
     protected PositionManager positionManager;
     protected OrderManager orderManager;
     protected double stopLoss, tradingMinimum, profitTaking;
-    protected List<Market> potentialMarkets = new ArrayList<>();
+    protected List<Market> potentialBuyMarkets = new ArrayList<>();
+    protected List<Market> potentialSellMarkets = new ArrayList<>();
     private Markets marketBook;
+    protected double adxTrendThreshold;
 
 
 
@@ -33,16 +35,21 @@ public abstract class AbstractTrader implements Trader {
         stopLoss = tradingProperties.getStopLoss();
         profitTaking = tradingProperties.getProfitTaking();
         tradingMinimum = tradingProperties.getMinimumBtc();
+        adxTrendThreshold = tradingProperties.getAdxTrendThreshold();
     }
 
     public void clearAllTempMarkets(){
-        potentialMarkets.clear();
+        potentialBuyMarkets.clear();
 
     }
 
 
     public void addToPotentialMarkets(Market m){
-        potentialMarkets.add(m);
+        potentialBuyMarkets.add(m);
+    }
+
+    public void addToPotentialSellMarkets(Market m){
+        potentialSellMarkets.add(m);
     }
 
     public void setMarketBook(Markets marketBook){
@@ -55,7 +62,9 @@ public abstract class AbstractTrader implements Trader {
 
 
     protected abstract boolean okToBuy(Market m);
+
     protected abstract boolean okToSell(Market m);
+
 
 
 }

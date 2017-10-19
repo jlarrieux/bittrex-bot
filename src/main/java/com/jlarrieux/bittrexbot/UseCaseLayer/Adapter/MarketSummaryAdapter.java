@@ -48,7 +48,7 @@ public class MarketSummaryAdapter {
         if(JsonParserUtil.isAsuccess(response)) return JsonParserUtil.getJsonArrayFromJsonString(response.getResult());
         return null;
     }
-public void executeMarketSearch(String marketName){
+    public void executeMarketSearch(String marketName){
         build(marketName);
     }
 
@@ -80,18 +80,25 @@ public void executeMarketSearch(String marketName){
     }
 
 
-    public String getMarketCurrency(String marketName){
-        if(marketHashMap.containsKey(marketName)) return marketHashMap.get(marketName).getMarketCurrency();
+    public String getMarketCurrencyShort(String marketName){
+        MarketInternal m = getMarket(marketName);
+        return m==null? null :m.getMarketCurrency();
+    }
+
+    public String getMarketCurrencyLong(String marketName){
+        MarketInternal m = getMarket(marketName);
+        return m==null? null: m.getMarketCurrencyLong();
+    }
+
+    private MarketInternal getMarket(String MarketName){
+        if(marketHashMap.containsKey(MarketName)) return marketHashMap.get(MarketName);
         else{
             Response response = client.getMarkets();
             if(JsonParserUtil.isAsuccess(response)){
                 populateMarketHashMap(JsonParserUtil.getJsonArrayFromJsonString(response.getResult()));
-                return marketHashMap.get(marketName) == null ?
-                                                        null:
-                        marketHashMap.get(marketName).getMarketCurrency();
+                return marketHashMap.get(MarketName) ==null? null: marketHashMap.get(MarketName);
             }
         }
-
         return null;
     }
 
@@ -99,7 +106,6 @@ public void executeMarketSearch(String marketName){
         MarketInternal market ;
         for(JsonElement element : jsonArray){
             JsonObject jsonObject = (JsonObject) element;
-//            System.out.println(jsonObject);
             market = new MarketInternal(jsonObject);
 
             marketHashMap.put(market.getMarketName(),market);

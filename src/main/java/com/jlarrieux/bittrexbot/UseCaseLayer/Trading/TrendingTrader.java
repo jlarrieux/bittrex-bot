@@ -3,9 +3,11 @@ package com.jlarrieux.bittrexbot.UseCaseLayer.Trading;
 
 
 import com.jlarrieux.bittrexbot.Entity.Market;
+import com.jlarrieux.bittrexbot.Entity.Position;
 import com.jlarrieux.bittrexbot.Properties.TradingProperties;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Comparators;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Manager.OrderManager;
+import com.jlarrieux.bittrexbot.Util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,9 +26,15 @@ public class TrendingTrader extends AbstractTrader {
 
     @Override
     public void executeStrategy() {
-        Collections.sort(potentialMarkets, new Comparators.MarketKeltnerToLastPriceAscending());
-        for(Market m: potentialMarkets){
-            if(positionManager.contains(m.getMarketName())) evaluateSell(m);
+        Collections.sort(potentialBuyMarkets, new Comparators.MarketKeltnerToLastPriceAscending());
+        for(Market m: potentialBuyMarkets){
+            evaluateBuy(m);
+        }
+        potentialBuyMarkets.clear();
+        for(Position p: positionManager.getPositionBooks().values()){
+            Market current = getMarketBook().getMarket(Constants.buildBtcMarketName(p.getShortCurrency()));
+            double adx = current.getAdxValue();
+            if(adx>adxTrendThreshold)evaluateSell(current);
         }
     }
 
@@ -34,7 +42,7 @@ public class TrendingTrader extends AbstractTrader {
 
     @Override
     public void evaluateBuy(Market market) {
-        if(okToBuy(market)) orderManager.initiateBuy(market.getMarketCurrency());
+        if(okToBuy(market)) orderManager.initiateBuy(market.getMarketName());
     }
 
 

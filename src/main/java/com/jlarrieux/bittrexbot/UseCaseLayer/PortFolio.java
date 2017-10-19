@@ -23,6 +23,7 @@ public class PortFolio {
     private MarketSummaryAdapter marketSummaryAdapter;
     private double total, initialFirstValue;
     private PositionManager positionManager;
+    private BalanceAdapter balanceAdapter;
 
 
 
@@ -31,11 +32,12 @@ public class PortFolio {
     public PortFolio(PositionManager manager, MarketSummaryAdapter marketSummaryAdapter, BalanceAdapter balanceAdapter){
         this.positionManager = manager;
         this.marketSummaryAdapter = marketSummaryAdapter;
+        this.balanceAdapter = balanceAdapter;
         initialFirstValue = balanceAdapter.getBalance(Constants.BTC.toUpperCase());
     }
 
     public double getCurrentPortFolioValue(){
-        total=0;
+        total=balanceAdapter.getBalance(Constants.BTC.toUpperCase());
         buildPositionBooks();
         return  total;
     }
@@ -63,7 +65,7 @@ public class PortFolio {
 
 
     private void lowLevelCalculation(Position p){
-        marketSummaryAdapter.executeMarketSearch(Constants.buildBtcMarketName(p.getCurrency()));
+        marketSummaryAdapter.executeMarketSearch(Constants.buildBtcMarketName(p.getShortCurrency()));
         double current = p.getQuantity() * marketSummaryAdapter.getLast();
         total += current;
     }

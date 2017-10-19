@@ -49,16 +49,26 @@ public class Decider {
 
     public void evaluate(Markets marketBooks){
         this.markets = marketBooks;
+        sideWaysTrader.clearAllTempMarkets();
+        trendingTrader.clearAllTempMarkets();
+        sideWaysTrader.setMarketBook(marketBooks);
+        trendingTrader.setMarketBook(marketBooks);
+        buildPotentialBuyMarkets(marketBooks);
 
+        executeStrategy();
+    }
+
+
+
+    private void buildPotentialBuyMarkets(Markets marketBooks) {
         for(String key: marketBooks.keySet()){
             Market market = marketBooks.get(key);
             double adx = market.getAdxValue();
             if(adx>= adxTrendThreshold) trendingTrader.addToPotentialMarkets(market);
             else if(adx<adxTrendThreshold) sideWaysTrader.addToPotentialMarkets(market);
         }
-
-        executeStrategy();
     }
+
 
 
 
@@ -69,8 +79,7 @@ public class Decider {
     private void executeStrategy(){
         sideWaysTrader.executeStrategy();
         trendingTrader.executeStrategy();
-//        sideWaysTrader.clearAllTempMarkets();
-//        trendingTrader.clearAllTempMarkets();
+
 
     }
 

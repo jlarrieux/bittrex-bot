@@ -94,8 +94,11 @@ public class OrderManager {
         double unitPrice = getSellPrice(currency);
         if (quantity>0){
             Order order = orderAdapater.sell(currency,quantity,unitPrice);//getOrder( client.sell(currency,quantity,unitPrice))  ord;
-            log.info(String.format("TRUE_SELL \tcurrency: %s\tquantity: %f\tunitPrice: %f", currency, quantity,unitPrice));
-            if(order!= null) pendingSellOrderTracker.put(order.getOrderUuid(), order);
+            log.info(String.format("\n\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\nTRUE_SELL \tcurrency: %s\tquantity: %f\tunitPrice: %f\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n\n", currency, quantity,unitPrice));
+            if(order!= null){
+                pendingSellOrderTracker.put(order.getOrderUuid(), order);
+                positionManager.remove(currency);
+            }
         }
 
 
@@ -122,7 +125,7 @@ public class OrderManager {
     private String actualBuying(String marketName, double quantity, double unitPrice){
         if(quantity==-1) quantity= buyIncrement/unitPrice;
         StringBuilder uuid = null;
-        log.info(String.format("TRUE_BUY \tmarketname: %s\tquantity: %f\tunitPrice: %f", marketName, quantity,unitPrice));
+        log.info(String.format("\n\n\n!!!!!!!!!!!!!!!!!!!!!!!!\n\nTRUE_BUY \tmarketname: %s\tquantity: %f\tunitPrice: %f\n!!!!!!!!!!!!!!!!!!!!!\n\n\n", marketName, quantity,unitPrice));
         Order order = orderAdapater.buy(marketName,quantity,unitPrice);
         if(order!=null){
             uuid = new StringBuilder();
@@ -224,7 +227,7 @@ public class OrderManager {
             double diff = localOrder.getQuantity() - localOrder.getQuantityRemaining();
             localOrder.setQuantity(remote.getQuantityRemaining());
             if(localOrder.getType()== Order.orderType.LIMIT_SELL);
-            Position p = new Position(diff, localOrder.getLimit(), marketSummaryAdapter.getMarketCurrency(localOrder.getMarketName()));
+            Position p = new Position(diff, localOrder.getLimit(), marketSummaryAdapter.getMarketCurrencyShort(localOrder.getMarketName()));
             positionManager.add(p);
     }
 
@@ -243,8 +246,11 @@ public class OrderManager {
 
     private Position createPositionFromOrder( Order localOrder){
         Position p = null;
-        String s = marketSummaryAdapter.getMarketCurrency(localOrder.getMarketName());
-        if(s!=null) p = new Position(localOrder, s);
+        StringBuilder shortCurrency =new StringBuilder( marketSummaryAdapter.getMarketCurrencyShort(localOrder.getMarketName()));
+        StringBuilder longCurrency = new StringBuilder(marketSummaryAdapter.getMarketCurrencyLong(localOrder.getMarketName()));
+        if(shortCurrency!=null && longCurrency!=null){
+            p = new Position(localOrder, shortCurrency.toString(), longCurrency.toString());
+        }
 
         return  p;
 
