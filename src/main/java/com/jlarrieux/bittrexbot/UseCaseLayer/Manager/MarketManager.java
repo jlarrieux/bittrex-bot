@@ -12,12 +12,12 @@ import com.jlarrieux.bittrexbot.UseCaseLayer.Decider;
 import com.jlarrieux.bittrexbot.Util.Constants;
 import com.jlarrieux.bittrexbot.Util.JsonParserUtil;
 import lombok.Getter;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 
-@Log
+@Log4j2
 @Component
 @Getter
 public class MarketManager {
@@ -65,7 +65,7 @@ public class MarketManager {
         String firstKey = (String) marketBooks.keySet().toArray()[0];
         Market first = marketBooks.get(firstKey);
 
-        if(first.getNumberOfPoints()==Constants.DATA_WINDOW) decider.evaluate(marketBooks);
+g        if(first.getNumberOfPoints()==Constants.DATA_WINDOW) decider.evaluate(marketBooks);
     }
 
 
