@@ -5,6 +5,7 @@ import com.jlarrieux.bittrexbot.Util.Constants;
 import com.jlarrieux.bittrexbot.simulation.DAO.IDBExchangeDAO;
 import com.jlarrieux.bittrexbot.simulation.TO.BalanceTO;
 import com.jlarrieux.bittrexbot.simulation.TO.BuyTO;
+import com.jlarrieux.bittrexbot.simulation.TO.OrderTO;
 import com.jlarrieux.bittrexbot.simulation.TO.SellTO;
 import lombok.Data;
 import lombok.extern.java.Log;
@@ -120,7 +121,7 @@ public class SimulatorExchange  implements ExchangeInterface{
         SellTO  sellTO= dbExchangeDAO.sell(generateUUID(),marketName, quantity, price);
         if(sellTO!=null) {
             availableBalance += quantity*price;
-            return new Response(dbExchangeDAO.sell(generateUUID(), marketName, quantity, price));
+            return new Response(sellTO);
         }
         return null;
     }
@@ -132,7 +133,8 @@ public class SimulatorExchange  implements ExchangeInterface{
 
     @Override
     public Response getOrder(String uuid) {
-        return new Response(dbExchangeDAO.getOrder(uuid));
+        OrderTO orderTO = dbExchangeDAO.getOrder(uuid);
+        return new Response(orderTO);
     }
 
     private String generateUUID(){//TODO use enum on orderType

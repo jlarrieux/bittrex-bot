@@ -89,18 +89,31 @@ public class OrderManager {
         }
     }
 
-    public void initiateSell(String currency){
-        double quantity = positionManager.getQuantityOwn(currency);
-        double unitPrice = getSellPrice(currency);
-        if (quantity>0){
-            Order order = orderAdapater.sell(currency,quantity,unitPrice);//getOrder( client.sell(currency,quantity,unitPrice))  ord;
-            log.info(String.format("\n\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\nTRUE_SELL \tcurrency: %s\tquantity: %f\tunitPrice: %f\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n\n", currency, quantity,unitPrice));
-            if(order!= null){
-                pendingSellOrderTracker.put(order.getOrderUuid(), order);
-                positionManager.remove(currency);
-            }
-        }
+    public String initiateSell(String marketName, String currency){
 
+
+        marketOrderBookAdapater.executeMarketOrderBook(marketName);
+        double quantity = positionManager.getQuantityOwn(currency);
+        double unitPrice = marketOrderBookAdapater.getFirstSellPrice();
+        StringBuilder uuid = new StringBuilder();
+        uuid.append( actualSell(marketName,quantity,unitPrice));
+        if(uuid.toString().length()>0) positionManager.remove(currency);
+        return uuid.toString();
+    }
+
+
+    public String actualSell(String marketName, double quantity, double unitPrice){
+        StringBuilder uuid = null;
+        Order order = orderAdapater.sell(marketName, quantity, unitPrice);
+        log.info(String.format("\n\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\nTRUE_SELL \tcurrency: %s\tquantity: %f\tunitPrice: %f\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n\n", marketName, quantity,unitPrice));
+        if(order!=null){
+            uuid = new StringBuilder();
+            pendingSellOrderTracker.put(order.getOrderUuid(), order);
+            uuid.append(order.getOrderUuid());
+        }
+        StringBuilder builder = new StringBuilder();
+        if(uuid!=null) builder.append(uuid.toString());
+        return builder.toString();
 
     }
 
@@ -158,8 +171,8 @@ public class OrderManager {
 
 
     private double getSellPrice(String marketName){
-
-        return 0;
+        marketOrderBookAdapater.executeMarketOrderBook(marketName);
+        return marketOrderBookAdapater.getFirstBuyPrice();
     }
 
     @Scheduled(fixedRate = 1500)
@@ -200,11 +213,12 @@ public class OrderManager {
             Order remote = orderAdapater.getOrder(localOrder.getOrderUuid());
             if(!remote.getIsOpen() && ! remote.getCancelIniated()){
                 positionManager.remove(key);
-                pendingSellOrderTracker.remove(key);
+
             }
             else if(cancelBecauseOfTimeTooOld(remote.getOpened())){
                 if(partialUpdateHasOccurred(localOrder, remote)) updateForPartialExecution(localOrder,remote);
                 orderAdapater.cancelOrder(remote.getOrderUuid());
+                positionManager.add(createPositionFromOrder(remote));
             }
             else if (partialUpdateHasOccurred(localOrder,remote)) updateForPartialExecution(localOrder,remote);//todo implement negative update
 

@@ -82,7 +82,7 @@ public class SideWaysTrader  extends AbstractTrader{
 
     @Override
     public void evaluateSell(Market market) {
-        if(okToSell(market))     orderManager.initiateSell(market.getMarketName());
+        if(okToSell(market))     orderManager.initiateSell(market.getMarketName(), market.getMarketCurrency());
 
     }
 

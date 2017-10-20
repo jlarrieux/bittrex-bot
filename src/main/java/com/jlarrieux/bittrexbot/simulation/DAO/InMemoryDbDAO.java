@@ -74,7 +74,8 @@ public class InMemoryDbDAO extends DBExchangeDAOImpl{
     @Nullable
     @Override
     public OrderTO getOrder(String uuid) {
-        return orderHashMap.get(uuid.toString());
+        OrderTO orderTO = orderHashMap.get(uuid);
+        return orderTO;
     }
 
     @Nullable
