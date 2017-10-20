@@ -20,7 +20,7 @@ public class Constants {
 
 
     public static final String RATE_CapitalFIRST = "Rate";
-    public static final int DATA_WINDOW = 1440;
+    public static final int DATA_WINDOW = 50;
     public static final String BITTREX_BASE_URL="https://bittrex.com/api/v1.1/";
     public static final String BITTREX_BASE_URL2 = "https://bittrex.com/api/v2.0/";
     public static final String ENCRYPTION_ALGORITHM = "HmacSHA512";

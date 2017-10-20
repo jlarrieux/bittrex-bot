@@ -36,6 +36,10 @@ public class PortFolio {
         initialFirstValue = balanceAdapter.getBalance(Constants.BTC.toUpperCase());
     }
 
+    public double getBTCBalance(){
+        return balanceAdapter.getBalance(Constants.BTC.toUpperCase());
+    }
+
     public double getCurrentPortFolioValue(){
         total=balanceAdapter.getBalance(Constants.BTC.toUpperCase());
         buildPositionBooks();
@@ -71,7 +75,7 @@ public class PortFolio {
     }
 
     public double profitAndLossPercentage(){
-        return (total-initialFirstValue)/initialFirstValue;
+        return (total-initialFirstValue)*100/initialFirstValue;
     }
 
 

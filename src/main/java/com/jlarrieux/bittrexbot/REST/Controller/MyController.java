@@ -79,8 +79,8 @@ public class MyController {
 
     @GetMapping("/pandl")
     public String getPandL(){
-        return String.format("Current Value: %f<br><br>P and L: %f %%"
-                , portFolio.getCurrentPortFolioValue(), portFolio.profitAndLossPercentage());
+        return String.format("Current Value: %f<br><br>P and L: %f %%<br><br>BTC current amount: %f"
+                , portFolio.getCurrentPortFolioValue(), portFolio.profitAndLossPercentage(), portFolio.getBTCBalance());
     }
 
 

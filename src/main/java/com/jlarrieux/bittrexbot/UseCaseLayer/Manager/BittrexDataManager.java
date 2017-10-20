@@ -49,7 +49,7 @@ public class BittrexDataManager {
 //        long totalTime = System.nanoTime() - startTime;
 
 
-//        numberOfExecution++;
+        numberOfExecution++;
 //        if (numberOfExecution == 1) {
 //            lowestExecutionTimeRecorded = totalTime;
 //        }
@@ -59,7 +59,7 @@ public class BittrexDataManager {
 //
 //        log.info("Time elapsed for Current Execution BittrexDatamanger: " +
 //                String.format("%dms",TimeUnit.NANOSECONDS.toMillis(totalTime)));
-//        log.info("Number of Execution: " + numberOfExecution);
+        log.info("Number of Execution: " + numberOfExecution);
 //        log.info("Highest Execution time: " + TimeUnit.NANOSECONDS.toMillis(highestExecutiontimeRecorded));
 //        log.info("Shortest Execution time: " + TimeUnit.NANOSECONDS.toMillis(lowestExecutionTimeRecorded));
 //        log.info("Average Execution time: " + TimeUnit.NANOSECONDS.toMillis(totalTimeOfExecution/numberOfExecution));
