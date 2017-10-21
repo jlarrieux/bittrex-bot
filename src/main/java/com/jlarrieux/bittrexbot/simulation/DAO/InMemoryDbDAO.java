@@ -43,8 +43,7 @@ public class InMemoryDbDAO extends DBExchangeDAOImpl{
     @Override
     public SellTO sell(String uuid, String marketName, double quantity, double price) {
 
-        updateAvailalbeBalance(quantity, price);
-        popOrder(uuid);
+        addOrder(createOrderTO(uuid, marketName, quantity, price));
 
         SellTO sellTO = new SellTO();
         SellTO.Result result = sellTO.createResult();
