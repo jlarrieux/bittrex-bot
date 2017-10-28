@@ -2,10 +2,8 @@ package com.jlarrieux.bittrexbot.Properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.stereotype.Component;
 
 @Data
 @Configuration
@@ -14,6 +12,7 @@ import org.springframework.stereotype.Component;
 public class SimulationProperties {
 
     private boolean startFromRecentDate;
+    private boolean useBorderDates;
     private String jdbcDriver;
     private String connection_url;
     private String user;
@@ -24,4 +23,6 @@ public class SimulationProperties {
     private double coinQuantity;
     private String dateFormatter;
     private String timeFormatter;
+    private String startDate;
+    private String endDate;
 }
