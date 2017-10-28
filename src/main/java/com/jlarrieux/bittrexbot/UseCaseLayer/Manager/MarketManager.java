@@ -49,14 +49,14 @@ public class MarketManager {
 //        log.info(String.valueOf(marketBooks.size()));
    //     if(marketBooks.size()==0)    getDataFromServer();
 
-        log.info("Inside: " + getClass().getSimpleName() +"\t Method: " + "addMarkets(JsonArray)" );
+        //log.info("Inside: " + getClass().getSimpleName() +"\t Method: " + "addMarkets(JsonArray)" );
         iterate(array);
 
 
     }
 
     private void iterate(JsonArray array){
-        log.info("Inside: " + getClass().getSimpleName() +"\t Method: " + "iterate(JsonArray)" );
+        //log.info("Inside: " + getClass().getSimpleName() +"\t Method: " + "iterate(JsonArray)" );
         for(int i=0; i<array.size(); i++){
             marketBooks.add(array, i);
             /*log.info(i+"- Inside: " + getClass().getSimpleName() +"\t Method: " + "iterate(JsonArray) in for loop! Curency is: " +
@@ -65,7 +65,7 @@ public class MarketManager {
         String firstKey = (String) marketBooks.keySet().toArray()[0];
         Market first = marketBooks.get(firstKey);
 
-g        if(first.getNumberOfPoints()==Constants.DATA_WINDOW) decider.evaluate(marketBooks);
+        if(first.getNumberOfPoints()==Constants.DATA_WINDOW) decider.evaluate(marketBooks);
     }
 
 

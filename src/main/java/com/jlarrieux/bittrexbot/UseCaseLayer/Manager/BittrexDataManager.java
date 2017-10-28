@@ -2,6 +2,7 @@ package com.jlarrieux.bittrexbot.UseCaseLayer.Manager;
 
 
 import com.jlarrieux.bittrexbot.UseCaseLayer.Adapter.MarketSummaryAdapter;
+import com.jlarrieux.bittrexbot.UseCaseLayer.PortFolio;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -24,6 +25,9 @@ public class BittrexDataManager {
     @Autowired
     private MarketManager marketManager;
 
+    @Autowired
+    private PortFolio portFolio;
+
     private final String GET_MARKET_SUMMARIES_LOG_DIVIDER = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" +
             "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
 
@@ -45,10 +49,10 @@ public class BittrexDataManager {
 
         long startTime = System.nanoTime();
 
-        log.(GET_MARKET_SUMMARIES_LOG_DIVIDER);
-        log.debug("Inside: " + getClass().getSimpleName() +"\t Method: " + "getMarketSummaries()");
+        log.debug(GET_MARKET_SUMMARIES_LOG_DIVIDER);
+        //log.debug("Inside: " + getClass().getSimpleName() +"\t Method: " + "getMarketSummaries()");
 
-        marketManager.addMarkets(marketSummaryAdapter.getMarketSummaries("BTC-CLUB"));
+        marketManager.addMarkets(marketSummaryAdapter.getMarketSummaries());
 
         long totalTime = System.nanoTime() - startTime;
 
@@ -70,6 +74,9 @@ public class BittrexDataManager {
         log.debug("Highest Execution time: " + TimeUnit.NANOSECONDS.toMillis(highestExecutiontimeRecorded));
         log.debug("Shortest Execution time: " + TimeUnit.NANOSECONDS.toMillis(lowestExecutionTimeRecorded));
         log.debug("Average Execution time: " + TimeUnit.NANOSECONDS.toMillis(totalTimeOfExecution/numberOfExecution));
+        log.debug(
+        String.format("Current Value: %f<br><br>P and L: %f %%<br><br>BTC current amount: %f"
+                , portFolio.getCurrentPortFolioValue(), portFolio.profitAndLossPercentage(), portFolio.getBTCBalance()));
     }
 
 
