@@ -7,13 +7,20 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
+
+import static com.jlarrieux.bittrexbot.simulation.SimulationConstants.*;
 
 @Log4j2
 @Component
@@ -31,39 +38,15 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     private DateTimeFormatter dtfDate;
     private DateTimeFormatter dtfTime;
 
+    private final String START_HOUR_MINUTE ="00:00:01.0";
+    private final String END_HOUR_MINUTE = "23:59:59.9" ;
+
     private DBConnectionPool dbConnectionPool;
-
-    private final String GET_MARKET_SUMMARIES_MARKET_NAME =
-            "select  * from my_data inner join market on my_data.market_id = " +
-            "market.id where my_data.date_create = ?" +
-            "AND market.market_name = ? limit 0,1";
-
-    private final String GET_MARKET_SUMMARIES = "select  * from my_data inner join market"
-            + " on my_data.market_id=market.id where my_data.date_create= ? limit 0,199";
-
-    private final String GET_ORDER_BOOK = "select my_data.last from my_data inner join "
-            + "market on my_data.market_id=market.id where my_data.date_create = ? " +
-            "AND market.market_name= ? limit 0, 1";
-
-    private final String GET_ORDER = "select * from orders_sim where uuid = ?";
-
-    private final String GET_MARKET_SUMMARY = "select * from my_data inner join "
-            + "market on my_data.market_id=market.id where my_data.date_create= ? "
-            + "AND market.market_name= ? limit 0, 1";
-
-    private final String GET_DATE_STACK = "select distinct date_create from " +
-            "my_data order by date_create";
-
-    private final String INSERT_ORDER = "Insert into orders_sim values (?,?,?,?,?,?,?,?)";
 
     @Autowired
     public DBExchangeDAOImpl(DBConnectionPool dbConnectionPool, SimulationProperties simulationProperties) {
 
         log.info("Creating DBExchangeDAO...");
-
-        this.simulationProperties = simulationProperties;
-
-        boolean startFromMostRecentDate = simulationProperties.isStartFromRecentDate();
 
         this.dbConnectionPool = dbConnectionPool;
 
@@ -74,7 +57,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
 
         long startTime = System.nanoTime();
 
-        dateStack = getDateStack(startFromMostRecentDate);
+        dateStack = getDateStack();
 
         long totalTime = System.nanoTime() - startTime;
 
@@ -111,8 +94,8 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
 
             resultSet = preparedStatment.executeQuery();
 
-            log.debug("Inside: " + getClass().getSimpleName() +"\t Method: getMarketSummary()" +
-                    "\t Date & Time currently in process: " + dateCurrentlyInProcess );
+            /*log.debug("Inside: " + getClass().getSimpleName() +"\t Method: getMarketSummary()" +
+                    "\t Date & Time currently in process: " + dateCurrentlyInProcess );*/
 
             while (resultSet.next()) {
 
@@ -142,72 +125,51 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
 
     @Override
     public MarketSummariesTO getMarketSummaries() {
-        MarketSummariesTO marketSummariesTO = new MarketSummariesTO();
-        Connection connect = null;
-        PreparedStatement prepStatement = null;
-        ResultSet resultSet = null;
-        try {
-            connect = getConnection();
-
-            prepStatement = connect.prepareStatement(GET_MARKET_SUMMARIES);
-            prepStatement.setString(1,getNextDateFromDateStack());
-            resultSet = prepStatement.executeQuery();
-
-            log.debug("Inside: " + getClass().getSimpleName() +"\t Method: getMarketSummaries()" +
-                    "\n Date & Time currently in process: " + dateCurrentlyInProcess );
-
-            while (resultSet.next()) {
-                MarketSummariesTO.Summary  summary = new MarketSummariesTO().createSummary();
-                summary.setAsk(resultSet.getDouble("ask"));
-                summary.setBid(resultSet.getDouble("bid"));
-                summary.setHigh((resultSet.getDouble("high")));
-                summary.setLast(resultSet.getDouble("last"));
-                summary.setLow(resultSet.getDouble("low"));
-                summary.setOpenBuyOrders(resultSet.getInt("open_buy_orders"));
-                summary.setOpenSellOrders(resultSet.getInt("open_sell_orders"));
-                summary.setVolume(resultSet.getDouble("volume"));
-                summary.setMarketName(resultSet.getString("market_name"));
-
-                MarketSummariesTO.Market market = new MarketSummariesTO().createMarket();
-                market.setBaseCurrency(resultSet.getString("base_currency"));
-                market.setMarketName(resultSet.getString("market_name"));
-                market.setMinTradeSize(resultSet.getDouble("min_trade_size"));
-                market.setIsActive(resultSet.getBoolean("is_active"));
-                market.setMarketCurrency(resultSet.getString("market_currency"));
-                market.setCreated(resultSet.getString("date_create"));
-
-                MarketSummariesTO.Result result = new MarketSummariesTO().createResult();
-                result.setSummary(summary);
-                result.setMarket(market);
-                result.setIsVerified(false);
-
-                marketSummariesTO.getResult().add(result);
-            }
-        } catch (Exception e) {
-             e.printStackTrace();
-        } finally {
-            close(resultSet, prepStatement, connect);
-        }
+        MarketSummariesTO marketSummariesTO = getMarketSummariesForSpecificMarkets(null);
         return marketSummariesTO;
     }
 
     @Override
-    public MarketSummariesTO getMarketSummaries(String marketName) {
+    public MarketSummariesTO getMarketSummaries(List<String> marketNames) {
+        MarketSummariesTO marketSummariesTO = getMarketSummariesForSpecificMarkets(marketNames);
+        return marketSummariesTO;
+    }
+
+    /**
+     *
+     * Method takes a list of markets and returns associated marketSummaries. If not markets
+     * are provided, method will revert to default and retrieve marketSummaries for all markets
+     *
+     * @param markets
+     * @return MarketSummariesTO
+     */
+    private MarketSummariesTO getMarketSummariesForSpecificMarkets(List<String> markets) {
         MarketSummariesTO marketSummariesTO = new MarketSummariesTO();
         Connection connect = null;
         PreparedStatement prepStatement = null;
         ResultSet resultSet = null;
+
         try {
             connect = getConnection();
+            markets = markets == null ? new ArrayList<>():markets;
+            String queryString = createMarketSummariesQuery(markets.size());
 
-            prepStatement = connect.prepareStatement(GET_MARKET_SUMMARIES_MARKET_NAME);
+            prepStatement = connect.prepareStatement(queryString);
             prepStatement.setString(1,getNextDateFromDateStack());
-            prepStatement.setString(2,marketName);
+
+            if (markets != null && markets.size() > 0) {
+                for(int i =1; i <= markets.size();i++) {
+                    prepStatement.setString(i+1, markets.get(i-1));
+                }
+            }
 
             resultSet = prepStatement.executeQuery();
 
-            log.debug("Inside: " + getClass().getSimpleName() +"\t Method: getMarketSummaries("+marketName+")" +
-                    "\n Date & Time currently in process: " + dateCurrentlyInProcess );
+            //todo find a better way to get the list of markets
+            String marketSize = markets.size() == 0 ? "" : Integer.toString(markets.size());
+            log.debug("Inside: " + getClass().getSimpleName()
+                    +"\t Method: getMarketSummaries(" + marketSize +")");
+            log.debug("Date & Time currently in process: " + dateCurrentlyInProcess );
 
             while (resultSet.next()) {
                 MarketSummariesTO.Summary  summary = new MarketSummariesTO().createSummary();
@@ -317,7 +279,7 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         SellTO sellTO = null;
-        updateAvailalbeBalance(quantity, price);
+//        updateAvailalbeBalance(quantity, price); // todo remove comment
 
         try {
             connect = getConnection();
@@ -420,8 +382,8 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     }
 
     private String getNextDateFromDateStack(){
-        dateCurrentlyInProcess = (String) dateStack.peek();
-        return (String) dateStack.pop();
+        dateCurrentlyInProcess = (String) dateStack.pop();
+        return dateCurrentlyInProcess ;
     }
 
     private String getDateInQuestion(){
@@ -429,18 +391,24 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     }
 
 
-    private Stack getDateStack(boolean startFromMostRecentDate)  {
+    private Stack getDateStack()  {
         Stack resultStack = new Stack();
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         try {
-
-            String dateOrder = startFromMostRecentDate ? "asc" : "desc";
-
             connection = getConnection();
 
-            preparedStatement = connection.prepareStatement(GET_DATE_STACK + " " + dateOrder);
+            if (!simulationProperties.isUseBorderDates()) {
+                preparedStatement = connection.prepareStatement(GET_DATE_STACK );
+            } else {
+                String startDate = simulationProperties.getStartDate() + " " + START_HOUR_MINUTE;
+                String endDate = simulationProperties.getEndDate() + " " + END_HOUR_MINUTE;
+                preparedStatement = connection.prepareStatement(GET_DATE_STACK_PER_DATES);
+                preparedStatement.setString(1, startDate);
+                preparedStatement.setString(2, endDate);
+            }
+
 
             resultSet = preparedStatement.executeQuery();
 
@@ -478,14 +446,29 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         return connect;
     }
 
+    private static String createMarketSummariesQuery(int length) {
+        String str = GET_MARKET_SUMMARIES;
+
+        if (length > 0) {
+            StringBuilder stringBuilder = new StringBuilder(GET_MARKET_SUMMARIES_MARKET_NAME_FOR_SPECIFIC_MARKETS);
+            for(int i = 0; i < length; i++) {
+                stringBuilder.append("?");
+                if(i != length-1){
+                    stringBuilder.append(",");
+                }
+            }
+            stringBuilder.append(")");
+            str = stringBuilder.toString();
+        }
+
+        return str;
+    }
+
     protected void populateInstances(DBConnectionPool dbConnectionPool, SimulationProperties simulationProperties) {
         this.dbConnectionPool = dbConnectionPool;
         this.simulationProperties = simulationProperties;
     }
-    protected void updateAvailalbeBalance(double quantity, double price) {
+   /* protected void updateAvailalbeBalance(double quantity, double price) {
         availableBalance += quantity*price;
-    }
-
-
+    }*/ //todo remove comments
 }
-

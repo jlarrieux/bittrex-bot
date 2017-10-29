@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.StringTokenizer;
 import java.util.UUID;
 
 
@@ -62,8 +64,20 @@ public class SimulatorExchange  implements ExchangeInterface{
     }
 
     @Override
-    public Response getMarketSummaries(String marName) {
-        return new Response(dbExchangeDAO.getMarketSummaries(marName));
+    public Response getMarketSummaries(String marketNames) {
+        Response response = null;
+        if (marketNames == "" || marketNames == null) {
+            response = getMarketSummaries();
+
+        } else{
+            StringTokenizer tokenizer = new StringTokenizer(marketNames,",");
+            ArrayList<String> marketList = new ArrayList<>();
+            while (tokenizer.hasMoreTokens()) {
+                marketList.add(tokenizer.nextToken());
+            }
+            response = new Response(dbExchangeDAO.getMarketSummaries(marketList));
+        }
+        return response;
     }
 
 

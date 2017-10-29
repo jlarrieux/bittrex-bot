@@ -2,22 +2,54 @@ package com.jlarrieux.bittrexbot.simulation;
 
 
 
-import com.jlarrieux.bittrexbot.simulation.DAO.DBExchangeDAOImpl;
-import com.mchange.v2.c3p0.ComboPooledDataSource;
 import lombok.Data;
 import lombok.extern.java.Log;
 
-import java.sql.Connection;
-
+import java.util.StringTokenizer;
 
 
 @Log
 @Data
 public class TestSimulation {
 
+    public static final String GET_MARKET_SUMMARIES_MARKET_NAME_FOR_SPECIFIC_MARKETS =
+            "select  * from my_data inner join market on my_data.market_id = " +
+                    "market.id where my_data.date_create = ? " +
+                    "AND market.market_name in (";
+
+    public static final String GET_MARKET_SUMMARIES = "select  * from my_data inner join market"
+            + " on my_data.market_id=market.id where my_data.date_create= ? limit 0,199";
+
+    private static String createQuery(int length) {
+        String str = GET_MARKET_SUMMARIES;
+
+        if (length > 0) {
+            StringBuilder stringBuilder = new StringBuilder(GET_MARKET_SUMMARIES_MARKET_NAME_FOR_SPECIFIC_MARKETS);
+            for(int i = 0; i < length; i++) {
+                stringBuilder.append("?");
+                if(i != length-1){
+                    stringBuilder.append(",");
+                }
+            }
+            stringBuilder.append(")");
+            str = stringBuilder.toString();
+        }
+
+        return str;
+    }
+
     public static void main(String[] args) {
 
-        log.info("Creating connection Pool...");
+        String market = "BTC-1st,BTC-2st,BTC-3st,BTC-4st";
+        StringTokenizer tokenizer = new StringTokenizer(market,",");
+//        while(tokenizer.hasMoreElements())
+        System.out.println("Token count: " + tokenizer.countTokens());
+        //System.out.println("Token: " + tokenizer.nextToken());
+        System.out.println("Dynamic Query: " + createQuery(tokenizer.countTokens()));
+
+
+
+        /*log.info("Creating connection Pool...");
         ComboPooledDataSource cpds = new ComboPooledDataSource();
         try {
             cpds.setDriverClass("com.mysql.jdbc.Driver");
@@ -32,11 +64,11 @@ public class TestSimulation {
             dbExchangeDAO.printOutStack();
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
 
 
         //todo put good control to check connection is successful before after configuration
-        log.info("Connection pool Configured!");
+        //log.info("Connection pool Configured!");
        /*
         JSON Conversion
         MarketSummariesTO responseTO = new MarketSummariesTO();

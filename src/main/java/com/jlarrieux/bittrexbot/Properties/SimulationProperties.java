@@ -11,8 +11,7 @@ import org.springframework.context.annotation.PropertySource;
 @ConfigurationProperties(prefix = "simulation")
 public class SimulationProperties {
 
-    private boolean startFromRecentDate;
-    private boolean useBorderDates;
+   private boolean useBorderDates;
     private String jdbcDriver;
     private String connection_url;
     private String user;
@@ -25,4 +24,5 @@ public class SimulationProperties {
     private String timeFormatter;
     private String startDate;
     private String endDate;
+    private String marketNames;
 }
