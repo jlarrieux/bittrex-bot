@@ -106,7 +106,7 @@ public class ADX {
 
 
     private double updateFirstLayerItem(double previous,  DescriptiveStatistics holder){
-//        log.info(String.format("holder q to string: %s", Constants.getListAsString(Arrays.stream(holder.getValues()).boxed().collect(Collectors.toList()))));
+//        log.info(String.format("holder q to string: %s", SimulationConstants.getListAsString(Arrays.stream(holder.getValues()).boxed().collect(Collectors.toList()))));
         double result;
         if(previous==-1 || Double.isNaN(previous)){
             result = holder.getSum();
@@ -128,7 +128,7 @@ public class ADX {
         currentADX = IndicatorUtil.calculateATR(DXqueue, previousADX);
 //        if(counter>period)
 //        log.info(String.format("~~~(%s)calculating adx: %f\t previousAdx: %f\t counter: %d\nDIdiff: %f\t DIsum: %f\tDIminus: %f\t DIplus: %f\nDMplusPeriod: %f\t DMminusPeriod: %f\ttrPeriod: %f\tpreviousTrPeriod: %f\nDmMinus: %f\t DMplus: %f\nWith dx q: %s\n\n"
-//                ,marketName, currentADX, previousADX, counter, DIdifference,DIsum,DIminus,DIplus,DMplusPeriod,DMminusPeriod,trPeriod, previousTrPeriod, DMminus, DMplus,     Constants.getListAsString(Arrays.stream(DXqueue.getValues()).boxed().collect(Collectors.toList()))));
+//                ,marketName, currentADX, previousADX, counter, DIdifference,DIsum,DIminus,DIplus,DMplusPeriod,DMminusPeriod,trPeriod, previousTrPeriod, DMminus, DMplus,     SimulationConstants.getListAsString(Arrays.stream(DXqueue.getValues()).boxed().collect(Collectors.toList()))));
         previousADX = currentADX;
 
     }

@@ -1,6 +1,7 @@
 package com.jlarrieux.bittrexbot.UseCaseLayer.Manager;
 
 
+import com.jlarrieux.bittrexbot.Properties.SimulationProperties;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Adapter.MarketSummaryAdapter;
 import com.jlarrieux.bittrexbot.UseCaseLayer.PortFolio;
 import lombok.extern.log4j.Log4j2;
@@ -28,6 +29,9 @@ public class BittrexDataManager {
     @Autowired
     private PortFolio portFolio;
 
+    @Autowired
+    SimulationProperties simulationProperties;
+
     private final String GET_MARKET_SUMMARIES_LOG_DIVIDER = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" +
             "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
 
@@ -52,8 +56,8 @@ public class BittrexDataManager {
         log.debug(GET_MARKET_SUMMARIES_LOG_DIVIDER);
         //log.debug("Inside: " + getClass().getSimpleName() +"\t Method: " + "getMarketSummaries()");
 
-        marketManager.addMarkets(marketSummaryAdapter.getMarketSummaries());
-
+        String marketNames =simulationProperties.getMarketNames();
+        marketManager.addMarkets(marketSummaryAdapter.getMarketSummaries(marketNames));
         long totalTime = System.nanoTime() - startTime;
 
         numberOfExecution++;
@@ -63,20 +67,18 @@ public class BittrexDataManager {
         }
 
         totalTimeOfExecution = totalTime + totalTimeOfExecution;
-
         highestExecutiontimeRecorded = highestExecutiontimeRecorded < totalTime ? totalTime:highestExecutiontimeRecorded;
-
         lowestExecutionTimeRecorded = lowestExecutionTimeRecorded > totalTime ? totalTime:lowestExecutionTimeRecorded;
 
         log.debug("Time elapsed for Current Execution BittrexDatamanger: " +
                 String.format("%dms",TimeUnit.NANOSECONDS.toMillis(totalTime)));
         log.debug("Number of Execution: " + numberOfExecution);
-        log.debug("Highest Execution time: " + TimeUnit.NANOSECONDS.toMillis(highestExecutiontimeRecorded));
+        log.debug("Longest Execution time: " + TimeUnit.NANOSECONDS.toMillis(highestExecutiontimeRecorded));
         log.debug("Shortest Execution time: " + TimeUnit.NANOSECONDS.toMillis(lowestExecutionTimeRecorded));
         log.debug("Average Execution time: " + TimeUnit.NANOSECONDS.toMillis(totalTimeOfExecution/numberOfExecution));
-        log.debug(
+        /*log.debug(
         String.format("Current Value: %f<br><br>P and L: %f %%<br><br>BTC current amount: %f"
-                , portFolio.getCurrentPortFolioValue(), portFolio.profitAndLossPercentage(), portFolio.getBTCBalance()));
+                , portFolio.getCurrentPortFolioValue(), portFolio.profitAndLossPercentage(), portFolio.getBTCBalance()));*/
     }
 
 
