@@ -11,10 +11,10 @@ import com.jlarrieux.bittrexbot.Properties.TradingProperties;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Adapter.MarketOrderBookAdapater;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Adapter.MarketSummaryAdapter;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Adapter.OrderAdapater;
+import com.jlarrieux.bittrexbot.Util.Analytics;
 import lombok.Data;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Clock;
@@ -35,6 +35,9 @@ public class OrderManager {
     private double buyIncrement;
     private int orderTimeOutInMinutes;
     private MarketSummaryAdapter marketSummaryAdapter;
+
+    @Autowired
+    private Analytics analytics;
 
 
     MarketOrderBookAdapater marketOrderBookAdapater;
@@ -111,6 +114,10 @@ public class OrderManager {
             pendingSellOrderTracker.put(order.getOrderUuid(), order);
             uuid.append(order.getOrderUuid());
         }
+
+        checkPendingOrders();//todo Simulation only! needs to be removed for production run
+        analytics.addTransaction(Analytics.OrderType.SELL,marketName, quantity, unitPrice);
+
         StringBuilder builder = new StringBuilder();
         if(uuid!=null) builder.append(uuid.toString());
         return builder.toString();
@@ -138,13 +145,19 @@ public class OrderManager {
     private String actualBuying(String marketName, double quantity, double unitPrice){
         if(quantity==-1) quantity= buyIncrement/unitPrice;
         StringBuilder uuid = null;
-        log.info(String.format("\n\n\n!!!!!!!!!!!!!!!!!!!!!!!!\n\nTRUE_BUY \tmarketname: %s\tquantity: %f\tunitPrice: %f\n!!!!!!!!!!!!!!!!!!!!!\n\n\n", marketName, quantity,unitPrice));
+        log.info(String.format("\n\n\n!!!!!!!!!!!!!!!!!!!!!!!!\n\n" +
+                "TRUE_BUY \tmarketname: %s\tquantity: %f\tunitPrice: %f\n!!!!!!!!!!!!!!!!!!!!!\n\n\n",
+                marketName, quantity,unitPrice));
         Order order = orderAdapater.buy(marketName,quantity,unitPrice);
         if(order!=null){
             uuid = new StringBuilder();
             pendingBuyOrderTracker.put(order.getOrderUuid(), order);
             uuid.append(order.getOrderUuid());
         }
+
+        checkPendingOrders();//todo Simulation only! needs to be removed for production run
+        analytics.addTransaction(Analytics.OrderType.BUY,marketName, quantity, unitPrice);
+
         StringBuilder builder = new StringBuilder();
         if(uuid!=null) builder.append(uuid.toString());
         return builder.toString();
@@ -175,7 +188,7 @@ public class OrderManager {
         return marketOrderBookAdapater.getFirstBuyPrice();
     }
 
-    @Scheduled(fixedRate = 1500)
+    //@Scheduled(fixedRate = 1500) -- should be bring back on when running in prod
     public void checkPendingOrders(){
         decideOnPendingBuyOrders();
         decideOnPendingSellOrders();

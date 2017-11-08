@@ -25,4 +25,5 @@ public class SimulationProperties {
     private String startDate;
     private String endDate;
     private String marketNames;
+    private double simlatorExchangeUserAvaialbleBalance;
 }

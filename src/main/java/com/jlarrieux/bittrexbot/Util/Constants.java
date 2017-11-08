@@ -67,6 +67,7 @@ public class Constants {
     public static final String EXCHANGE = "Exchange";
     public static final String QUANTITY = "Quantity";
     public static final String AVAILABLE = "Available";
+
     private static final String JLARRIEUX_BITTREX_BASE_ADDRES ="http://bittrex.jlarrieux.com";
     public static final String BITTREX_JLARRIEUX_COM_MARKET_ID = JLARRIEUX_BITTREX_BASE_ADDRES+ "/market?id=";
     public static final String BITTREX_JLARRIEUX_COUNT = JLARRIEUX_BITTREX_BASE_ADDRES+"/count";
@@ -119,6 +120,8 @@ public class Constants {
     public static final String SELL = "sell";
 
 
+    public static final String GET_MARKET_SUMMARIES_LOG_DIVIDER = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" +
+            "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
 
     public static String upperCaseFirst(String value){
         char[] array = value.toCharArray();

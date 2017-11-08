@@ -22,6 +22,8 @@ import java.util.concurrent.TimeUnit;
 
 import static com.jlarrieux.bittrexbot.simulation.SimulationConstants.*;
 
+//todo Add code to prevent system for erroring out after date stack have been depleted
+
 @Log4j2
 @Component
 public class DBExchangeDAOImpl implements IDBExchangeDAO {
