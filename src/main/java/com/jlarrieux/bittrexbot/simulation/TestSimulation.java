@@ -5,8 +5,6 @@ package com.jlarrieux.bittrexbot.simulation;
 import lombok.Data;
 import lombok.extern.java.Log;
 
-import java.util.StringTokenizer;
-
 
 @Log
 @Data
@@ -40,12 +38,25 @@ public class TestSimulation {
 
     public static void main(String[] args) {
 
-        String market = "BTC-1st,BTC-2st,BTC-3st,BTC-4st";
+      /*  String market = "BTC-1st,BTC-2st,BTC-3st,BTC-4st";
         StringTokenizer tokenizer = new StringTokenizer(market,",");
 //        while(tokenizer.hasMoreElements())
         System.out.println("Token count: " + tokenizer.countTokens());
         //System.out.println("Token: " + tokenizer.nextToken());
-        System.out.println("Dynamic Query: " + createQuery(tokenizer.countTokens()));
+        System.out.println("Dynamic Query: " + createQuery(tokenizer.countTokens()));*/
+
+        /*StringBuilder strBuiler = new StringBuilder();
+        strBuiler.append("*************************************************\n");
+        Date date = new Date();
+        strBuiler.append(date.toString());
+        strBuiler.append("\t\t\t\t\t*");
+        strBuiler.append("\n*************************************************\n");*/
+
+        double currentPortFolioValue = 175;
+        double previousPortFolioValue = 175;
+        double value = 0.0;
+        value  = ((currentPortFolioValue - previousPortFolioValue)/previousPortFolioValue) * 100;
+        System.out.println("Value: " + value);
 
 
 

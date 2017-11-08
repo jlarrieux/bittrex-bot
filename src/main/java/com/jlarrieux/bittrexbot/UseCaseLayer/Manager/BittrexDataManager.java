@@ -4,6 +4,7 @@ package com.jlarrieux.bittrexbot.UseCaseLayer.Manager;
 import com.jlarrieux.bittrexbot.Properties.SimulationProperties;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Adapter.MarketSummaryAdapter;
 import com.jlarrieux.bittrexbot.UseCaseLayer.PortFolio;
+import com.jlarrieux.bittrexbot.Util.Constants;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -32,9 +33,6 @@ public class BittrexDataManager {
     @Autowired
     SimulationProperties simulationProperties;
 
-    private final String GET_MARKET_SUMMARIES_LOG_DIVIDER = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" +
-            "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
-
     private static long numberOfExecution;
     private static long totalTimeOfExecution;
     private static long lowestExecutionTimeRecorded;
@@ -53,7 +51,7 @@ public class BittrexDataManager {
 
         long startTime = System.nanoTime();
 
-        log.debug(GET_MARKET_SUMMARIES_LOG_DIVIDER);
+        log.debug(Constants.GET_MARKET_SUMMARIES_LOG_DIVIDER);
         //log.debug("Inside: " + getClass().getSimpleName() +"\t Method: " + "getMarketSummaries()");
 
         String marketNames =simulationProperties.getMarketNames();
