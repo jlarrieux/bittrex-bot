@@ -92,23 +92,23 @@ public class OrderManager {
         }
     }
 
-    public String initiateSell(String marketName, String currency){
+    public String initiateSell(Market market, String currency){
 
 
-        marketOrderBookAdapater.executeMarketOrderBook(marketName);
+        marketOrderBookAdapater.executeMarketOrderBook(market.getMarketName());
         double quantity = positionManager.getQuantityOwn(currency);
         double unitPrice = marketOrderBookAdapater.getFirstSellPrice();
         StringBuilder uuid = new StringBuilder();
-        uuid.append( actualSell(marketName,quantity,unitPrice));
+        uuid.append( actualSell(market,quantity,unitPrice));
         if(uuid.toString().length()>0) positionManager.remove(currency);
         return uuid.toString();
     }
 
 
-    public String actualSell(String marketName, double quantity, double unitPrice){
+    public String actualSell(Market market, double quantity, double unitPrice){
         StringBuilder uuid = null;
-        Order order = orderAdapater.sell(marketName, quantity, unitPrice);
-        log.info(String.format("\n\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\nTRUE_SELL \tcurrency: %s\tquantity: %f\tunitPrice: %f\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n\n", marketName, quantity,unitPrice));
+        Order order = orderAdapater.sell(market.getMarketName(), quantity, unitPrice);
+        log.info(String.format("\n\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\nTRUE_SELL \tcurrency: %s\tquantity: %f\tunitPrice: %f\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n\n", market.getMarketName(), quantity,unitPrice));
         if(order!=null){
             uuid = new StringBuilder();
             pendingSellOrderTracker.put(order.getOrderUuid(), order);
@@ -116,7 +116,7 @@ public class OrderManager {
         }
 
         checkPendingOrders();//todo Simulation only! needs to be removed for production run
-        analytics.addTransaction(Analytics.OrderType.SELL,marketName, quantity, unitPrice);
+        analytics.addTransaction(Analytics.OrderType.SELL, market, quantity, unitPrice);
 
         StringBuilder builder = new StringBuilder();
         if(uuid!=null) builder.append(uuid.toString());
@@ -124,25 +124,26 @@ public class OrderManager {
 
     }
 
-    public String initiateBuy(String marketName){
-        marketOrderBookAdapater.executeMarketOrderBook(marketName);
+    public String initiateBuy(Market market){
+        marketOrderBookAdapater.executeMarketOrderBook(market.getMarketName());
         double unitPrice = marketOrderBookAdapater.getFirstBuyPrice();
         double quantity = marketOrderBookAdapater.getFirstBuyQuantity();
         double fallBackQuantity = buyIncrement/unitPrice;
         if(fallBackQuantity< quantity) quantity = fallBackQuantity;
-        return actualBuying(marketName, quantity,unitPrice);
+        return actualBuying(market, quantity,unitPrice);
 
     }
 
 
 
 
-    public String initiateBuy(String marketName,double quantity, double price){
+    public String initiateBuy(Market market,double quantity, double price){
 //        log.info(String.format("Initiate buy: "));
-        return actualBuying(marketName,quantity, price);
+        return actualBuying(market,quantity, price);
     }
 
-    private String actualBuying(String marketName, double quantity, double unitPrice){
+    private String actualBuying(Market market, double quantity, double unitPrice){
+        String marketName = market.getMarketName();
         if(quantity==-1) quantity= buyIncrement/unitPrice;
         StringBuilder uuid = null;
         log.info(String.format("\n\n\n!!!!!!!!!!!!!!!!!!!!!!!!\n\n" +
@@ -156,7 +157,7 @@ public class OrderManager {
         }
 
         checkPendingOrders();//todo Simulation only! needs to be removed for production run
-        analytics.addTransaction(Analytics.OrderType.BUY,marketName, quantity, unitPrice);
+        analytics.addTransaction(Analytics.OrderType.BUY, market, quantity, unitPrice);
 
         StringBuilder builder = new StringBuilder();
         if(uuid!=null) builder.append(uuid.toString());

@@ -334,6 +334,11 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         return orderTO;
     }
 
+    @Override
+    public String getDateCurrentlyInProcess(){
+        return getDateInQuestion();
+    }
+
     private void insertOrder(String uuid, String marketName, double quantity,
                              double price, String orderType, PreparedStatement preparedStmt,
                              Connection connect ) throws SQLException {

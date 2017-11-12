@@ -2,6 +2,7 @@ package com.jlarrieux.bittrexbot.REST;
 
 
 import com.jlarrieux.bittrexbot.Properties.SimulationProperties;
+import com.jlarrieux.bittrexbot.Util.Analytics;
 import com.jlarrieux.bittrexbot.Util.Constants;
 import com.jlarrieux.bittrexbot.simulation.DAO.IDBExchangeDAO;
 import com.jlarrieux.bittrexbot.simulation.TO.BalanceTO;
@@ -34,12 +35,14 @@ public class SimulatorExchange  implements ExchangeInterface{
     @Autowired
     private SimulationProperties simulationProperties;
 
+    private Analytics analytics;
 
     private double availableBalance;
 
     @Autowired
-    public SimulatorExchange(SimulationProperties simulationProperties){
+    public SimulatorExchange(SimulationProperties simulationProperties, Analytics analytics){
         availableBalance = simulationProperties.getSimlatorExchangeUserAvaialbleBalance();
+        this.analytics = analytics;
     }
 
     @Override
@@ -65,6 +68,7 @@ public class SimulatorExchange  implements ExchangeInterface{
 
     @Override
     public Response getMarketSummaries() {
+        analytics.setDateInProcess(dbExchangeDAO.getDateCurrentlyInProcess());
         return new Response(dbExchangeDAO.getMarketSummaries());
     }
 
@@ -80,6 +84,7 @@ public class SimulatorExchange  implements ExchangeInterface{
             while (tokenizer.hasMoreTokens()) {
                 marketList.add(tokenizer.nextToken());
             }
+            analytics.setDateInProcess(dbExchangeDAO.getDateCurrentlyInProcess());
             response = new Response(dbExchangeDAO.getMarketSummaries(marketList));
         }
         return response;

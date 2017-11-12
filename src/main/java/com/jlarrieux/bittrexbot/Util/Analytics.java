@@ -1,8 +1,9 @@
 package com.jlarrieux.bittrexbot.Util;
 
+import com.jlarrieux.bittrexbot.Entity.Market;
 import com.jlarrieux.bittrexbot.Entity.Positions;
 import com.jlarrieux.bittrexbot.Properties.SimulationProperties;
-import com.jlarrieux.bittrexbot.UseCaseLayer.Manager.OrderManager;
+import com.jlarrieux.bittrexbot.UseCaseLayer.Manager.BittrexDataManager;
 import com.jlarrieux.bittrexbot.UseCaseLayer.PortFolio;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
@@ -32,25 +33,38 @@ public class Analytics {
     private double currentPandL, previousPandL;
     private double currentBTCBalance, previousBTCBalance;
 
+    private String dateInProcess;
+
     private static Analytics analytics;
+
+    private BittrexDataManager btxM;
 
     public enum OrderType{
         BUY,SELL
     }
 
     @Autowired
-    private Analytics(PortFolio portFolio, SimulationProperties simulationProperties,
-                      OrderManager orderManager) {
-        this.portFolio = portFolio;
+    private Analytics(SimulationProperties simulationProperties, BittrexDataManager bittrexDataManager) {
+        this.btxM = bittrexDataManager;
+        this.portFolio = bittrexDataManager.getPortFolio();
         properties = simulationProperties;
         log.info(createStartOfLogOuput());
     }
 
+    public void setProcessingDate(String dateStr) {
+        this.dateInProcess = dateStr;
+    }
+
+    public String getProcessingDate() {
+        return dateInProcess;
+    }
+
     public void addTransaction(OrderType orderType,
-                               String marketName,
+                               Market market,
                                double quantity,
                                double unitPrice) {
 
+        portFolio = btxM.getPortFolio();
         double total = unitPrice * quantity;
         if (invocationCounter > 0) {
             previousPortFolioValue = currentPortFolioValue;
@@ -60,28 +74,35 @@ public class Analytics {
         String transactionType = orderType == OrderType.BUY ? "BUY" : "SELL";
         invocationCounter++;
         log.info(GET_MARKET_SUMMARIES_LOG_DIVIDER);
-        log.info("Transaction Number: " + invocationCounter);
+        log.info("Transaction Number: " + invocationCounter
+                + " Date: " + getDateInProcess());
         log.info("Transaction Type: " + transactionType);
-        log.info("MarketName: " + marketName
+        log.info("MarketName: " + market.getMarketName()
                 + ". Quantity: " + quantity
                 + ". UnitPrice: " + unitPrice
                 + ". Total: " + unitPrice * quantity);
+        log.info("ADX Value: " + market.getAdxValue());
+        log.info("Bollinger H: " + market.getBollingerHigh()
+                + ". Bollinger M: " + market.getBollingerMid()
+                + ". Bollinger L: " + market.getBollingerLow());
         log.info("Current Value: \t" + currentPortFolioValue);
         log.info("P and L: \t" + portFolio.profitAndLossPercentage());
         log.info("BTC Current Amount: \t" + portFolio.getBTCBalance());
         log.info("Fluctuation Percentage from Last Transaction: "+fluctuationPercentage);
+        log.info("\n" + getPositionsString().toString());
+        //log.info("RSI: \n" + market.getRsi());
+        log.info("KELTNER CHANNELS: \n" +market.getKeltnerChannels().toString() + "\n");
+    }
 
-
+    private StringBuilder getPositionsString() {
         StringBuilder b = new StringBuilder();
         b.append("\n");
         Positions positions = portFolio.getPositionManager().getPositionBooks();
         Set<String> list = positions.keySet();
         for(String s: list){
-            b.append(positions.get(s).toString()+"\n");
+            b.append(positions.get(s).toString() + "\n");
         }
-        log.info(b.toString());
-
-
+        return b;
     }
 
     private double calculateFluctuationPercentage(double previousPortFolioValue, double currentPortFolioValue){

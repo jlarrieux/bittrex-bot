@@ -42,7 +42,7 @@ public class TrendingTrader extends AbstractTrader {
 
     @Override
     public void evaluateBuy(Market market) {
-        if(okToBuy(market)) orderManager.initiateBuy(market.getMarketName());
+        if(okToBuy(market)) orderManager.initiateBuy(market);
     }
 
 
@@ -60,7 +60,7 @@ public class TrendingTrader extends AbstractTrader {
 
     @Override
     public void evaluateSell(Market market) {
-        if(okToSell(market)) orderManager.initiateSell(market.getMarketName(), market.getMarketCurrency());
+        if(okToSell(market)) orderManager.initiateSell(market, market.getMarketCurrency());
 
     }
 

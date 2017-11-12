@@ -80,6 +80,9 @@ public class BittrexDataManager {
     }
 
 
+    public PortFolio getPortFolio(){
+        return portFolio;
+    }
 
 
 
