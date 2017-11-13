@@ -1,9 +1,17 @@
 package com.jlarrieux.bittrexbot.simulation;
 
 
-
+import com.jlarrieux.bittrexbot.Util.Analytics;
 import lombok.Data;
 import lombok.extern.java.Log;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 
 @Log
@@ -52,12 +60,42 @@ public class TestSimulation {
         strBuiler.append("\t\t\t\t\t*");
         strBuiler.append("\n*************************************************\n");*/
 
-        double currentPortFolioValue = 175;
+
+/*double currentPortFolioValue = 175;
         double previousPortFolioValue = 175;
         double value = 0.0;
         value  = ((currentPortFolioValue - previousPortFolioValue)/previousPortFolioValue) * 100;
-        System.out.println("Value: " + value);
+        System.out.println("Value: " + value);*/
 
+        long timeInMilis = System.currentTimeMillis();
+         DateTimeFormatter dtfDate = null;
+         DateTimeFormatter dtfTime = null;
+        dtfDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        dtfTime = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+        LocalDateTime localDateTime =
+                LocalDateTime.ofInstant(Instant.ofEpochMilli(timeInMilis), ZoneId.systemDefault());
+        String datePortionOfTime = dtfDate.format(localDateTime);
+        String timePortionOfTime = dtfTime.format(localDateTime);
+        System.out.println(localDateTime.toString());
+        System.out.println(datePortionOfTime);
+        System.out.println(timePortionOfTime);
+        System.out.println(Analytics.OrderType.BUY.toString());
+
+
+        String myDate = "2017-08-15 07:54:15.0";
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = null;
+        try {
+            date = sdf.parse(myDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        long millis = date.getTime();
+        System.out.println("Last Conversion: " + millis);
+        localDateTime =
+                LocalDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneId.systemDefault());
+        System.out.println(localDateTime.toString());
 
 
         /*log.info("Creating connection Pool...");

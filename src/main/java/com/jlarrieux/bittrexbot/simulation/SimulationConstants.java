@@ -33,4 +33,7 @@ public class SimulationConstants {
             "date_create >= ? AND date_create <= ? order by date_create DESC";
 
     public static final String INSERT_ORDER = "Insert into orders_sim values (?,?,?,?,?,?,?,?)";
+
+    public static final String INSERT_ANLYTICS_TRNS =
+            "Insert into analytics value (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 }

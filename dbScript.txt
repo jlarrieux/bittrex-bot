@@ -15,3 +15,28 @@ CREATE TABLE `orders_sim` (
 
 #Index Script
 create index date_create_index on my_data (date_create)
+
+#create table analytics
+CREATE TABLE `analytics` (
+  `market_name` varchar(20) DEFAULT NULL,
+  `bolinger_h` double DEFAULT NULL,
+  `bolinger_m` double DEFAULT NULL,
+  `bolinger_l` double DEFAULT NULL,
+  `adx` double DEFAULT NULL,
+  `p_n_l` double DEFAULT NULL,
+  `portfolio_current_value` double DEFAULT NULL,
+  `portfolio_previous_value` double DEFAULT NULL,
+  `btc_current_amount` double DEFAULT NULL,
+  `fluctuation_percent` double DEFAULT NULL,
+  `transaction_count` int(11) NOT NULL,
+  `transaction_type` varchar(10) DEFAULT NULL,
+  `quantity` double DEFAULT NULL,
+  `unit_price` double DEFAULT NULL,
+  `transaction_total_price` double DEFAULT NULL,
+  `transaction_datetime` datetime DEFAULT NULL,
+  `transaction_date` varchar(10) DEFAULT NULL,
+  `transaction_time` varchar(10) DEFAULT NULL,
+  `time_process_started` varchar(30) DEFAULT NULL,
+  `time_transaction_processed` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`transaction_count`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='	';

@@ -7,15 +7,15 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
@@ -52,14 +52,16 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
 
         this.dbConnectionPool = dbConnectionPool;
 
-        dtfDate = DateTimeFormatter.ofPattern(simulationProperties.getDateFormatter());
-        dtfTime = DateTimeFormatter.ofPattern(simulationProperties.getTimeFormatter());
+        this.simulationProperties = simulationProperties;
+
+        dtfDate = DateTimeFormatter.ofPattern(this.simulationProperties.getDateFormatter());
+        dtfTime = DateTimeFormatter.ofPattern(this.simulationProperties.getTimeFormatter());
 
         log.info("Retrieving DateStack...");
 
         long startTime = System.nanoTime();
 
-        dateStack = getDateStack();
+        dateStack = fillOutDateStack();
 
         long totalTime = System.nanoTime() - startTime;
 
@@ -339,6 +341,71 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
         return getDateInQuestion();
     }
 
+    @Override
+    public void logAnalyticsTransaction(AnalyticsTransaction aTrnsx) {
+        if (aTrnsx != null) {
+
+            try {
+
+                /******************************/
+                Timestamp dateInProcessTimestamp = convertToSqlTStamp(aTrnsx.getDateInProcess());
+                LocalDateTime localDateTime = dateInProcessTimestamp.toLocalDateTime();
+                String datePortionOfTime = dtfDate.format(localDateTime);
+                String timePortionOfTime = dtfTime.format(localDateTime);
+                /***********************************************/
+
+                Connection connect = getConnection();
+
+                PreparedStatement preparedStmt = connect.prepareStatement(INSERT_ANLYTICS_TRNS);
+
+                preparedStmt.setString(1, aTrnsx.getMarketName());
+                preparedStmt.setDouble(2, aTrnsx.getBollingerHigh());
+                preparedStmt.setDouble(3, aTrnsx.getBollingerMid());
+                preparedStmt.setDouble(4, aTrnsx.getBollingerLow());
+                preparedStmt.setDouble(5, aTrnsx.getAdxValue());
+                preparedStmt.setDouble(6, aTrnsx.getProfitNLossPercentage());
+                preparedStmt.setDouble(7, aTrnsx.getCurrentPortFolioValue());
+                preparedStmt.setDouble(8, aTrnsx.getPreviousPortFolioValue());
+                preparedStmt.setDouble(9, aTrnsx.getBtcBalance());
+                preparedStmt.setDouble(10, aTrnsx.getFluctuationPercentage());
+                preparedStmt.setInt(11, aTrnsx.getInvocationCounter());
+                preparedStmt.setString(12, aTrnsx.getTransactionType().toString());
+                preparedStmt.setDouble(13, aTrnsx.getQuantity());
+                preparedStmt.setDouble(14, aTrnsx.getUnitPrice());
+                preparedStmt.setDouble(15, aTrnsx.getTransactionTotal());
+                preparedStmt.setTimestamp(16, dateInProcessTimestamp);
+                preparedStmt.setString(17, datePortionOfTime);
+                preparedStmt.setString(18, timePortionOfTime);
+                preparedStmt.setString(19, convertMilisToStringTime(aTrnsx.getTimeProcessStarted()));
+                preparedStmt.setString(20, convertMilisToStringTime(aTrnsx.getTimeTransactionIsProcessed()));
+                preparedStmt.execute();
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+    private String convertMilisToStringTime(long time) {//todo Add null check. Add method to util
+        LocalDateTime localDateTime =
+                LocalDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.systemDefault());
+        return localDateTime.toString();
+    }
+
+    private Timestamp convertToSqlTStamp(String timeStr) {//todo add method to util
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = null;
+        try {
+            date = sdf.parse(timeStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        long millis = date.getTime();
+
+        return new java.sql.Timestamp(millis);
+
+    }
     private void insertOrder(String uuid, String marketName, double quantity,
                              double price, String orderType, PreparedStatement preparedStmt,
                              Connection connect ) throws SQLException {
@@ -398,7 +465,9 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     }
 
 
-    private Stack getDateStack()  {
+
+
+    private Stack fillOutDateStack()  {
         Stack resultStack = new Stack();
         Connection connection = null;
         PreparedStatement preparedStatement = null;

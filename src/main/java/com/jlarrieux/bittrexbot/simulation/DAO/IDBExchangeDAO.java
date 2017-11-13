@@ -14,5 +14,6 @@ public interface IDBExchangeDAO {
     public SellTO sell(String uuid, String marketName, double quantity, double price);
     public OrderTO getOrder(String uuid);
     public BalanceTO getBalance(String currency);
+    public void logAnalyticsTransaction(AnalyticsTransaction aTrnx);
 
 }

@@ -11,7 +11,8 @@ import org.springframework.context.annotation.PropertySource;
 @ConfigurationProperties(prefix = "simulation")
 public class SimulationProperties {
 
-   private boolean useBorderDates;
+    private boolean useBorderDates;
+    private boolean trxnDbLog;
     private String jdbcDriver;
     private String connection_url;
     private String user;

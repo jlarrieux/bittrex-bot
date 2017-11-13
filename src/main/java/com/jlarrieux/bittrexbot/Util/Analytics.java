@@ -5,9 +5,12 @@ import com.jlarrieux.bittrexbot.Entity.Positions;
 import com.jlarrieux.bittrexbot.Properties.SimulationProperties;
 import com.jlarrieux.bittrexbot.UseCaseLayer.Manager.BittrexDataManager;
 import com.jlarrieux.bittrexbot.UseCaseLayer.PortFolio;
+import com.jlarrieux.bittrexbot.simulation.DAO.IDBExchangeDAO;
+import com.jlarrieux.bittrexbot.simulation.TO.AnalyticsTransaction;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -33,11 +36,18 @@ public class Analytics {
     private double currentPandL, previousPandL;
     private double currentBTCBalance, previousBTCBalance;
 
+    //format: 2017-08-15 07:54:15.0
     private String dateInProcess;
+
+    private long timeProcessStarted;
 
     private static Analytics analytics;
 
-    private BittrexDataManager btxM;
+    private BittrexDataManager bittrexDataManager;
+
+    @Autowired
+    @Qualifier("DBExchangeDAOImpl")
+    private IDBExchangeDAO dbExchangeDAO;
 
     public enum OrderType{
         BUY,SELL
@@ -45,7 +55,7 @@ public class Analytics {
 
     @Autowired
     private Analytics(SimulationProperties simulationProperties, BittrexDataManager bittrexDataManager) {
-        this.btxM = bittrexDataManager;
+        this.bittrexDataManager = bittrexDataManager;
         this.portFolio = bittrexDataManager.getPortFolio();
         properties = simulationProperties;
         log.info(createStartOfLogOuput());
@@ -64,7 +74,7 @@ public class Analytics {
                                double quantity,
                                double unitPrice) {
 
-        portFolio = btxM.getPortFolio();
+        portFolio = bittrexDataManager.getPortFolio();
         double total = unitPrice * quantity;
         if (invocationCounter > 0) {
             previousPortFolioValue = currentPortFolioValue;
@@ -92,6 +102,33 @@ public class Analytics {
         log.info("\n" + getPositionsString().toString());
         //log.info("RSI: \n" + market.getRsi());
         log.info("KELTNER CHANNELS: \n" +market.getKeltnerChannels().toString() + "\n");
+
+        if (properties.isTrxnDbLog()) {
+            AnalyticsTransaction analyticsTransaction =
+                    AnalyticsTransaction.createAnalyticsTransaction(
+                            orderType,
+                            dateInProcess,
+                            timeProcessStarted,
+                            System.currentTimeMillis(),
+                            market.getMarketName(),
+                            getPositionsString().toString(),
+                            market.getKeltnerChannels().toString(),
+                            invocationCounter,
+                            quantity,
+                            unitPrice,
+                            unitPrice*quantity,
+                            market.getAdxValue(),
+                            market.getBollingerHigh(),
+                            market.getBollingerMid(),
+                            market.getBollingerLow(),
+                            currentPortFolioValue,
+                            previousPortFolioValue,
+                            portFolio.profitAndLossPercentage(),
+                            portFolio.getBTCBalance(),
+                            fluctuationPercentage
+                    );
+            logTransactionInDb(analyticsTransaction);
+        }
     }
 
     private StringBuilder getPositionsString() {
@@ -121,12 +158,14 @@ public class Analytics {
         StringBuilder strBuiler = new StringBuilder();
         strBuiler.append("START OF ANALYTICS LOG\n*************************************************\n");
         Date date = new Date();
-        strBuiler.append(date.toString());
+        timeProcessStarted = date.getTime();
+        strBuiler.append(date);
         strBuiler.append("\t\t\t\t\t*");
         strBuiler.append("\n*************************************************\n");
         return strBuiler.toString();
     }
 
-
-
+    private void logTransactionInDb(AnalyticsTransaction analyticsTransaction){
+        dbExchangeDAO.logAnalyticsTransaction(analyticsTransaction);
+    }
 }
