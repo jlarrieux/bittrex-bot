@@ -99,8 +99,8 @@ public class Analytics {
         log.info("P and L: \t" + portFolio.profitAndLossPercentage());
         log.info("BTC Current Amount: \t" + portFolio.getBTCBalance());
         log.info("Fluctuation Percentage from Last Transaction: "+fluctuationPercentage);
-        log.info("\n" + getPositionsString().toString());
-        //log.info("RSI: \n" + market.getRsi());
+        log.info("Positions ------>\n" + getPositionsString().toString());
+        log.info("RSI: " + market.getCurrentRSI());
         log.info("KELTNER CHANNELS: \n" +market.getKeltnerChannels().toString() + "\n");
 
         if (properties.isTrxnDbLog()) {
@@ -125,7 +125,8 @@ public class Analytics {
                             previousPortFolioValue,
                             portFolio.profitAndLossPercentage(),
                             portFolio.getBTCBalance(),
-                            fluctuationPercentage
+                            fluctuationPercentage,
+                            market.getCurrentRSI()
                     );
             logTransactionInDb(analyticsTransaction);
         }

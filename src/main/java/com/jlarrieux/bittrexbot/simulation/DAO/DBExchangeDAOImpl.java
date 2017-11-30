@@ -345,6 +345,8 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
     public void logAnalyticsTransaction(AnalyticsTransaction aTrnsx) {
         if (aTrnsx != null) {
 
+            Connection connect = null;
+            PreparedStatement preparedStmt = null;
             try {
 
                 /******************************/
@@ -354,9 +356,9 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
                 String timePortionOfTime = dtfTime.format(localDateTime);
                 /***********************************************/
 
-                Connection connect = getConnection();
+                connect = getConnection();
 
-                PreparedStatement preparedStmt = connect.prepareStatement(INSERT_ANLYTICS_TRNS);
+                preparedStmt = connect.prepareStatement(INSERT_ANLYTICS_TRNS);
 
                 preparedStmt.setString(1, aTrnsx.getMarketName());
                 preparedStmt.setDouble(2, aTrnsx.getBollingerHigh());
@@ -378,10 +380,14 @@ public class DBExchangeDAOImpl implements IDBExchangeDAO {
                 preparedStmt.setString(18, timePortionOfTime);
                 preparedStmt.setString(19, convertMilisToStringTime(aTrnsx.getTimeProcessStarted()));
                 preparedStmt.setString(20, convertMilisToStringTime(aTrnsx.getTimeTransactionIsProcessed()));
+                preparedStmt.setDouble(21, aTrnsx.getRsiValue());
                 preparedStmt.execute();
 
             } catch (SQLException e) {
                 e.printStackTrace();
+            }
+            finally {
+                close(null, preparedStmt, connect);
             }
 
         }

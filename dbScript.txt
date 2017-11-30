@@ -37,6 +37,10 @@ CREATE TABLE `analytics` (
   `transaction_date` varchar(10) DEFAULT NULL,
   `transaction_time` varchar(10) DEFAULT NULL,
   `time_process_started` varchar(30) DEFAULT NULL,
-  `time_transaction_processed` varchar(30) DEFAULT NULL,
-  PRIMARY KEY (`transaction_count`)
+  `time_transaction_processed` varchar(30) NOT NULL,
+  `rsi_value` double DEFAULT NULL,
+  PRIMARY KEY (`transaction_count`,`time_transaction_processed`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='	';
+
+
+

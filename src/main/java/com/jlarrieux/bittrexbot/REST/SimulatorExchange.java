@@ -75,7 +75,7 @@ public class SimulatorExchange  implements ExchangeInterface{
     @Override
     public Response getMarketSummaries(String marketNames) {
         Response response = null;
-        if (marketNames == "" || marketNames == null) {
+        if ( "".equals(marketNames) || marketNames == null) {
             response = getMarketSummaries();
 
         } else{

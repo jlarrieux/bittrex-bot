@@ -21,6 +21,7 @@ public class AnalyticsTransaction {
     private double profitNLossPercentage;
     private double btcBalance;
     private double fluctuationPercentage;
+    private double rsiValue;
 
 
     public AnalyticsTransaction(){}
@@ -45,7 +46,8 @@ public class AnalyticsTransaction {
             double previousPortFolioValue,
             double profitNLossPercentage,
             double btcBalance,
-            double fluctuationPercentage) {
+            double fluctuationPercentage,
+            double rsiValue) {
 
         AnalyticsTransaction analyticsTrns = new AnalyticsTransaction();
 
@@ -69,6 +71,7 @@ public class AnalyticsTransaction {
         analyticsTrns.setBtcBalance(btcBalance);
         analyticsTrns.setFluctuationPercentage(fluctuationPercentage);
         analyticsTrns.setProfitNLossPercentage(profitNLossPercentage);
+        analyticsTrns.setRsiValue(rsiValue);
 
         return analyticsTrns;
     }
