@@ -69,7 +69,7 @@ public class TrendingTrader extends AbstractTrader {
     @Override
     protected boolean okToSell(Market m) {
         boolean isDownTrend = m.getAdx().getADXDirection()<0;
-        double pAndL = orderManager.getPandL(m);
+        double pAndL = orderManager.getPercentage(m);
         if((isDownTrend && m.isPriceBelowKeltnerLow()) || pAndL<=stopLoss || pAndL>= profitTaking) return true;
         else return false;
     }

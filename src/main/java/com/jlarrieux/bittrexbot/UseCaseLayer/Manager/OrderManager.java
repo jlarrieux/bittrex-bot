@@ -113,10 +113,10 @@ public class OrderManager {
             uuid = new StringBuilder();
             pendingSellOrderTracker.put(order.getOrderUuid(), order);
             uuid.append(order.getOrderUuid());
+            checkPendingOrders();//todo Simulation only! needs to be removed for production run
+            analytics.addTransaction(Analytics.OrderType.SELL, market, quantity, unitPrice);
         }
 
-        checkPendingOrders();//todo Simulation only! needs to be removed for production run
-        analytics.addTransaction(Analytics.OrderType.SELL, market, quantity, unitPrice);
 
         StringBuilder builder = new StringBuilder();
         if(uuid!=null) builder.append(uuid.toString());
@@ -154,10 +154,9 @@ public class OrderManager {
             uuid = new StringBuilder();
             pendingBuyOrderTracker.put(order.getOrderUuid(), order);
             uuid.append(order.getOrderUuid());
+            checkPendingOrders();//todo Simulation only! needs to be removed for production run
+            analytics.addTransaction(Analytics.OrderType.BUY, market, quantity, unitPrice);
         }
-
-        checkPendingOrders();//todo Simulation only! needs to be removed for production run
-        analytics.addTransaction(Analytics.OrderType.BUY, market, quantity, unitPrice);
 
         StringBuilder builder = new StringBuilder();
         if(uuid!=null) builder.append(uuid.toString());
@@ -178,6 +177,17 @@ public class OrderManager {
             double quantity = positionManager.getQuantityOwn(market.getMarketCurrency());
             double currentValueOfQuantity = quantity* market.getLast();
             return currentValueOfQuantity- totalPriceAtBuy;
+        }
+
+        return null;
+    }
+
+    public Double getPercentage(Market market) {
+        if(positionManager.contains(market.getMarketCurrency())){
+            double totalPriceAtBuy = positionManager.getTotalPricePaid(market.getMarketCurrency());
+            double quantity = positionManager.getQuantityOwn(market.getMarketCurrency());
+            double currentValueOfQuantity = quantity* market.getLast();
+            return ((currentValueOfQuantity - totalPriceAtBuy)/totalPriceAtBuy) *100;
         }
 
         return null;
@@ -221,12 +231,12 @@ public class OrderManager {
 
 
     private void decideOnPendingSellOrders(){
-        for (String key: pendingSellOrderTracker.keySet()){
-            Order localOrder = pendingSellOrderTracker.get(key);
+        for (String orderNumber: pendingSellOrderTracker.keySet()){
+            Order localOrder = pendingSellOrderTracker.get(orderNumber);
 
             Order remote = orderAdapater.getOrder(localOrder.getOrderUuid());
             if(!remote.getIsOpen() && ! remote.getCancelIniated()){
-                positionManager.remove(key);
+                positionManager.remove(marketSummaryAdapter.getMarketCurrencyLong(remote.getMarketName()));
 
             }
             else if(cancelBecauseOfTimeTooOld(remote.getOpened())){

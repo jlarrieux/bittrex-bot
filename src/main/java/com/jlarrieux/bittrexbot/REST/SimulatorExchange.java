@@ -138,8 +138,6 @@ public class SimulatorExchange  implements ExchangeInterface{
         }
     }
 
-
-
     @Override
     public Response sell(String marketName, double quantity, double price) {
         SellTO  sellTO= dbExchangeDAO.sell(generateUUID(),marketName, quantity, price);

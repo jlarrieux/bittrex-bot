@@ -27,7 +27,7 @@ public class Analytics {
     private PortFolio portFolio;
     private PortFolio previousPortFolio;
 
-    private int invocationCounter;
+    private int addTransactionInvocationCounter;
 
 
     private SimulationProperties properties;
@@ -76,15 +76,15 @@ public class Analytics {
 
         portFolio = bittrexDataManager.getPortFolio();
         double total = unitPrice * quantity;
-        if (invocationCounter > 0) {
+        if (addTransactionInvocationCounter > 0) {
             previousPortFolioValue = currentPortFolioValue;
         }
         currentPortFolioValue = portFolio.getCurrentPortFolioValue();
         double fluctuationPercentage = calculateFluctuationPercentage(previousPortFolioValue, currentPortFolioValue);
         String transactionType = orderType == OrderType.BUY ? "BUY" : "SELL";
-        invocationCounter++;
+        addTransactionInvocationCounter++;
         log.info(GET_MARKET_SUMMARIES_LOG_DIVIDER);
-        log.info("Transaction Number: " + invocationCounter
+        log.info("Transaction Number: " + addTransactionInvocationCounter
                 + " Date: " + getDateInProcess());
         log.info("Transaction Type: " + transactionType);
         log.info("MarketName: " + market.getMarketName()
@@ -113,7 +113,7 @@ public class Analytics {
                             market.getMarketName(),
                             getPositionsString().toString(),
                             market.getKeltnerChannels().toString(),
-                            invocationCounter,
+                            addTransactionInvocationCounter,
                             quantity,
                             unitPrice,
                             unitPrice*quantity,

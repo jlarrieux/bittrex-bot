@@ -93,8 +93,7 @@ public class SideWaysTrader  extends AbstractTrader{
         double rsi = market.getCurrentRSI();
         double bollingerLow = market.getBollingerLow();
         double currentPrice = market.getLast();
-        double pAndL = orderManager.getPandL(market);
-
+        double pAndL = orderManager.getPercentage(market);
         if( (rsi>= rsiOverBought  && currentPrice>bollingerLow) || pAndL<= stopLoss || pAndL>= profitTaking) return true;
         else     return false;
     }
